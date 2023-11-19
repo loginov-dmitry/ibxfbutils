@@ -1,4 +1,4 @@
-{
+п»ї{
 Copyright (c) 2012-2013, Loginov Dmitry Sergeevich
 All rights reserved.
 
@@ -22,86 +22,99 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 }
-
+          
 { *************************************************************************** }
 {                                                                             }
 {                                                                             }
 {                                                                             }
-{ Модуль fbUtilsPool - содержит пул подключений для библиотеки fbUtils        }
-{ (c) 2012 Логинов Дмитрий Сергеевич                                          }
-{ Последнее обновление: 30.04.2012                                            }
-{ Протестировано на D7, D2007, D2010, D-XE2                                   }
-{ Адрес сайта: http://loginovprojects.ru/                                     }
+{ РњРѕРґСѓР»СЊ fbUtilsPool - СЃРѕРґРµСЂР¶РёС‚ РїСѓР» РїРѕРґРєР»СЋС‡РµРЅРёР№ РґР»СЏ Р±РёР±Р»РёРѕС‚РµРєРё fbUtils        }
+{ (c) 2012 Р›РѕРіРёРЅРѕРІ Р”РјРёС‚СЂРёР№ РЎРµСЂРіРµРµРІРёС‡                                          }
+{ РџРѕСЃР»РµРґРЅРµРµ РѕР±РЅРѕРІР»РµРЅРёРµ: 30.04.2012                                            }
+{ РџСЂРѕС‚РµСЃС‚РёСЂРѕРІР°РЅРѕ РЅР° D7, D2007, D2010, D-XE2                                   }
+{ РђРґСЂРµСЃ СЃР°Р№С‚Р°: http://loginovprojects.ru/                                     }
 { e-mail: loginov_d@inbox.ru                                                  }
 {                                                                             }
 { *************************************************************************** }
+
+{$IFDEF FPC}
+{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
+{$ENDIF}
 
 unit fbUtilsPool;
 
 interface
 
 uses
-  Windows, SysUtils, Classes, SyncObjs, DateUtils, fbUtilsBase, fbSomeFuncs, IBDatabase, IBCustomDataSet,
-  fbTypes, IniFiles;
+{$IFnDEF FPC}
+  Windows,
+{$ELSE}
+  {$IFDEF MSWINDOWS}Windows, {$ENDIF}LCLIntf, LCLType, LMessages,
+{$ENDIF}
+  SysUtils, Classes, SyncObjs, DateUtils, fbUtilsBase, fbSomeFuncs, IBDatabase, IBCustomDataSet,
+  fbTypes, IniFiles, LDSLogger, TimeIntervals;
 
 type
 
   TFBConnectionPool = class(TBaseObject)
   private
-    DBPoolList: TList; // Пул подключений к базе данных
+    DBPoolList: TList; // РџСѓР» РїРѕРґРєР»СЋС‡РµРЅРёР№ Рє Р±Р°Р·Рµ РґР°РЅРЅС‹С…
     DBPoolCS: TCriticalSection;
-    FProfileList: THashedStringList; // Список зарегистрированных профилей
+    FProfileList: THashedStringList; // РЎРїРёСЃРѕРє Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹С… РїСЂРѕС„РёР»РµР№
+    FLastLogTestConnectTime: TDateTime; // Р’СЂРµРјСЏ РїРѕСЃР»РµРґРЅРµРіРѕ Р»РѕРіРёСЂРѕРІР°РЅРёСЏ СЃРєРѕСЂРѕСЃС‚Рё РѕРїРµСЂР°С†РёРё TestConnected
 
     procedure ClearPool;
 
-    {Очищает список профилей}
+    {РћС‡РёС‰Р°РµС‚ СЃРїРёСЃРѕРє РїСЂРѕС„РёР»РµР№}
     procedure ClearConnectionProfiles;
 
-    {Удаляет из пула старые подключения}
+    {РЈРґР°Р»СЏРµС‚ РёР· РїСѓР»Р° СЃС‚Р°СЂС‹Рµ РїРѕРґРєР»СЋС‡РµРЅРёСЏ}
     procedure DeleteOldConnections;
 
-  public { Конструктор и деструктор }
+  public { РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ Рё РґРµСЃС‚СЂСѓРєС‚РѕСЂ }
 
     constructor Create;
     destructor Destroy; override;
 
-  public { Настройка профилей с параметрами подключения к БД }
+  public { РќР°СЃС‚СЂРѕР№РєР° РїСЂРѕС„РёР»РµР№ СЃ РїР°СЂР°РјРµС‚СЂР°РјРё РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р‘Р” }
 
-    {Добавляет новый профиль подключения, т.е. набор параметров которому поставлено
-     в соответствие некоторое имя. Пример вызова:
+    {Р”РѕР±Р°РІР»СЏРµС‚ РЅРѕРІС‹Р№ РїСЂРѕС„РёР»СЊ РїРѕРґРєР»СЋС‡РµРЅРёСЏ, С‚.Рµ. РЅР°Р±РѕСЂ РїР°СЂР°РјРµС‚СЂРѕРІ РєРѕС‚РѕСЂРѕРјСѓ РїРѕСЃС‚Р°РІР»РµРЅРѕ
+     РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ РЅРµРєРѕС‚РѕСЂРѕРµ РёРјСЏ. РџСЂРёРјРµСЂ РІС‹Р·РѕРІР°:
      AddConnectionProfile(FBDefDB, FBDefServer, FBDefPort, 'C:\DB\MyDB.FDB', FBDefUser, FBDefPassword, FBRusCharSet);
-     Вместо FBDefDB можно указывать любое другое имя профиля. }
+     Р’РјРµСЃС‚Рѕ FBDefDB РјРѕР¶РЅРѕ СѓРєР°Р·С‹РІР°С‚СЊ Р»СЋР±РѕРµ РґСЂСѓРіРѕРµ РёРјСЏ РїСЂРѕС„РёР»СЏ. }
     procedure AddConnectionProfile(AProfileName: string; AServerName: string; APort: Integer;
       ADataBase: string; AUserName: string; APassword: string; ACharSet: string);
 
-    {Вызывает метод AddConnectionProfile с профилем FBDefDB}
+    {Р’С‹Р·С‹РІР°РµС‚ РјРµС‚РѕРґ AddConnectionProfile СЃ РїСЂРѕС„РёР»РµРј FBDefDB}
     procedure AddDefaultConnectionProfile(AServerName: string; APort: Integer;
       ADataBase: string; AUserName: string; APassword: string; ACharSet: string);
 
-  public { Подключение к БД и отключение. Работа с пулом. }
+  public { РџРѕРґРєР»СЋС‡РµРЅРёРµ Рє Р‘Р” Рё РѕС‚РєР»СЋС‡РµРЅРёРµ. Р Р°Р±РѕС‚Р° СЃ РїСѓР»РѕРј. }
 
-    {Возвращает подключение, параметры которого ранее были сохранены в профиле AProfileName. Пример:
+    {Р’РѕР·РІСЂР°С‰Р°РµС‚ РїРѕРґРєР»СЋС‡РµРЅРёРµ, РїР°СЂР°РјРµС‚СЂС‹ РєРѕС‚РѕСЂРѕРіРѕ СЂР°РЅРµРµ Р±С‹Р»Рё СЃРѕС…СЂР°РЅРµРЅС‹ РІ РїСЂРѕС„РёР»Рµ AProfileName. РџСЂРёРјРµСЂ:
      FDB := GetConnection('MyDB', ReadTran, WriteTran, trRCRO, trRCRW)
-     2018-08-30 - транзакция для чтения создаётся в любом случае - trRCRO }
+     2018-08-30 - С‚СЂР°РЅР·Р°РєС†РёСЏ РґР»СЏ С‡С‚РµРЅРёСЏ СЃРѕР·РґР°С‘С‚СЃСЏ РІ Р»СЋР±РѕРј СЃР»СѓС‡Р°Рµ - trRCRO }
     function GetConnection(AProfileName: string; ReadTran, WriteTran: PIBTransaction;
-      ReadTranType, WriteTranType: TTransactionType): TIBDatabase; overload;
+      ReadTranType, WriteTranType: TTransactionType; AModuleName: string): TIBDatabase; overload;
 
-    {Возвращает подключение в соответствии с заданными параметрами. Пример:
+    {Р’РѕР·РІСЂР°С‰Р°РµС‚ РїРѕРґРєР»СЋС‡РµРЅРёРµ РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРё СЃ Р·Р°РґР°РЅРЅС‹РјРё РїР°СЂР°РјРµС‚СЂР°РјРё. РџСЂРёРјРµСЂ:
      FDB := GetConnection(FBDefServer, FBDefPort, 'C:\DB\MyDB.FDB', FBDefUser, FBDefPassword,
        FBRusCharSet, ReadTran, WriteTran, trRCRO, trRCRW)}
     function GetConnection(AServerName: string; APort: Integer; ADataBase: string;
       AUserName: string; APassword: string; ACharSet: string; ReadTran, WriteTran: PIBTransaction;
-      ReadTranType, WriteTranType: TTransactionType): TIBDatabase; overload;
+      ReadTranType, WriteTranType: TTransactionType; AModuleName: string): TIBDatabase; overload;
 
-    { Возвращает подключение для базы данных, для которой был настроен профиль FBDefDB
-      Используются типы транзакций: trRCRO и trRCRW }
-    function GetDefaultConnection(ReadTran, WriteTran: PIBTransaction; ReadTranType, WriteTranType: TTransactionType): TIBDatabase;
+    { Р’РѕР·РІСЂР°С‰Р°РµС‚ РїРѕРґРєР»СЋС‡РµРЅРёРµ РґР»СЏ Р±Р°Р·С‹ РґР°РЅРЅС‹С…, РґР»СЏ РєРѕС‚РѕСЂРѕР№ Р±С‹Р» РЅР°СЃС‚СЂРѕРµРЅ РїСЂРѕС„РёР»СЊ FBDefDB
+      РСЃРїРѕР»СЊР·СѓСЋС‚СЃСЏ С‚РёРїС‹ С‚СЂР°РЅР·Р°РєС†РёР№: trRCRO Рё trRCRW }
+    function GetDefaultConnection(ReadTran, WriteTran: PIBTransaction; ReadTranType,
+    WriteTranType: TTransactionType; AModuleName: string): TIBDatabase;
 
-    { Кладет подключение обратно в пул }
+    { РљР»Р°РґРµС‚ РїРѕРґРєР»СЋС‡РµРЅРёРµ РѕР±СЂР°С‚РЅРѕ РІ РїСѓР» }
     procedure ReturnConnection(FDB: TIBDatabase);
 
-    { Возвращает количество подключений в пуле }
+    { Р’РѕР·РІСЂР°С‰Р°РµС‚ РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРґРєР»СЋС‡РµРЅРёР№ РІ РїСѓР»Рµ }
     function GetPoolSize: Integer;
+
+    class procedure FreePool;
   end;
 
 procedure FBPoolAddConnectionProfile(AProfileName: string; AServerName: string; APort: Integer;
@@ -124,7 +137,7 @@ procedure FBPoolReturnConnection(FDB: TIBDatabase; AModuleName: string);
 
 function FBPoolGetSize: Integer;
 
-{$IFDEF FBUTILSDLL} // Замечания по директиве смотрите в модуле fbUtilsBase.pas
+{$IFDEF FBUTILSDLL} // Р—Р°РјРµС‡Р°РЅРёСЏ РїРѕ РґРёСЂРµРєС‚РёРІРµ СЃРјРѕС‚СЂРёС‚Рµ РІ РјРѕРґСѓР»Рµ fbUtilsBase.pas
 exports
   FBPoolAddConnectionProfile name 'ibxFBPoolAddConnectionProfile',
   FBPoolAddDefaultConnectionProfile name 'ibxFBPoolAddDefaultConnectionProfile',
@@ -136,14 +149,20 @@ exports
 {$ENDIF}
 
 resourcestring
-  FBStrProfileNotFound = 'Профиль "%s" с параметрами подключения к БД не найден';
-  FBStrPoolGetConnection = 'Получить подключение из пула';
-  FBStrPoolReturnConnection = 'Вернуть подключение обратно в пул';
+  FBStrProfileNotFound = 'РџСЂРѕС„РёР»СЊ "%s" СЃ РїР°СЂР°РјРµС‚СЂР°РјРё РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р‘Р” РЅРµ РЅР°Р№РґРµРЅ';
+  FBStrPoolGetConnection = 'РџРѕР»СѓС‡РёС‚СЊ РїРѕРґРєР»СЋС‡РµРЅРёРµ РёР· РїСѓР»Р°';
+  FBStrPoolReturnConnection = 'Р’РµСЂРЅСѓС‚СЊ РїРѕРґРєР»СЋС‡РµРЅРёРµ РѕР±СЂР°С‚РЅРѕ РІ РїСѓР»';
+
+var
+  DebugPool: Boolean;  
+
 implementation
 
 var
-  {Пул подключений. Создается в секции initialization}
+  {РџСѓР» РїРѕРґРєР»СЋС‡РµРЅРёР№. РЎРѕР·РґР°РµС‚СЃСЏ РІ СЃРµРєС†РёРё initialization}
   FBPool: TFBConnectionPool;
+
+  ConnectionId: Integer;
 
 procedure FBPoolAddConnectionProfile(AProfileName: string; AServerName: string; APort: Integer;
       ADataBase: string; AUserName: string; APassword: string; ACharSet: string; AModuleName: string);
@@ -158,9 +177,9 @@ begin
 end;
 
 function FBPoolGetConnectionByProfile(AProfileName: string; ReadTran, WriteTran: PIBTransaction;
-  ReadTranType, WriteTranType: TTransactionType; AModuleName: string): TIBDatabase; overload;
+  ReadTranType, WriteTranType: TTransactionType; AModuleName: string): TIBDatabase;
 begin
-  Result := FBPool.GetConnection(AProfileName, ReadTran, WriteTran, ReadTranType, WriteTranType);
+  Result := FBPool.GetConnection(AProfileName, ReadTran, WriteTran, ReadTranType, WriteTranType, AModuleName);
 end;
 
 function FBPoolGetConnectionByParams(AServerName: string; APort: Integer; ADataBase: string;
@@ -168,13 +187,13 @@ function FBPoolGetConnectionByParams(AServerName: string; APort: Integer; ADataB
   ReadTranType, WriteTranType: TTransactionType; AModuleName: string): TIBDatabase;
 begin
   Result := FBPool.GetConnection(AServerName, APort, ADataBase, AUserName, APassword,
-    ACharSet, ReadTran, WriteTran, ReadTranType, WriteTranType);
+    ACharSet, ReadTran, WriteTran, ReadTranType, WriteTranType, AModuleName);
 end;
 
 function FBPoolGetDefaultConnection(ReadTran, WriteTran: PIBTransaction;
   ReadTranType, WriteTranType: TTransactionType; AModuleName: string): TIBDatabase;
 begin
-  Result := FBPool.GetDefaultConnection(ReadTran, WriteTran, ReadTranType, WriteTranType);
+  Result := FBPool.GetDefaultConnection(ReadTran, WriteTran, ReadTranType, WriteTranType, AModuleName);
 end;
 
 procedure FBPoolReturnConnection(FDB: TIBDatabase; AModuleName: string);
@@ -191,124 +210,187 @@ type
 
 { TFBConnectionPool }
 
-  {Профиль, хранящий настройки подключения к базе данных}
+  {РџСЂРѕС„РёР»СЊ, С…СЂР°РЅСЏС‰РёР№ РЅР°СЃС‚СЂРѕР№РєРё РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р±Р°Р·Рµ РґР°РЅРЅС‹С…}
   TConnectionProfile = class
-    cpServerName: string; // Имя сервера, на котором запущена СУБД Firebird (или его IP-адрес)
-    cpPort: Integer;      // Порт, на который настроена СУБД Firebird. По умолчанию = 3050
-    cpDataBase: string;   // Полное имя файла БД (относительно серверного компьютера) или его алиас
-    cpUserName: string;   // Имя пользователя для подключения к БД. По умолчанию =  SYSDBA
-    cpPassword: string;   // Пароль для подключения к БД. По умолчанию =  masterkey
-    cpCharSet: string;    // Кодовая страница, используемая для подключения к БД.
-                          // Рекомендуется указывать ту же самую страницу, с помощью
-                          // которой была создана база данных. Пример: WIN1251
+    cpServerName: string; // РРјСЏ СЃРµСЂРІРµСЂР°, РЅР° РєРѕС‚РѕСЂРѕРј Р·Р°РїСѓС‰РµРЅР° РЎРЈР‘Р” Firebird (РёР»Рё РµРіРѕ IP-Р°РґСЂРµСЃ)
+    cpPort: Integer;      // РџРѕСЂС‚, РЅР° РєРѕС‚РѕСЂС‹Р№ РЅР°СЃС‚СЂРѕРµРЅР° РЎРЈР‘Р” Firebird. РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ = 3050
+    cpDataBase: string;   // РџРѕР»РЅРѕРµ РёРјСЏ С„Р°Р№Р»Р° Р‘Р” (РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ СЃРµСЂРІРµСЂРЅРѕРіРѕ РєРѕРјРїСЊСЋС‚РµСЂР°) РёР»Рё РµРіРѕ Р°Р»РёР°СЃ
+    cpUserName: string;   // РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РґР»СЏ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р‘Р”. РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ =  SYSDBA
+    cpPassword: string;   // РџР°СЂРѕР»СЊ РґР»СЏ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р‘Р”. РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ =  masterkey
+    cpCharSet: string;    // РљРѕРґРѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°, РёСЃРїРѕР»СЊР·СѓРµРјР°СЏ РґР»СЏ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р‘Р”.
+                          // Р РµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ СѓРєР°Р·С‹РІР°С‚СЊ С‚Сѓ Р¶Рµ СЃР°РјСѓСЋ СЃС‚СЂР°РЅРёС†Сѓ, СЃ РїРѕРјРѕС‰СЊСЋ
+                          // РєРѕС‚РѕСЂРѕР№ Р±С‹Р»Р° СЃРѕР·РґР°РЅР° Р±Р°Р·Р° РґР°РЅРЅС‹С…. РџСЂРёРјРµСЂ: WIN1251
   end;
 
-  TDBPool = class
-    dpConnProfile: TConnectionProfile; // Используемый профиль
-    dpUsed: Boolean;                   // Подключение используется
-    dpCloseTime: TDateTime;            // Момент времени, с которого никто не использует данное подключение
-    dpConnect: TIBDatabase;            // Само подключение к базе данных
-    dpReadTran: TIBTransaction;        // Транзакция для чтения
-    dpWriteTran: TIBTransaction;       // Транзакция для записи (и чтения)
+  TDBPoolConnection = class
+    dpConnProfile: TConnectionProfile; // РСЃРїРѕР»СЊР·СѓРµРјС‹Р№ РїСЂРѕС„РёР»СЊ
+    dpUsed: Boolean;                   // РџРѕРґРєР»СЋС‡РµРЅРёРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ
+    dpCloseTime: TDateTime;            // РњРѕРјРµРЅС‚ РІСЂРµРјРµРЅРё, СЃ РєРѕС‚РѕСЂРѕРіРѕ РЅРёРєС‚Рѕ РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚ РґР°РЅРЅРѕРµ РїРѕРґРєР»СЋС‡РµРЅРёРµ
+    dpLastTestTime: TDateTime;         // Р’СЂРµРјСЏ РїРѕСЃР»РµРґРЅРµРіРѕ С‚РµСЃС‚РёСЂРѕРІР°РЅРёСЏ РїРѕРґРєР»СЋС‡РµРЅРёСЏ
+    dpConnect: TIBDatabase;            // РЎР°РјРѕ РїРѕРґРєР»СЋС‡РµРЅРёРµ Рє Р±Р°Р·Рµ РґР°РЅРЅС‹С…
+    dpReadTran: TIBTransaction;        // РўСЂР°РЅР·Р°РєС†РёСЏ РґР»СЏ С‡С‚РµРЅРёСЏ
+    dpWriteTran: TIBTransaction;       // РўСЂР°РЅР·Р°РєС†РёСЏ РґР»СЏ Р·Р°РїРёСЃРё (Рё С‡С‚РµРЅРёСЏ)
   end;
 
 function TFBConnectionPool.GetConnection(AProfileName: string; ReadTran, WriteTran: PIBTransaction;
-  ReadTranType, WriteTranType: TTransactionType): TIBDatabase;
+  ReadTranType, WriteTranType: TTransactionType; AModuleName: string): TIBDatabase;
 var
-  pPool: TDBPool;
+  pPool, pPoolTmp: TDBPoolConnection;
   cp: TConnectionProfile;
   I, Idx: Integer;
+  IsConnected: Boolean;
+  ti: TTimeInterval;
+  sOldRefs: string;
+  NeedTest: Boolean;
 begin
   Result := nil;
   pPool := nil;
-
+  NeedTest := False;
   if WriteTran = nil then
     WriteTranType := trNone;
 
-  ReadTranType := trRCRO; // Транзакцию для чтения создаём в любом случае, она - долгоживущая
+  ReadTranType := trRCRO; // РўСЂР°РЅР·Р°РєС†РёСЋ РґР»СЏ С‡С‚РµРЅРёСЏ СЃРѕР·РґР°С‘Рј РІ Р»СЋР±РѕРј СЃР»СѓС‡Р°Рµ, РѕРЅР° - РґРѕР»РіРѕР¶РёРІСѓС‰Р°СЏ
+
+  if DebugPool then
+    FBLogMsg(Format('Pool GetConnection: Enter (ProfileName=%s)', [AProfileName]), tlpInformation, AModuleName);
 
   try
-    DeleteOldConnections; // Удаляем старые подключения
+    DeleteOldConnections; // РЈРґР°Р»СЏРµРј СЃС‚Р°СЂС‹Рµ РїРѕРґРєР»СЋС‡РµРЅРёСЏ
 
-    DBPoolCS.Enter; // В рамках крит. секции должны выполняться только самые быстрые операции
+    DBPoolCS.Enter; // Р’ СЂР°РјРєР°С… РєСЂРёС‚. СЃРµРєС†РёРё РґРѕР»Р¶РЅС‹ РІС‹РїРѕР»РЅСЏС‚СЊСЃСЏ С‚РѕР»СЊРєРѕ СЃР°РјС‹Рµ Р±С‹СЃС‚СЂС‹Рµ РѕРїРµСЂР°С†РёРё
     try
-      // Отыскиваем параметры подключения для заданного профиля
+      // РћС‚С‹СЃРєРёРІР°РµРј РїР°СЂР°РјРµС‚СЂС‹ РїРѕРґРєР»СЋС‡РµРЅРёСЏ РґР»СЏ Р·Р°РґР°РЅРЅРѕРіРѕ РїСЂРѕС„РёР»СЏ
       Idx := FProfileList.IndexOf(AProfileName);
       if Idx < 0 then
         raise Exception.CreateFmt(FBStrProfileNotFound, [AProfileName]);
       cp := TConnectionProfile(FProfileList.Objects[Idx]);
 
-      // Пробуем найди готовое подключение в пуле
+      // РџСЂРѕР±СѓРµРј РЅР°Р№РґРё РіРѕС‚РѕРІРѕРµ РїРѕРґРєР»СЋС‡РµРЅРёРµ РІ РїСѓР»Рµ
       for I := 0 to DBPoolList.Count - 1 do
       begin
-        pPool := TDBPool(DBPoolList[I]);
+        pPool := TDBPoolConnection(DBPoolList[I]);
 
-        // Если в пуле найден неиспользуемый коннект...
+        // Р•СЃР»Рё РІ РїСѓР»Рµ РЅР°Р№РґРµРЅ РЅРµРёСЃРїРѕР»СЊР·СѓРµРјС‹Р№ РєРѕРЅРЅРµРєС‚...
         if (pPool.dpConnProfile = cp) and (not pPool.dpUsed) then
         begin
           Result := pPool.dpConnect;
-          pPool.dpUsed := True;    // Ставим отметку, что объект используется
+          pPool.dpUsed := True;    // РЎС‚Р°РІРёРј РѕС‚РјРµС‚РєСѓ, С‡С‚Рѕ РѕР±СЉРµРєС‚ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ
+
+          NeedTest := SecondsBetween(Now, pPool.dpLastTestTime) > 10;
           pPool.dpCloseTime := 0;
           Break;
         end;
       end; // for I
 
-      if Result = nil then // Подключение в пуле не было найдено.
+      if Result = nil then // РџРѕРґРєР»СЋС‡РµРЅРёРµ РІ РїСѓР»Рµ РЅРµ Р±С‹Р»Рѕ РЅР°Р№РґРµРЅРѕ.
       begin
-        // Создаем новое подключение
+        // РЎРѕР·РґР°РµРј РЅРѕРІРѕРµ РїРѕРґРєР»СЋС‡РµРЅРёРµ
         Result := FBCreateConnection(cp.cpServerName, cp.cpPort, cp.cpDataBase,
           cp.cpUserName, cp.cpPassword, cp.cpCharSet, trNone, False, nil, '');
-
-        // Добавляем объект в пул подключений
-        pPool := TDBPool.Create;
+        if ConnectionId = MaxInt then
+          ConnectionId := 0;
+        Inc(ConnectionId);
+        Result.Name := Format('PoolDBConn%d', [ConnectionId]);
+        // Р”РѕР±Р°РІР»СЏРµРј РѕР±СЉРµРєС‚ РІ РїСѓР» РїРѕРґРєР»СЋС‡РµРЅРёР№
+        pPool := TDBPoolConnection.Create;
         DBPoolList.Add(pPool);
         pPool.dpConnProfile := cp;
-        pPool.dpUsed := True;      // Ставим отметку, что объект используется
+        pPool.dpUsed := True;      // РЎС‚Р°РІРёРј РѕС‚РјРµС‚РєСѓ, С‡С‚Рѕ РѕР±СЉРµРєС‚ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ
         pPool.dpCloseTime := 0;
         pPool.dpConnect := Result;
+        if Assigned(FBLogMsg) then
+          FBLogMsg(Format('Pool: РЎРѕР·РґР°РЅ РЅРѕРІС‹Р№ РѕР±СЉРµРєС‚ "%s". Р­Р»РµРјРµРЅС‚РѕРІ: %d', [Result.Name, DBPoolList.Count]), tlpInformation, AModuleName);
+        if DebugPool then
+        begin
+          sOldRefs := '';
+          for I := 0 to DBPoolList.Count - 1 do
+          begin
+            pPoolTmp := TDBPoolConnection(DBPoolList[I]);
+            if sOldRefs <> '' then sOldRefs := sOldRefs + ', ';
+            sOldRefs := sOldRefs + '0x' + IntToHex(LPARAM(pPoolTmp.dpConnect), 8);
+          end;
+          FBLogMsg(Format('Pool GetConnection: FDBRefList=%s', [sOldRefs]), tlpInformation, AModuleName);
+        end;
       end;
     finally
       DBPoolCS.Leave;
     end;
 
-    // Выполняем подключение к базе данных
+    // Р’С‹РїРѕР»РЅСЏРµРј РїРѕРґРєР»СЋС‡РµРЅРёРµ Рє Р±Р°Р·Рµ РґР°РЅРЅС‹С…
     if Assigned(Result) then
     begin
-      if not Result.TestConnected then // Если подключение к БД не установлено
+      IsConnected := Result.Connected;
+      if IsConnected and NeedTest then
       begin
-        Result.Connected := False; // На всякий случай
+        ti.Start;
+
+        if DebugPool then
+          FBLogMsg('Pool GetConnection: TestConnected BEGIN...', tlpInformation, AModuleName);
+
+        IsConnected := Result.TestConnected;
+        if IsConnected then
+          pPool.dpLastTestTime := Now;
+
+        if DebugPool then
+          FBLogMsg('Pool GetConnection: TestConnected END...', tlpInformation, AModuleName);
+
+        if Assigned(FBLogMsg) and ((SecondsBetween(Now, FLastLogTestConnectTime) > 10 * 60) or (ti.ElapsedMilliseconds > 1000)) then
+        begin
+          FLastLogTestConnectTime := Now;
+          FBLogMsg(Format('Pool: Р’СЂРµРјСЏ TestConnected РґР»СЏ РѕР±СЉРµРєС‚Р° %s СЃРѕСЃС‚Р°РІРёР»Рѕ %d РјСЃ', [Result.Name, ti.ElapsedMilliseconds]), tlpInformation, AModuleName);
+        end;
+      end;
+
+      if not IsConnected then // Р•СЃР»Рё РїРѕРґРєР»СЋС‡РµРЅРёРµ Рє Р‘Р” РЅРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅРѕ
+      begin
+        Result.Connected := False; // РќР° РІСЃСЏРєРёР№ СЃР»СѓС‡Р°Р№
         try
-          FBConnectDB(Result, ''); // Выполняем подключение к БД
+          FBConnectDB(Result, AModuleName); // Р’С‹РїРѕР»РЅСЏРµРј РїРѕРґРєР»СЋС‡РµРЅРёРµ Рє Р‘Р”
+          pPool.dpLastTestTime := Now;
         except
           pPool.dpCloseTime := Now - OneHour;
-          pPool.dpUsed := False;    // Сбрасываем отметку, что объект используется
+          pPool.dpUsed := False;    // РЎР±СЂР°СЃС‹РІР°РµРј РѕС‚РјРµС‚РєСѓ, С‡С‚Рѕ РѕР±СЉРµРєС‚ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ
           raise;
         end;
       end;
 
+     if DebugPool then
+       FBLogMsg(Format('Pool GetConnection: FDBRef=0x%s (ProfileName=%s)', [IntToHex(LPARAM(Result), 8), AProfileName]), tlpInformation, AModuleName);
+
       Result.DefaultTransaction := nil;
 
-      // В любом случае создаём транзакцию для чтения
+      // Р’ Р»СЋР±РѕРј СЃР»СѓС‡Р°Рµ СЃРѕР·РґР°С‘Рј С‚СЂР°РЅР·Р°РєС†РёСЋ РґР»СЏ С‡С‚РµРЅРёСЏ
       if pPool.dpReadTran = nil then
         pPool.dpReadTran := FBCreateTransaction(Result, ReadTranType, False, Result, '');
-      pPool.dpReadTran.Active := True;
 
-      // Если передана ссылка, то делаем читающую транзакцию - по умолчанию
+      if not pPool.dpReadTran.Active then
+      begin
+        pPool.dpReadTran.Active := True;
+        if DebugPool then
+          FBLogMsg('Pool GetConnection: dpReadTran.Active := True', tlpInformation, AModuleName);
+      end;
+
+      // Р•СЃР»Рё РїРµСЂРµРґР°РЅР° СЃСЃС‹Р»РєР°, С‚Рѕ РґРµР»Р°РµРј С‡РёС‚Р°СЋС‰СѓСЋ С‚СЂР°РЅР·Р°РєС†РёСЋ - РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
       if Assigned(ReadTran) then
         Result.DefaultTransaction := pPool.dpReadTran;
 
-      if WriteTranType > trNone then // Создаем транзакцию для записи
+      if WriteTranType > trNone then // РЎРѕР·РґР°РµРј С‚СЂР°РЅР·Р°РєС†РёСЋ РґР»СЏ Р·Р°РїРёСЃРё
       begin
         pPool.dpWriteTran := FBCreateTransaction(Result, WriteTranType, False, Result, '');
         if Result.DefaultTransaction = nil then
           Result.DefaultTransaction := pPool.dpWriteTran;
       end;
 
-      // Если не переданы ссылки ни на читающую ни на пишущую транзакцию, то делаем читающую транзакцию - по умолчанию
+      // Р•СЃР»Рё РЅРµ РїРµСЂРµРґР°РЅС‹ СЃСЃС‹Р»РєРё РЅРё РЅР° С‡РёС‚Р°СЋС‰СѓСЋ РЅРё РЅР° РїРёС€СѓС‰СѓСЋ С‚СЂР°РЅР·Р°РєС†РёСЋ, С‚Рѕ РґРµР»Р°РµРј С‡РёС‚Р°СЋС‰СѓСЋ С‚СЂР°РЅР·Р°РєС†РёСЋ - РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
       if Result.DefaultTransaction = nil then
         Result.DefaultTransaction := pPool.dpReadTran;
 
-      Result.DefaultTransaction.Active := True;
+      if not Result.DefaultTransaction.Active then
+      begin
+        Result.DefaultTransaction.Active := True;
+        if DebugPool then
+          FBLogMsg('Pool GetConnection: DefaultTransaction.Active := True', tlpInformation, AModuleName);
+      end;
 
       if Assigned(ReadTran) then
         ReadTran^ := pPool.dpReadTran;
@@ -316,6 +398,9 @@ begin
         WriteTran^ := pPool.dpWriteTran;
     end else
       raise Exception.Create('Result=nil');
+
+    if DebugPool then
+      FBLogMsg(Format('Pool GetConnection: Exit (ProfileName=%s)', [AProfileName]), tlpInformation, AModuleName);
 
   except
     on E: Exception do
@@ -326,23 +411,25 @@ end;
 function TFBConnectionPool.GetConnection(AServerName: string; APort: Integer;
   ADataBase, AUserName, APassword, ACharSet: string; ReadTran,
   WriteTran: PIBTransaction; ReadTranType,
-  WriteTranType: TTransactionType): TIBDatabase;
+  WriteTranType: TTransactionType; AModuleName: string): TIBDatabase;
 var
-  AProfileName: string; // Имя профиля
+  AProfileName: string; // РРјСЏ РїСЂРѕС„РёР»СЏ
 begin
-  // Генерируем имя профиля
+  if LowerCase(AServerName) = 'localhost' then
+    AServerName := FBLocalhostIP;
+  // Р“РµРЅРµСЂРёСЂСѓРµРј РёРјСЏ РїСЂРѕС„РёР»СЏ
   AProfileName := Format('%s_%d_%s_%s_%s', [AServerName, APort, ADataBase, AUserName, ACharSet]);
-  // Регистрируем новый профиль
+  // Р РµРіРёСЃС‚СЂРёСЂСѓРµРј РЅРѕРІС‹Р№ РїСЂРѕС„РёР»СЊ
   AddConnectionProfile(AProfileName, AServerName, APort, ADataBase, AUserName, APassword, ACharSet);
-  // Подключаемся к БД
-  Result := GetConnection(AProfileName, ReadTran, WriteTran, ReadTranType, WriteTranType);
+  // РџРѕРґРєР»СЋС‡Р°РµРјСЃСЏ Рє Р‘Р”
+  Result := GetConnection(AProfileName, ReadTran, WriteTran, ReadTranType, WriteTranType, AModuleName);
 end;
 
 function TFBConnectionPool.GetDefaultConnection(ReadTran,
-  WriteTran: PIBTransaction; ReadTranType, WriteTranType: TTransactionType): TIBDatabase;
+  WriteTran: PIBTransaction; ReadTranType, WriteTranType: TTransactionType; AModuleName: string): TIBDatabase;
 begin
   try
-    Result := GetConnection(FBDefDB, ReadTran, WriteTran, ReadTranType, WriteTranType);
+    Result := GetConnection(FBDefDB, ReadTran, WriteTran, ReadTranType, WriteTranType, AModuleName);
   except
     on E: Exception do
       raise ReCreateEObject(E, 'TFBConnectionPool.GetDefaultConnection');
@@ -359,7 +446,7 @@ begin
   end;
 end;
 
-function PoolFreeTransactions(pPool: TDBPool; MustFree: Boolean): Boolean;
+function PoolFreeTransactions(pPool: TDBPoolConnection; MustFree: Boolean): Boolean;
 var
   DefTran: TIBTransaction;
 begin
@@ -375,7 +462,7 @@ begin
           DefTran.Rollback;
         except
           Result := False;
-          // По хорошему нужно вывести в лог
+          // РџРѕ С…РѕСЂРѕС€РµРјСѓ РЅСѓР¶РЅРѕ РІС‹РІРµСЃС‚Рё РІ Р»РѕРі
         end;
       end;
       pPool.dpConnect.DefaultTransaction := nil;
@@ -387,7 +474,7 @@ begin
         pPool.dpReadTran.Free;
       except
         Result := False;
-        // По хорошему нужно вывести в лог
+        // РџРѕ С…РѕСЂРѕС€РµРјСѓ РЅСѓР¶РЅРѕ РІС‹РІРµСЃС‚Рё РІ Р»РѕРі
       end;
 
       pPool.dpReadTran := nil;
@@ -399,7 +486,7 @@ begin
         pPool.dpWriteTran.Free;
       except
         Result := False;
-        // По хорошему нужно вывести в лог
+        // РџРѕ С…РѕСЂРѕС€РµРјСѓ РЅСѓР¶РЅРѕ РІС‹РІРµСЃС‚Рё РІ Р»РѕРі
       end;
 
       pPool.dpWriteTran := nil;
@@ -413,32 +500,37 @@ end;
 
 procedure TFBConnectionPool.ReturnConnection(FDB: TIBDatabase);
 var
-  pPool: TDBPool;
+  pPool: TDBPoolConnection;
   I: Integer;
-  TranOk, DSOk: Boolean;
+  TranOk, DSOk, WasFind: Boolean;
 begin
+  if DebugPool then
+    FBLogMsg(Format('Pool ReturnConnection: Enter (FDBRef=0x%s)', [IntToHex(LPARAM(FDB), 8)]), tlpInformation, '');
+
   try
+    WasFind := False;
     DBPoolCS.Enter;
     try
       for I := 0 to DBPoolList.Count - 1 do
       begin
-        pPool := TDBPool(DBPoolList[I]);
+        pPool := TDBPoolConnection(DBPoolList[I]);
         if pPool.dpConnect = FDB then
         begin
+          WasFind := True;
           pPool.dpUsed := False;
 
           try
-            pPool.dpConnect.CloseDataSets; // Закрываем все открытые наборы данных
+            pPool.dpConnect.CloseDataSets; // Р—Р°РєСЂС‹РІР°РµРј РІСЃРµ РѕС‚РєСЂС‹С‚С‹Рµ РЅР°Р±РѕСЂС‹ РґР°РЅРЅС‹С…
             DSOk := True;
           except
             DSOk := False;
-            // По хорошему нужно вывести ошибку в лог
+            // РџРѕ С…РѕСЂРѕС€РµРјСѓ РЅСѓР¶РЅРѕ РІС‹РІРµСЃС‚Рё РѕС€РёР±РєСѓ РІ Р»РѕРі
           end;
 
-          TranOk := PoolFreeTransactions(pPool, False); // Закрываем транзакции (кроме транзакции для чтения)
+          TranOk := PoolFreeTransactions(pPool, False); // Р—Р°РєСЂС‹РІР°РµРј С‚СЂР°РЅР·Р°РєС†РёРё (РєСЂРѕРјРµ С‚СЂР°РЅР·Р°РєС†РёРё РґР»СЏ С‡С‚РµРЅРёСЏ)
 
           if TranOk and DSOk then
-            pPool.dpCloseTime := Now; // Устанавливаем время закрытия только после успешного выполнения операций
+            pPool.dpCloseTime := Now; // РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј РІСЂРµРјСЏ Р·Р°РєСЂС‹С‚РёСЏ С‚РѕР»СЊРєРѕ РїРѕСЃР»Рµ СѓСЃРїРµС€РЅРѕРіРѕ РІС‹РїРѕР»РЅРµРЅРёСЏ РѕРїРµСЂР°С†РёР№
 
           Break;
         end;
@@ -446,13 +538,16 @@ begin
     finally
       DBPoolCS.Leave;
     end;
+
+    if DebugPool then
+      FBLogMsg(Format('Pool ReturnConnection: Exit (FDBRef=0x%s). WasFind=%d', [IntToHex(LPARAM(FDB), 8), Integer(WasFind)]), tlpInformation, '');
   except
     on E: Exception do
       raise ReCreateEObject(E, FBStrPoolReturnConnection);
   end;
 end;
 
-// Осуществляет очистку пула соединений
+// РћСЃСѓС‰РµСЃС‚РІР»СЏРµС‚ РѕС‡РёСЃС‚РєСѓ РїСѓР»Р° СЃРѕРµРґРёРЅРµРЅРёР№
 procedure TFBConnectionPool.AddConnectionProfile(AProfileName,
   AServerName: string; APort: Integer; ADataBase, AUserName, APassword,
   ACharSet: string);
@@ -477,6 +572,8 @@ begin
       FProfileList.AddObject(AProfileName, cp);
     end;
     UniqueString(AServerName);
+    if LowerCase(AServerName) = 'localhost' then
+      AServerName := FBLocalhostIP;
     cp.cpServerName := AServerName;
 
     cp.cpPort := APort;
@@ -525,34 +622,36 @@ end;
 
 procedure TFBConnectionPool.ClearPool();
 var
-  pPool: TDBPool;
+  pPool: TDBPoolConnection;
   I: Integer;
   FDB: TIBDatabase;
 begin
   try
-    {$IFDEF FBUTILSDLL}
     if GetModuleHandle('GDS32.dll') = 0 then
-      raise Exception.Create('GetModuleHandle(GDS32.dll)=NULL');
-    {$ENDIF}
+    begin
+      //raise Exception.Create('GetModuleHandle(GDS32.dll)=NULL');
+      // Р›СѓС‡С€Рµ РЅРµ РІС‹РґР°РІР°С‚СЊ СЃРѕРѕР±С‰РµРЅРёР№ РѕР± РѕС€РёР±РєР°С… РїСЂРё РІС‹С…РѕРґРµ РёР· РїСЂРѕРіСЂР°РјРјС‹
+    end else
+    begin
+      DBPoolCS.Enter;
+      try
+        for I := 0 to DBPoolList.Count - 1 do
+        begin
+          pPool := TDBPoolConnection(DBPoolList[I]);
+          PoolFreeTransactions(pPool, True);
+          FDB := pPool.dpConnect;
+          pPool.Free;
 
-    DBPoolCS.Enter;
-    try
-      for I := 0 to DBPoolList.Count - 1 do
-      begin
-        pPool := TDBPool(DBPoolList[I]);
-        PoolFreeTransactions(pPool, True);
-        FDB := pPool.dpConnect;
-        pPool.Free;
-
-        try
-          FBFreeConnection(FDB, '');
-        except
-          // По хорошему нужно вывести в лог
+          try
+            FBFreeConnection(FDB, '');
+          except
+            // РџРѕ С…РѕСЂРѕС€РµРјСѓ РЅСѓР¶РЅРѕ РІС‹РІРµСЃС‚Рё РІ Р»РѕРі
+          end;
         end;
+        DBPoolList.Clear;
+      finally
+        DBPoolCS.Leave;
       end;
-      DBPoolList.Clear;
-    finally
-      DBPoolCS.Leave;
     end;
   except
     on E: Exception do
@@ -571,42 +670,47 @@ end;
 
 procedure TFBConnectionPool.DeleteOldConnections;
 var
-  pPool: TDBPool;
+  pPool: TDBPoolConnection;
   I: Integer;
   AList: TList;
+  sConnName: string;
+  ConnCount: Integer;
 begin
   try
     AList := TList.Create;
     try
       DBPoolCS.Enter;
       try
-        // Закрываем все неиспользуемые подключения, живущие более 5 минут
+        // Р—Р°РєСЂС‹РІР°РµРј РІСЃРµ РЅРµРёСЃРїРѕР»СЊР·СѓРµРјС‹Рµ РїРѕРґРєР»СЋС‡РµРЅРёСЏ, Р¶РёРІСѓС‰РёРµ Р±РѕР»РµРµ 5 РјРёРЅСѓС‚
         for I := DBPoolList.Count - 1 downto 0 do
         begin
-          pPool := TDBPool(DBPoolList[I]);
+          pPool := TDBPoolConnection(DBPoolList[I]);
           if not pPool.dpUsed then
             if SecondsBetween(Now, pPool.dpCloseTime) > FBPoolConnectionMaxTime then
             begin
               DBPoolList.Delete(I);
               AList.Add(pPool.dpConnect);
 
-              // Закрываем транзакции. От БД здесь нельзя отключаться, чтобы
-              // ничего не тормозило
+              // Р—Р°РєСЂС‹РІР°РµРј С‚СЂР°РЅР·Р°РєС†РёРё. РћС‚ Р‘Р” Р·РґРµСЃСЊ РЅРµР»СЊР·СЏ РѕС‚РєР»СЋС‡Р°С‚СЊСЃСЏ, С‡С‚РѕР±С‹
+              // РЅРёС‡РµРіРѕ РЅРµ С‚РѕСЂРјРѕР·РёР»Рѕ
               PoolFreeTransactions(pPool, True);
               pPool.Free;
             end;
         end;
-
+        ConnCount := DBPoolList.Count;
       finally
         DBPoolCS.Leave;
       end;
 
-      // Выносим удаление ненужных подключений за пределы критической секции
+      // Р’С‹РЅРѕСЃРёРј СѓРґР°Р»РµРЅРёРµ РЅРµРЅСѓР¶РЅС‹С… РїРѕРґРєР»СЋС‡РµРЅРёР№ Р·Р° РїСЂРµРґРµР»С‹ РєСЂРёС‚РёС‡РµСЃРєРѕР№ СЃРµРєС†РёРё
       for I := 0 to AList.Count - 1 do
       try
+        sConnName := TIBDatabase(AList[I]).Name;
         FBFreeConnection(TIBDatabase(AList[I]), '');
+        if Assigned(FBLogMsg) then
+          FBLogMsg(Format('Pool: РЈРґР°Р»С‘РЅ РѕР±СЉРµРєС‚ "%s". Р­Р»РµРјРµРЅС‚РѕРІ: %d', [sConnName, ConnCount]), tlpInformation, '');
       except
-        // По хорошему нужно вывести в лог
+        // РџРѕ С…РѕСЂРѕС€РµРјСѓ РЅСѓР¶РЅРѕ РІС‹РІРµСЃС‚Рё РІ Р»РѕРі
       end;
     finally
       AList.Free;
@@ -620,17 +724,21 @@ end;
 
 destructor TFBConnectionPool.Destroy;
 begin
-  ClearPool(); // Очищаем пул соединений
-  ClearConnectionProfiles(); // Очищаем список профилей
-  // Объекты, созданные в конструкторе и зарегистрированные с помощью RegObj,
-  // будут удалены автоматически
+  ClearPool(); // РћС‡РёС‰Р°РµРј РїСѓР» СЃРѕРµРґРёРЅРµРЅРёР№
+  ClearConnectionProfiles(); // РћС‡РёС‰Р°РµРј СЃРїРёСЃРѕРє РїСЂРѕС„РёР»РµР№
+  // РћР±СЉРµРєС‚С‹, СЃРѕР·РґР°РЅРЅС‹Рµ РІ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂРµ Рё Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹Рµ СЃ РїРѕРјРѕС‰СЊСЋ RegObj,
+  // Р±СѓРґСѓС‚ СѓРґР°Р»РµРЅС‹ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё
   inherited;
 end;
 
+class procedure TFBConnectionPool.FreePool;
+begin
+  FreeAndNil(FBPool);
+end;
+
 initialization
+  DebugPool := DirectoryExists('C:\DEXE\FBUtilsDebugPool');
   FBPool := TFBConnectionPool.Create;
 finalization
-  //MessageBox(0, 'POOL finalization - BEGIN', '', 0);
-  FBPool.Free;
-  //MessageBox(0, 'POOL finalization - END', '', 0);
+  TFBConnectionPool.FreePool;
 end.

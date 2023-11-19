@@ -1,4 +1,4 @@
-{
+п»ї{
 Copyright (c) 2012-2013, Loginov Dmitry Sergeevich
 All rights reserved.
 
@@ -27,158 +27,168 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 {                                                                             }
 {                                                                             }
 {                                                                             }
-{ Модуль fbUtilsDBStruct - модуль описания структуры БД                       }
-{ (c) 2012 Логинов Дмитрий Сергеевич                                          }
-{ Последнее обновление: 09.05.2012                                            }
-{ Протестировано на D7, D2007, D2010, D-XE2                                   }
-{ Адрес сайта: http://loginovprojects.ru/                                     }
+{ РњРѕРґСѓР»СЊ fbUtilsDBStruct - РјРѕРґСѓР»СЊ РѕРїРёСЃР°РЅРёСЏ СЃС‚СЂСѓРєС‚СѓСЂС‹ Р‘Р”                       }
+{ (c) 2012 Р›РѕРіРёРЅРѕРІ Р”РјРёС‚СЂРёР№ РЎРµСЂРіРµРµРІРёС‡                                          }
+{ РџРѕСЃР»РµРґРЅРµРµ РѕР±РЅРѕРІР»РµРЅРёРµ: 09.05.2012                                            }
+{ РџСЂРѕС‚РµСЃС‚РёСЂРѕРІР°РЅРѕ РЅР° D7, D2007, D2010, D-XE2                                   }
+{ РђРґСЂРµСЃ СЃР°Р№С‚Р°: http://loginovprojects.ru/                                     }
 { e-mail: loginov_d@inbox.ru                                                  }
 {                                                                             }
 { *************************************************************************** }
 
 {
-Модель позволяет описать лишь некоторые объекты базы данных. Его целесообразно
-использовать при разработке коробочных приложений, где структура базы данных
-зачастую относительно простая.
+РњРѕРґРµР»СЊ РїРѕР·РІРѕР»СЏРµС‚ РѕРїРёСЃР°С‚СЊ Р»РёС€СЊ РЅРµРєРѕС‚РѕСЂС‹Рµ РѕР±СЉРµРєС‚С‹ Р±Р°Р·С‹ РґР°РЅРЅС‹С…. Р•РіРѕ С†РµР»РµСЃРѕРѕР±СЂР°Р·РЅРѕ
+РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РїСЂРё СЂР°Р·СЂР°Р±РѕС‚РєРµ РєРѕСЂРѕР±РѕС‡РЅС‹С… РїСЂРёР»РѕР¶РµРЅРёР№, РіРґРµ СЃС‚СЂСѓРєС‚СѓСЂР° Р±Р°Р·С‹ РґР°РЅРЅС‹С…
+Р·Р°С‡Р°СЃС‚СѓСЋ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РїСЂРѕСЃС‚Р°СЏ.
 }
 
-unit fbUtilsDBStruct;
+{$IFDEF FPC}
+{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
+{$ENDIF}
 
+unit fbUtilsDBStruct;
+    
 interface
 
 uses
   SysUtils, Classes, fbTypes, fbSomeFuncs;
 
 type
-  {Описание поля}
+  {РћРїРёСЃР°РЅРёРµ РїРѕР»СЏ}
   TfbFieldDesc = class
-    { Имя поля. Используется для поиска. Если при поиске имя поля в заданной
-      таблице не найдено, то поле создается }
+    { РРјСЏ РїРѕР»СЏ. РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РґР»СЏ РїРѕРёСЃРєР°. Р•СЃР»Рё РїСЂРё РїРѕРёСЃРєРµ РёРјСЏ РїРѕР»СЏ РІ Р·Р°РґР°РЅРЅРѕР№
+      С‚Р°Р±Р»РёС†Рµ РЅРµ РЅР°Р№РґРµРЅРѕ, С‚Рѕ РїРѕР»Рµ СЃРѕР·РґР°РµС‚СЃСЏ }
     FName: string;
 
-    { Тип / домен поля }
+    { РўРёРї / РґРѕРјРµРЅ РїРѕР»СЏ }
     FType: string;
 
-    { Значение по умолчанию. Если поле не должно иметь значение по
-      умолчанию, указывайте пустую строку }
+    { Р—РЅР°С‡РµРЅРёРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ. Р•СЃР»Рё РїРѕР»Рµ РЅРµ РґРѕР»Р¶РЅРѕ РёРјРµС‚СЊ Р·РЅР°С‡РµРЅРёРµ РїРѕ
+      СѓРјРѕР»С‡Р°РЅРёСЋ, СѓРєР°Р·С‹РІР°Р№С‚Рµ РїСѓСЃС‚СѓСЋ СЃС‚СЂРѕРєСѓ }
     FDefault: string;
 
-    { Укажите True, если значение обязательно }
+    { РЈРєР°Р¶РёС‚Рµ True, РµСЃР»Рё Р·РЅР°С‡РµРЅРёРµ РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ }
     FNotNull: TFBNotNull;
   end;
 
-  {Описание домена}
-  TfbDomainDesc = class
-    FName: string;         // Имя домена
-    FType: string;         // Описание домена
-    FDefault: string;      // Значение по умолчанию
-    FNotNull: TFBNotNull;  // NOT NULL
-    FCheck: string;        // Выражение проверки CHECK
+  {РРЅС„РѕСЂРјР°С†РёСЏ Рѕ РґРѕРјРµРЅРµ РґР»СЏ РїРѕР»СЏ РІ Р‘Р” РЅР° РґР°РЅРЅС‹Р№ РјРѕРјРµРЅС‚}
+  TfbFieldDomain = class
+    DomainName: string; // Р”РѕРјРµРЅРЅРѕРµ РёРјСЏ РїРѕР»СЏ, РЅР°РїСЂРёРјРµСЂ "RDB$639"
+    CurLength: Integer; // РўРµРєСѓС‰Р°СЏ РґР»РёРЅР° РїРѕР»СЏ
   end;
 
-  {Описание первичного ключа}
+  {РћРїРёСЃР°РЅРёРµ РґРѕРјРµРЅР°}
+  TfbDomainDesc = class
+    FName: string;         // РРјСЏ РґРѕРјРµРЅР°
+    FType: string;         // РћРїРёСЃР°РЅРёРµ РґРѕРјРµРЅР°
+    FDefault: string;      // Р—РЅР°С‡РµРЅРёРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+    FNotNull: TFBNotNull;  // NOT NULL
+    FCheck: string;        // Р’С‹СЂР°Р¶РµРЅРёРµ РїСЂРѕРІРµСЂРєРё CHECK
+  end;
+
+  {РћРїРёСЃР°РЅРёРµ РїРµСЂРІРёС‡РЅРѕРіРѕ РєР»СЋС‡Р°}
   TfbPrimaryKeyDesc = record
     FName: string;
 
-    { Перечень полей, входящих в первичный ключ }
+    { РџРµСЂРµС‡РµРЅСЊ РїРѕР»РµР№, РІС…РѕРґСЏС‰РёС… РІ РїРµСЂРІРёС‡РЅС‹Р№ РєР»СЋС‡ }
     FConstraintFields: string;
   end;
 
-  {Описание внешнего ключа}
+  {РћРїРёСЃР°РЅРёРµ РІРЅРµС€РЅРµРіРѕ РєР»СЋС‡Р°}
   TfbForeignKeyDesc = class
-    { Наименование внешнего ключа }
+    { РќР°РёРјРµРЅРѕРІР°РЅРёРµ РІРЅРµС€РЅРµРіРѕ РєР»СЋС‡Р° }
     FName: string;
 
-    { Имя таблицы, в которой данный ключ создается }
+    { РРјСЏ С‚Р°Р±Р»РёС†С‹, РІ РєРѕС‚РѕСЂРѕР№ РґР°РЅРЅС‹Р№ РєР»СЋС‡ СЃРѕР·РґР°РµС‚СЃСЏ }
     FTableName: string;
 
-    { Перечень полей, входящих во внешний ключ }
+    { РџРµСЂРµС‡РµРЅСЊ РїРѕР»РµР№, РІС…РѕРґСЏС‰РёС… РІРѕ РІРЅРµС€РЅРёР№ РєР»СЋС‡ }
     FConstraintFields: string;
 
-    { Имя таблицы, на которую ключ ссылается }
+    { РРјСЏ С‚Р°Р±Р»РёС†С‹, РЅР° РєРѕС‚РѕСЂСѓСЋ РєР»СЋС‡ СЃСЃС‹Р»Р°РµС‚СЃСЏ }
     FRefTableName: string;
 
-    { Имена полей таблицы FRefTableName, на которые ссылаюттся поля FConstraintFields}
+    { РРјРµРЅР° РїРѕР»РµР№ С‚Р°Р±Р»РёС†С‹ FRefTableName, РЅР° РєРѕС‚РѕСЂС‹Рµ СЃСЃС‹Р»Р°СЋС‚С‚СЃСЏ РїРѕР»СЏ FConstraintFields}
     FRefConstraintFields: string;
   end;
 
-  {Описание индекса}
+  {РћРїРёСЃР°РЅРёРµ РёРЅРґРµРєСЃР°}
   TfbIndexDesc = class
-    { Наименование индекса }
+    { РќР°РёРјРµРЅРѕРІР°РЅРёРµ РёРЅРґРµРєСЃР° }
     FName: string;
 
-    { Значения должны быть уникальными }
+    { Р—РЅР°С‡РµРЅРёСЏ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ СѓРЅРёРєР°Р»СЊРЅС‹РјРё }
     FIsUnique: Boolean;
 
-    { Порядок сортировки }
+    { РџРѕСЂСЏРґРѕРє СЃРѕСЂС‚РёСЂРѕРІРєРё }
     FSorting: TFBSorting;
 
-    { Перечень полей, входящих в индекс }
+    { РџРµСЂРµС‡РµРЅСЊ РїРѕР»РµР№, РІС…РѕРґСЏС‰РёС… РІ РёРЅРґРµРєСЃ }
     FConstraintFields: string;
   end;
 
-  {Описание триггера}
+  {РћРїРёСЃР°РЅРёРµ С‚СЂРёРіРіРµСЂР°}
   TfbTriggerDesc = class
-    { Наименование триггера }
+    { РќР°РёРјРµРЅРѕРІР°РЅРёРµ С‚СЂРёРіРіРµСЂР° }
     FName: string;
 
-    { Имя таблицы }
+    { РРјСЏ С‚Р°Р±Р»РёС†С‹ }
     FTableName: string;
 
-    { Момент срабатывания триггера }
+    { РњРѕРјРµРЅС‚ СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ С‚СЂРёРіРіРµСЂР° }
     FEventTime: TFBTriggerEventTime;
 
-    { События, на которые должен реагировать триггер }
+    { РЎРѕР±С‹С‚РёСЏ, РЅР° РєРѕС‚РѕСЂС‹Рµ РґРѕР»Р¶РµРЅ СЂРµР°РіРёСЂРѕРІР°С‚СЊ С‚СЂРёРіРіРµСЂ }
     FEvents: TFBTriggerEvents;
 
-    { Нужно ли делать триггер активным  }
+    { РќСѓР¶РЅРѕ Р»Рё РґРµР»Р°С‚СЊ С‚СЂРёРіРіРµСЂ Р°РєС‚РёРІРЅС‹Рј  }
     FState: TFBTriggerState;
 
-    { Порядок срабатывания триггера }
+    { РџРѕСЂСЏРґРѕРє СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ С‚СЂРёРіРіРµСЂР° }
     FPos: Integer;
 
-    { Локальные переменные триггера }
+    { Р›РѕРєР°Р»СЊРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ С‚СЂРёРіРіРµСЂР° }
     FVarDesc: string;
 
-    { Исходный код (тело триггера) }
+    { РСЃС…РѕРґРЅС‹Р№ РєРѕРґ (С‚РµР»Рѕ С‚СЂРёРіРіРµСЂР°) }
     FBody: string;
 
-    { Хэш исходного текста триггера (из базы получить исходный текст - это проблема) }
+    { РҐСЌС€ РёСЃС…РѕРґРЅРѕРіРѕ С‚РµРєСЃС‚Р° С‚СЂРёРіРіРµСЂР° (РёР· Р±Р°Р·С‹ РїРѕР»СѓС‡РёС‚СЊ РёСЃС…РѕРґРЅС‹Р№ С‚РµРєСЃС‚ - СЌС‚Рѕ РїСЂРѕР±Р»РµРјР°) }
     FHash: Cardinal;
   end;
 
-  {Описание хранимой процедуры}
+  {РћРїРёСЃР°РЅРёРµ С…СЂР°РЅРёРјРѕР№ РїСЂРѕС†РµРґСѓСЂС‹}
   TfbProcedureDesc = class
-    { Наименование процедуры }
+    { РќР°РёРјРµРЅРѕРІР°РЅРёРµ РїСЂРѕС†РµРґСѓСЂС‹ }
     FName: string;
 
-    {Описание входных полей}
+    {РћРїРёСЃР°РЅРёРµ РІС…РѕРґРЅС‹С… РїРѕР»РµР№}
     FInFieldsDesc: string;
 
-    {Описание выходных полей}
+    {РћРїРёСЃР°РЅРёРµ РІС‹С…РѕРґРЅС‹С… РїРѕР»РµР№}
     FOutFieldsDesc: string;
 
-    {Описание переменных}
+    {РћРїРёСЃР°РЅРёРµ РїРµСЂРµРјРµРЅРЅС‹С…}
     FVarDesc: string;
 
-    {Тело процедуры}
+    {РўРµР»Рѕ РїСЂРѕС†РµРґСѓСЂС‹}
     FBody: string;
 
-    { Хэш исходного текста процедуры }
+    { РҐСЌС€ РёСЃС…РѕРґРЅРѕРіРѕ С‚РµРєСЃС‚Р° РїСЂРѕС†РµРґСѓСЂС‹ }
     FHash: Cardinal;
   end;
 
-  {Описание таблицы}
+  {РћРїРёСЃР°РЅРёРµ С‚Р°Р±Р»РёС†С‹}
   TfbTableDesc = class
   private
     FFieldList: TList;
-    FPrimaryKey: TfbPrimaryKeyDesc; // Первичный ключ таблицы
+    FPrimaryKey: TfbPrimaryKeyDesc; // РџРµСЂРІРёС‡РЅС‹Р№ РєР»СЋС‡ С‚Р°Р±Р»РёС†С‹
     FName: string;
     FIndexList: TList;
     FTriggerList: TList;
     FChecksList: TStringList;
-    FUseModifyDate: TFBTriggerState; // Использовать или нет поле MODIFYDATE
-    FDBDesc: TObject; // Ссылка на объект TfbDataBaseDesc
+    FUseModifyDate: TFBTriggerState; // РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РёР»Рё РЅРµС‚ РїРѕР»Рµ MODIFYDATE
+    FDBDesc: TObject; // РЎСЃС‹Р»РєР° РЅР° РѕР±СЉРµРєС‚ TfbDataBaseDesc
     procedure Clear;
   public
     constructor Create;
@@ -190,78 +200,78 @@ type
     property PrimaryKey: TfbPrimaryKeyDesc read FPrimaryKey;
     property TriggerList: TList read FTriggerList;
 
-  private {Виртуальные функции}
+  private {Р’РёСЂС‚СѓР°Р»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё}
 
     procedure SetUseModifyDate(Value: TFBTriggerState); virtual;
     function GetUseModifyDate: TFBTriggerState; virtual;
-  public {Виртуальные функции}
+  public {Р’РёСЂС‚СѓР°Р»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё}
 
-    { Добавляет описание поля базы данных }
+    { Р”РѕР±Р°РІР»СЏРµС‚ РѕРїРёСЃР°РЅРёРµ РїРѕР»СЏ Р±Р°Р·С‹ РґР°РЅРЅС‹С… }
     procedure AddField(AName, AType, ADefault: string; NotNull: TFBNotNull); virtual;
 
-    { Устанавливает первичный ключ таблицы }
+    { РЈСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ РїРµСЂРІРёС‡РЅС‹Р№ РєР»СЋС‡ С‚Р°Р±Р»РёС†С‹ }
     procedure SetPrimaryKey(AName, ConstraintFields: string); virtual;
 
-    { Добавляет индекс}
+    { Р”РѕР±Р°РІР»СЏРµС‚ РёРЅРґРµРєСЃ}
     procedure AddIndex(AName: string; IsUnique: Boolean;
       ASorting: TFBSorting; ConstraintFields: string); virtual;
 
-    { Добавляет выражение проверки для таблицы }
+    { Р”РѕР±Р°РІР»СЏРµС‚ РІС‹СЂР°Р¶РµРЅРёРµ РїСЂРѕРІРµСЂРєРё РґР»СЏ С‚Р°Р±Р»РёС†С‹ }
     procedure AddCheck(AName: string; ACheck: string); virtual;
 
-    { Добавляет триггер. В качестве TriggerName можно задавать пустую строку. В
-      этом случае имя триггера будет сформировано автоматически. В качестве TriggerPos
-      (порядок срабатывания триггера) рекомендуется значение > 0 }
+    { Р”РѕР±Р°РІР»СЏРµС‚ С‚СЂРёРіРіРµСЂ. Р’ РєР°С‡РµСЃС‚РІРµ TriggerName РјРѕР¶РЅРѕ Р·Р°РґР°РІР°С‚СЊ РїСѓСЃС‚СѓСЋ СЃС‚СЂРѕРєСѓ. Р’
+      СЌС‚РѕРј СЃР»СѓС‡Р°Рµ РёРјСЏ С‚СЂРёРіРіРµСЂР° Р±СѓРґРµС‚ СЃС„РѕСЂРјРёСЂРѕРІР°РЅРѕ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё. Р’ РєР°С‡РµСЃС‚РІРµ TriggerPos
+      (РїРѕСЂСЏРґРѕРє СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ С‚СЂРёРіРіРµСЂР°) СЂРµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ Р·РЅР°С‡РµРЅРёРµ > 0 }
     procedure AddTrigger(TriggerEventTime: TFBTriggerEventTime; TriggerEvents: TFBTriggerEvents;
       TriggerPos: Integer; TriggerState: TFBTriggerState; TriggerName: string;
       TriggerVarDesc, TriggerBody: string); virtual;
 
-    { Добавляет триггер для поддержки автоинкремента. Если CreateGenerator=TRUE,
-      то создает генератор с именем AGenName автоматически }
+    { Р”РѕР±Р°РІР»СЏРµС‚ С‚СЂРёРіРіРµСЂ РґР»СЏ РїРѕРґРґРµСЂР¶РєРё Р°РІС‚РѕРёРЅРєСЂРµРјРµРЅС‚Р°. Р•СЃР»Рё CreateGenerator=TRUE,
+      С‚Рѕ СЃРѕР·РґР°РµС‚ РіРµРЅРµСЂР°С‚РѕСЂ СЃ РёРјРµРЅРµРј AGenName Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё }
     procedure AddAutoIncTrigger(ATriggerName, AFieldName, AGenName: string; CreateGenerator: Boolean); virtual;
 
-    { Определяет, следует ли использовать MODIFYDATE }
+    { РћРїСЂРµРґРµР»СЏРµС‚, СЃР»РµРґСѓРµС‚ Р»Рё РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ MODIFYDATE }
     property UseModifyDateTrigger: TFBTriggerState read GetUseModifyDate write SetUseModifyDate;
   end;
 
-  {Описание базы данных}
+  {РћРїРёСЃР°РЅРёРµ Р±Р°Р·С‹ РґР°РЅРЅС‹С…}
   TfbDataBaseDesc = class
   private
     procedure Clear;
   public
 
-    FTableList: TList;           // Список таблиц
-    FDomainList: TList;          // Список доменов
-    FForeignKeyList: TList;      // Список внешних ключей
-    FGeneratorList: TStringList; // Список генераторов
-    FProcedureList: TList;       // Список хранимых процедур
-    FAddErrException: Boolean;   // Определяет, нужно ли добавлять объект исключения
+    FTableList: TList;           // РЎРїРёСЃРѕРє С‚Р°Р±Р»РёС†
+    FDomainList: TList;          // РЎРїРёСЃРѕРє РґРѕРјРµРЅРѕРІ
+    FForeignKeyList: TList;      // РЎРїРёСЃРѕРє РІРЅРµС€РЅРёС… РєР»СЋС‡РµР№
+    FGeneratorList: TStringList; // РЎРїРёСЃРѕРє РіРµРЅРµСЂР°С‚РѕСЂРѕРІ
+    FProcedureList: TList;       // РЎРїРёСЃРѕРє С…СЂР°РЅРёРјС‹С… РїСЂРѕС†РµРґСѓСЂ
+    FAddErrException: Boolean;   // РћРїСЂРµРґРµР»СЏРµС‚, РЅСѓР¶РЅРѕ Р»Рё РґРѕР±Р°РІР»СЏС‚СЊ РѕР±СЉРµРєС‚ РёСЃРєР»СЋС‡РµРЅРёСЏ
 
     constructor Create;
     destructor Destroy; override;
 
-  public {Виртуальные функции}
+  public {Р’РёСЂС‚СѓР°Р»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё}
 
-    { Номер версии }
+    { РќРѕРјРµСЂ РІРµСЂСЃРёРё }
     function GetVersion: Integer; virtual;
 
-    { Добавляет описание домена }
+    { Р”РѕР±Р°РІР»СЏРµС‚ РѕРїРёСЃР°РЅРёРµ РґРѕРјРµРЅР° }
     procedure AddDomain(AName, AType, ADefault: string; NotNull: TFBNotNull; ACheck: string); virtual;
 
-    { Добавляет описание таблицы }
+    { Р”РѕР±Р°РІР»СЏРµС‚ РѕРїРёСЃР°РЅРёРµ С‚Р°Р±Р»РёС†С‹ }
     function AddTable(TableName: string): TfbTableDesc; virtual;
 
-    { Добавляет внешний ключ }
+    { Р”РѕР±Р°РІР»СЏРµС‚ РІРЅРµС€РЅРёР№ РєР»СЋС‡ }
     procedure AddForeignKey(AName, TableName, ConstraintFields,
       RefTableName, RefConstraintFields: string); virtual;
 
-    { Добавляет счетчик генератора }
+    { Р”РѕР±Р°РІР»СЏРµС‚ СЃС‡РµС‚С‡РёРє РіРµРЅРµСЂР°С‚РѕСЂР° }
     procedure AddGenerator(AName: string; StartValue: Int64); virtual;
 
-    { Добавляет хранимую процедуру }
+    { Р”РѕР±Р°РІР»СЏРµС‚ С…СЂР°РЅРёРјСѓСЋ РїСЂРѕС†РµРґСѓСЂСѓ }
     procedure AddProcedure(AName, InFieldsDesc, OutFieldsDesc, VarDesc, Body: string); virtual;
 
-    { Добавляет объект исключения "ERR" }
+    { Р”РѕР±Р°РІР»СЏРµС‚ РѕР±СЉРµРєС‚ РёСЃРєР»СЋС‡РµРЅРёСЏ "ERR" }
     procedure AddDefaultException; virtual;
   end;
 
@@ -269,7 +279,7 @@ type
 function FBCreateDataBaseDesc: TfbDataBaseDesc;
 procedure FBFreeDataBaseDesc(dbDesc: TfbDataBaseDesc);
 
-{$IFDEF FBUTILSDLL} // Замечания по директиве смотрите в модуле fbUtilsBase.pas
+{$IFDEF FBUTILSDLL} // Р—Р°РјРµС‡Р°РЅРёСЏ РїРѕ РґРёСЂРµРєС‚РёРІРµ СЃРјРѕС‚СЂРёС‚Рµ РІ РјРѕРґСѓР»Рµ fbUtilsBase.pas
 exports
   FBCreateDataBaseDesc name 'ibxFBCreateDataBaseDesc',
   FBFreeDataBaseDesc name 'ibxFBFreeDataBaseDesc';
@@ -338,11 +348,11 @@ begin
     ActStr := ActStr + 'D';
   ActStr := ActStr + IntToStr(TriggerPos);
 
-  // При необходимости формируем TriggerName
+  // РџСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё С„РѕСЂРјРёСЂСѓРµРј TriggerName
   if TriggerName = '' then
     TriggerName := FName + '_' + ActStr;
 
-  if TriggerState = trsActive then // Требуется для вычисления хэша
+  if TriggerState = trsActive then // РўСЂРµР±СѓРµС‚СЃСЏ РґР»СЏ РІС‹С‡РёСЃР»РµРЅРёСЏ С…СЌС€Р°
     S := '_A'
   else
     S := '_I';
@@ -380,7 +390,7 @@ begin
 
   AddTrigger(trBefore, [trInsert], 0, trsActive,
     ATriggerName,
-    '', // Локальные переменные - отсутствуют
+    '', // Р›РѕРєР°Р»СЊРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ - РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚
     Format('IF (NEW."%0:s" IS NULL) THEN NEW."%0:s"=GEN_ID("%1:s", 1);',
       [AFieldName, AGenName]));
 end;
@@ -441,21 +451,21 @@ end;
 procedure TfbTableDesc.SetUseModifyDate(Value: TFBTriggerState);
 const
   TrCode =
-    '  IF ((NEW.MODIFYDATE IS NULL) AND (OLD.MODIFYDATE IS NOT NULL)) THEN EXIT;'#13#10+ // Позволяет возвращать значение в NULL
-    '  IF ((OLD.MODIFYDATE IS NULL) AND (NEW.MODIFYDATE IS NOT NULL)) THEN EXIT;'#13#10+ // Позволяем устанавливать произвольное значение (только в первый раз)
-    '  NEW.MODIFYDATE = CURRENT_TIMESTAMP;'; // Присваиваем текущий момент времени
+    '  IF ((NEW.MODIFYDATE IS NULL) AND (OLD.MODIFYDATE IS NOT NULL)) THEN EXIT;'#13#10+ // РџРѕР·РІРѕР»СЏРµС‚ РІРѕР·РІСЂР°С‰Р°С‚СЊ Р·РЅР°С‡РµРЅРёРµ РІ NULL
+    '  IF ((OLD.MODIFYDATE IS NULL) AND (NEW.MODIFYDATE IS NOT NULL)) THEN EXIT;'#13#10+ // РџРѕР·РІРѕР»СЏРµРј СѓСЃС‚Р°РЅР°РІР»РёРІР°С‚СЊ РїСЂРѕРёР·РІРѕР»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ (С‚РѕР»СЊРєРѕ РІ РїРµСЂРІС‹Р№ СЂР°Р·)
+    '  NEW.MODIFYDATE = CURRENT_TIMESTAMP;'; // РџСЂРёСЃРІР°РёРІР°РµРј С‚РµРєСѓС‰РёР№ РјРѕРјРµРЅС‚ РІСЂРµРјРµРЅРё
 begin
   FUseModifyDate := Value;
 
   if FUseModifyDate <> trsNone then
   begin
-    // Добавляем поле MODIFYDATE
+    // Р”РѕР±Р°РІР»СЏРµРј РїРѕР»Рµ MODIFYDATE
     AddField('MODIFYDATE', 'TIMESTAMP', '', CanNull);
 
-    // Добавляем индекс
+    // Р”РѕР±Р°РІР»СЏРµРј РёРЅРґРµРєСЃ
     AddIndex(FName + '_MDIDX', False, Ascending, '"MODIFYDATE"');
 
-    // Добавляем триггер
+    // Р”РѕР±Р°РІР»СЏРµРј С‚СЂРёРіРіРµСЂ
     AddTrigger(trBefore, [trInsert, trUpdate], 10, Value, FName + '_MDBIU', '', TrCode);
   end;
 end;

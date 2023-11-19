@@ -1,4 +1,4 @@
-{
+п»ї{
 Copyright (c) 2012-2013, Loginov Dmitry Sergeevich
 All rights reserved.
 
@@ -22,59 +22,71 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 }
-
+      
 { *************************************************************************** }
 {                                                                             }
 {                                                                             }
 {                                                                             }
-{ Модуль fbUtilsBackupRestore - содержит функции для резервирования и         }
-{ восстановления баз данных Firebird                                          }
-{ (c) 2012 Логинов Дмитрий Сергеевич                                          }
-{ Последнее обновление: 30.04.2012                                            }
-{ Протестировано на D7, D2007, D2010, D-XE2                                   }
-{ Адрес сайта: http://loginovprojects.ru/                                     }
+{ РњРѕРґСѓР»СЊ fbUtilsBackupRestore - СЃРѕРґРµСЂР¶РёС‚ С„СѓРЅРєС†РёРё РґР»СЏ СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёСЏ Рё         }
+{ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ Р±Р°Р· РґР°РЅРЅС‹С… Firebird                                          }
+{ (c) 2012 Р›РѕРіРёРЅРѕРІ Р”РјРёС‚СЂРёР№ РЎРµСЂРіРµРµРІРёС‡                                          }
+{ РџРѕСЃР»РµРґРЅРµРµ РѕР±РЅРѕРІР»РµРЅРёРµ: 30.04.2012                                            }
+{ РџСЂРѕС‚РµСЃС‚РёСЂРѕРІР°РЅРѕ РЅР° D7, D2007, D2010, D-XE2                                   }
+{ РђРґСЂРµСЃ СЃР°Р№С‚Р°: http://loginovprojects.ru/                                     }
 { e-mail: loginov_d@inbox.ru                                                  }
 {                                                                             }
 { *************************************************************************** }
+
+{$IFDEF FPC}
+{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
+{$ENDIF}
+
 unit fbUtilsBackupRestore;
 
 interface
 uses
-  Windows, SysUtils, Classes, IBDatabase, IBServices, fbSomeFuncs, fbUtilsBase, fbTypes;
+{$IFnDEF FPC}
+  Windows,
+{$ELSE}
+  {$IFDEF MSWINDOWS}Windows, {$ENDIF}LCLIntf, LCLType, LMessages, LazUTF8,
+{$ENDIF}
+  SysUtils, Classes, IBDatabase, IBServices, IB, fbSomeFuncs, fbUtilsBase, fbTypes;
 
+{$IFnDEF FPC}
 {$IF RTLVersion >= 23.00}
    {$DEFINE DXE2PLUS}
 {$IFEND}
+{$ENDIF}
 
-{Осуществляет резервирование базы данных средствами Firebird Service-API.
- Весь процесс резервирования осуществляется на сервере (AServerName). Файл
- бэкапа ABackupFile следует задавать относительно сервера, на котором должно
- выполняться резервирование.}
+{РћСЃСѓС‰РµСЃС‚РІР»СЏРµС‚ СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ Р±Р°Р·С‹ РґР°РЅРЅС‹С… СЃСЂРµРґСЃС‚РІР°РјРё Firebird Service-API.
+ Р’РµСЃСЊ РїСЂРѕС†РµСЃСЃ СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёСЏ РѕСЃСѓС‰РµСЃС‚РІР»СЏРµС‚СЃСЏ РЅР° СЃРµСЂРІРµСЂРµ (AServerName). Р¤Р°Р№Р»
+ Р±СЌРєР°РїР° ABackupFile СЃР»РµРґСѓРµС‚ Р·Р°РґР°РІР°С‚СЊ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ СЃРµСЂРІРµСЂР°, РЅР° РєРѕС‚РѕСЂРѕРј РґРѕР»Р¶РЅРѕ
+ РІС‹РїРѕР»РЅСЏС‚СЊСЃСЏ СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ.}
 procedure FBBackupDatabaseOnServer(AServerName: string; APort: Integer; ADBName, ABackupFile,
   AUser, APassw: string; ABackupOptions: TFBBackupOptions; AProgressProc: TBackupRestoreProgressProc; AModuleName: string);
 
-{Осуществляет резервирование базы данных и копирует файл резервной копии с сервера
- на компьютер клиента.
- ASourBackupFileOnServer: имя файла резервной копии, доступное для клиентской программы
- ADestBackupFileOnClient: имя файла, под которым рез. копия будет сохранена на клиентском компьютере}
+{РћСЃСѓС‰РµСЃС‚РІР»СЏРµС‚ СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ Р±Р°Р·С‹ РґР°РЅРЅС‹С… Рё РєРѕРїРёСЂСѓРµС‚ С„Р°Р№Р» СЂРµР·РµСЂРІРЅРѕР№ РєРѕРїРёРё СЃ СЃРµСЂРІРµСЂР°
+ РЅР° РєРѕРјРїСЊСЋС‚РµСЂ РєР»РёРµРЅС‚Р°.
+ ASourBackupFileOnServer: РёРјСЏ С„Р°Р№Р»Р° СЂРµР·РµСЂРІРЅРѕР№ РєРѕРїРёРё, РґРѕСЃС‚СѓРїРЅРѕРµ РґР»СЏ РєР»РёРµРЅС‚СЃРєРѕР№ РїСЂРѕРіСЂР°РјРјС‹
+ ADestBackupFileOnClient: РёРјСЏ С„Р°Р№Р»Р°, РїРѕРґ РєРѕС‚РѕСЂС‹Рј СЂРµР·. РєРѕРїРёСЏ Р±СѓРґРµС‚ СЃРѕС…СЂР°РЅРµРЅР° РЅР° РєР»РёРµРЅС‚СЃРєРѕРј РєРѕРјРїСЊСЋС‚РµСЂРµ}
 procedure FBBackupDatabaseAndCopyFromServer(AServerName: string; APort: Integer; ADBName, ABackupFile,
   AUser, APassw: string; ABackupOptions: TFBBackupOptions; AProgressProc: TBackupRestoreProgressProc;
   ASourBackupFileOnServer, ADestBackupFileOnClient: string; TryDeleteSourBackupFile: Boolean; AModuleName: string);
 
-{Осуществляет восстановление базы данных средствами Firebird Service-API.
- Весь процесс восстановления осуществляется на сервере (AServerName). Файл
- бэкапа ABackupFile следует задавать относительно сервера, на котором должно
- выполняться рвосстановление.}
+{РћСЃСѓС‰РµСЃС‚РІР»СЏРµС‚ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ Р±Р°Р·С‹ РґР°РЅРЅС‹С… СЃСЂРµРґСЃС‚РІР°РјРё Firebird Service-API.
+ Р’РµСЃСЊ РїСЂРѕС†РµСЃСЃ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ РѕСЃСѓС‰РµСЃС‚РІР»СЏРµС‚СЃСЏ РЅР° СЃРµСЂРІРµСЂРµ (AServerName). Р¤Р°Р№Р»
+ Р±СЌРєР°РїР° ABackupFile СЃР»РµРґСѓРµС‚ Р·Р°РґР°РІР°С‚СЊ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ СЃРµСЂРІРµСЂР°, РЅР° РєРѕС‚РѕСЂРѕРј РґРѕР»Р¶РЅРѕ
+ РІС‹РїРѕР»РЅСЏС‚СЊСЃСЏ СЂРІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ.}
 procedure FBRestoreDatabaseOnServer(AServerName: string; APort: Integer; ADBName, ABackupFile,
   AUser, APassw: string; ARestoreOptions: TFBRestoreOptions; AProgressProc: TBackupRestoreProgressProc; AModuleName: string);
 
-{Копирует байл резервной копии на сервер и производит восстановление базы данных}
+{РљРѕРїРёСЂСѓРµС‚ Р±Р°Р№Р» СЂРµР·РµСЂРІРЅРѕР№ РєРѕРїРёРё РЅР° СЃРµСЂРІРµСЂ Рё РїСЂРѕРёР·РІРѕРґРёС‚ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ Р±Р°Р·С‹ РґР°РЅРЅС‹С…}
 procedure FBCopyBackupToServerAndRestoreDatabase(AServerName: string; APort: Integer; ADBName, ABackupFile,
   AUser, APassw: string; ARestoreOptions: TFBRestoreOptions; AProgressProc: TBackupRestoreProgressProc;
   ABackupFileOnClient, ABackupFileOnServer: string; TryDeleteBackupFileOnClient,
   TryDeleteBackupFileOnServer: Boolean; AModuleName: string);
 
-{$IFDEF FBUTILSDLL} // Замечания по директиве смотрите в модуле fbUtilsBase.pas
+{$IFDEF FBUTILSDLL} // Р—Р°РјРµС‡Р°РЅРёСЏ РїРѕ РґРёСЂРµРєС‚РёРІРµ СЃРјРѕС‚СЂРёС‚Рµ РІ РјРѕРґСѓР»Рµ fbUtilsBase.pas
 exports
   FBBackupDatabaseOnServer name 'ibxFBBackupDatabaseOnServer',      
   FBBackupDatabaseAndCopyFromServer name 'ibxFBBackupDatabaseAndCopyFromServer',
@@ -83,11 +95,11 @@ exports
 {$ENDIF}
 
 resourcestring
-  FBStrOperationAborted       = 'Операция прервана клиентом'; // Operation was aborted by client
-  FBStrBackupOnServerNotFound = 'Файл бэкапа "%s" на сервере "%s" не найден или нет доступа';
-  FBStrFileNotFound           = 'Файл "%s" не найден';
-  FBStrCanNotDeleteFile       = 'Невозможно удалить файл "%s". Причина: %s';
-  FBStrCanNotCopyFile         = 'Невозможно скопировать файл "%s" в "%s". Причина: %s';
+  FBStrOperationAborted       = 'РћРїРµСЂР°С†РёСЏ РїСЂРµСЂРІР°РЅР° РєР»РёРµРЅС‚РѕРј'; // Operation was aborted by client
+  FBStrBackupOnServerNotFound = 'Р¤Р°Р№Р» Р±СЌРєР°РїР° "%s" РЅР° СЃРµСЂРІРµСЂРµ "%s" РЅРµ РЅР°Р№РґРµРЅ РёР»Рё РЅРµС‚ РґРѕСЃС‚СѓРїР°';
+  FBStrFileNotFound           = 'Р¤Р°Р№Р» "%s" РЅРµ РЅР°Р№РґРµРЅ';
+  FBStrCanNotDeleteFile       = 'РќРµРІРѕР·РјРѕР¶РЅРѕ СѓРґР°Р»РёС‚СЊ С„Р°Р№Р» "%s". РџСЂРёС‡РёРЅР°: %s';
+  FBStrCanNotCopyFile         = 'РќРµРІРѕР·РјРѕР¶РЅРѕ СЃРєРѕРїРёСЂРѕРІР°С‚СЊ С„Р°Р№Р» "%s" РІ "%s". РџСЂРёС‡РёРЅР°: %s';
 
 implementation
 
@@ -103,7 +115,7 @@ begin
     bs := TIBBackupService.Create(nil);
     try
     {$IFDEF DXE2PLUS}
-      { В новых версиях IBX чего-то намутили... }
+      { Р’ РЅРѕРІС‹С… РІРµСЂСЃРёСЏС… IBX С‡РµРіРѕ-С‚Рѕ РЅР°РјСѓС‚РёР»Рё... }
       bs.ServerType := 'IBServer';
     {$ENDIF}
 
@@ -111,13 +123,21 @@ begin
         Format('user_name=%s%spassword=%s',
           [AUser, sLineBreak, APassw]);
 
+    {$IF defined(FPC) and defined(WINDOWS)}
+    if ADBName <> UTF8ToWinCP(ADBName) then
+      raise Exception.CreateFmt(FBStrDBNameMustEnglish, [ADBName]);
+
+    if ABackupFile <> UTF8ToWinCP(ABackupFile) then
+      raise Exception.CreateFmt(FBStrDBNameMustEnglish, [ABackupFile]);
+    {$IFEND}
+
       bs.DatabaseName := ADBName;
 
       bs.BackupFile.Text := ABackupFile;
 
       if AServerName = '' then
       begin
-        bs.Protocol := Local;
+        bs.Protocol := {$IFDEF FPC}TProtocol.{$ENDIF}Local;
       end else
       begin
         bs.ServerName := AServerName + '/' + IntToStr(APort);
@@ -125,12 +145,12 @@ begin
       end;
 
       bs.LoginPrompt := False;
-      bs.Verbose := True; // Включаем генерацию сообщений о ходе резервирования
+      bs.Verbose := True; // Р’РєР»СЋС‡Р°РµРј РіРµРЅРµСЂР°С†РёСЋ СЃРѕРѕР±С‰РµРЅРёР№ Рѕ С…РѕРґРµ СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёСЏ
 
-      bs.Options := TBackupOptions(ABackupOptions); // Опции резервирования
+      bs.Options := TBackupOptions(ABackupOptions); // РћРїС†РёРё СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёСЏ
 
       try
-        bs.Active := True; // Подключаемся к Firebird
+        bs.Active := True; // РџРѕРґРєР»СЋС‡Р°РµРјСЃСЏ Рє Firebird
       except
         on E: Exception do
           if E is EAccessViolation then
@@ -139,7 +159,7 @@ begin
             raise;
       end;
       try
-        bs.ServiceStart; // Запускаем резервирование
+        bs.ServiceStart; // Р—Р°РїСѓСЃРєР°РµРј СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ
         while not bs.Eof do
         begin
           LastMsg := bs.GetNextLine;
@@ -152,7 +172,7 @@ begin
           end;
         end;
       finally
-        bs.Active := False; // Отключаемся от Firebird
+        bs.Active := False; // РћС‚РєР»СЋС‡Р°РµРјСЃСЏ РѕС‚ Firebird
       end;
     finally
       bs.Free;
@@ -182,7 +202,7 @@ begin
         [ASourBackupFileOnServer, ADestBackupFileOnClient, SysErrorMessage(GetLastError)]);
 
     if TryDeleteSourBackupFile then
-      DeleteFile(ASourBackupFileOnServer); // В случае неудачи ошибка не выдается!
+      DeleteFile(ASourBackupFileOnServer); // Р’ СЃР»СѓС‡Р°Рµ РЅРµСѓРґР°С‡Рё РѕС€РёР±РєР° РЅРµ РІС‹РґР°РµС‚СЃСЏ!
   except
     on E: Exception do
       raise ReCreateEObject(E, 'FBBackupDatabaseAndCopyFromServer');
@@ -201,13 +221,21 @@ begin
     rs := TIBRestoreService.Create(nil);
     try
     {$IFDEF DXE2PLUS}
-      { В новых версиях IBX чего-то намутили... }
+      { Р’ РЅРѕРІС‹С… РІРµСЂСЃРёСЏС… IBX С‡РµРіРѕ-С‚Рѕ РЅР°РјСѓС‚РёР»Рё... }
       rs.ServerType := 'IBServer';
     {$ENDIF}
 
       rs.Params.Text :=
         Format('user_name=%s%spassword=%s',
           [AUser, sLineBreak, APassw]);
+
+      {$IF defined(FPC) and defined(WINDOWS)}
+      if ADBName <> UTF8ToWinCP(ADBName) then
+        raise Exception.CreateFmt(FBStrDBNameMustEnglish, [ADBName]);
+
+      if ABackupFile <> UTF8ToWinCP(ABackupFile) then
+        raise Exception.CreateFmt(FBStrDBNameMustEnglish, [ABackupFile]);
+      {$IFEND}
 
       rs.DatabaseName.Text := ADBName;
 
@@ -223,13 +251,14 @@ begin
       end;
 
       rs.LoginPrompt := False;
-      rs.Verbose := True; // Включаем генерацию сообщений о ходе восстановления
+      rs.Verbose     := True; // Р’РєР»СЋС‡Р°РµРј РіРµРЅРµСЂР°С†РёСЋ СЃРѕРѕР±С‰РµРЅРёР№ Рѕ С…РѕРґРµ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ
+      rs.PageSize    := 16384;
 
-      rs.Options := TRestoreOptions(ARestoreOptions); // Опции восстановления
+      rs.Options := TRestoreOptions(ARestoreOptions); // РћРїС†РёРё РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ
 
-      rs.Active := True; // Подключаемся к Firebird
+      rs.Active := True; // РџРѕРґРєР»СЋС‡Р°РµРјСЃСЏ Рє Firebird
       try
-        rs.ServiceStart; // Запускаем восстановление
+        rs.ServiceStart; // Р—Р°РїСѓСЃРєР°РµРј РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ
         while not rs.Eof do
         begin
           LastMsg := rs.GetNextLine;
@@ -242,7 +271,7 @@ begin
           end;
         end;
       finally
-        rs.Active := False; // Отключаемся от Firebird
+        rs.Active := False; // РћС‚РєР»СЋС‡Р°РµРјСЃСЏ РѕС‚ Firebird
       end;
     finally
       rs.Free;
@@ -266,16 +295,16 @@ begin
       if not DeleteFile(ABackupFileOnServer) then
         raise Exception.CreateFmt(FBStrCanNotDeleteFile, [ABackupFileOnServer, SysErrorMessage(GetLastError)]);
 
-    // Копируем файл бэкапа на сервер
+    // РљРѕРїРёСЂСѓРµРј С„Р°Р№Р» Р±СЌРєР°РїР° РЅР° СЃРµСЂРІРµСЂ
     if not CopyFile(PChar(ABackupFileOnClient), PChar(ABackupFileOnServer), True) then
       raise Exception.CreateFmt(FBStrCanNotCopyFile,
         [ABackupFileOnClient, ABackupFileOnServer, SysErrorMessage(GetLastError)]);
 
-    // Осуществляет восстановление БД из резервной копии
+    // РћСЃСѓС‰РµСЃС‚РІР»СЏРµС‚ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ Р‘Р” РёР· СЂРµР·РµСЂРІРЅРѕР№ РєРѕРїРёРё
     FBRestoreDatabaseOnServer(AServerName, APort, ADBName, ABackupFile,
       AUser, APassw, ARestoreOptions, AProgressProc, AModuleName);
 
-    // Удаляем файлы резервной копии при необходимости
+    // РЈРґР°Р»СЏРµРј С„Р°Р№Р»С‹ СЂРµР·РµСЂРІРЅРѕР№ РєРѕРїРёРё РїСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё
     if TryDeleteBackupFileOnServer then
       DeleteFile(ABackupFileOnServer);
     if TryDeleteBackupFileOnClient then

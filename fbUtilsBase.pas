@@ -1,4 +1,4 @@
-{
+п»ї{
 Copyright (c) 2012-2013, Loginov Dmitry Sergeevich
 All rights reserved.
 
@@ -27,37 +27,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 {                                                                             }
 {                                                                             }
 {                                                                             }
-{ Модуль fbUtilsBase - содержит базовые функции для работы с fbUtils          }
-{ (c) 2012 Логинов Дмитрий Сергеевич                                          }
-{ Последнее обновление: 09.05.2012                                            }
-{ Протестировано на D7, D2007, D2010, D-XE2                                   }
-{ Адрес сайта: http://loginovprojects.ru/                                     }
+{ РњРѕРґСѓР»СЊ fbUtilsBase - СЃРѕРґРµСЂР¶РёС‚ Р±Р°Р·РѕРІС‹Рµ С„СѓРЅРєС†РёРё РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ fbUtils          }
+{ (c) 2012 Р›РѕРіРёРЅРѕРІ Р”РјРёС‚СЂРёР№ РЎРµСЂРіРµРµРІРёС‡                                          }
+{ РџРѕСЃР»РµРґРЅРµРµ РѕР±РЅРѕРІР»РµРЅРёРµ: 09.05.2012                                            }
+{ РџСЂРѕС‚РµСЃС‚РёСЂРѕРІР°РЅРѕ РЅР° D7, D2007, D2010, D-XE2                                   }
+{ РђРґСЂРµСЃ СЃР°Р№С‚Р°: http://loginovprojects.ru/                                     }
 { e-mail: loginov_d@inbox.ru                                                  }
 {                                                                             }
 { *************************************************************************** }
 
 {
-Этот модуль не использует функции из модуля fbUtils.pas.
+Р­С‚РѕС‚ РјРѕРґСѓР»СЊ РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚ С„СѓРЅРєС†РёРё РёР· РјРѕРґСѓР»СЏ fbUtils.pas.
 
-Данные модуль НЕЛЬЗЯ компилировать в нескольких модулях одного приложения.
-Если такая необходимость возникла, то модуль должен быть вкомпилирован в
-отдельную DLL-библиотеку или BPL-пакет
+Р”Р°РЅРЅС‹Рµ РјРѕРґСѓР»СЊ РќР•Р›Р¬Р—РЇ РєРѕРјРїРёР»РёСЂРѕРІР°С‚СЊ РІ РЅРµСЃРєРѕР»СЊРєРёС… РјРѕРґСѓР»СЏС… РѕРґРЅРѕРіРѕ РїСЂРёР»РѕР¶РµРЅРёСЏ.
+Р•СЃР»Рё С‚Р°РєР°СЏ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚СЊ РІРѕР·РЅРёРєР»Р°, С‚Рѕ РјРѕРґСѓР»СЊ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РІРєРѕРјРїРёР»РёСЂРѕРІР°РЅ РІ
+РѕС‚РґРµР»СЊРЅСѓСЋ DLL-Р±РёР±Р»РёРѕС‚РµРєСѓ РёР»Рё BPL-РїР°РєРµС‚
 
-Пользователю в своих проектах не нужно использовать данный модуль напрямую.
+РџРѕР»СЊР·РѕРІР°С‚РµР»СЋ РІ СЃРІРѕРёС… РїСЂРѕРµРєС‚Р°С… РЅРµ РЅСѓР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РґР°РЅРЅС‹Р№ РјРѕРґСѓР»СЊ РЅР°РїСЂСЏРјСѓСЋ.
 }
+
+{$IFDEF FPC}
+{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
+{$ENDIF}
 
 unit fbUtilsBase;
 
 interface
 
 uses
-  Windows, SysUtils, Classes, IB, IBDatabase, IBCustomDataSet, Variants, fbTypes, fbSomeFuncs,
-  IniFiles, StrUtils;
+{$IFnDEF FPC}
+  Windows,
+{$ELSE}
+  LCLIntf, LCLType, LMessages, LazUTF8,
+{$ENDIF}
+  SysUtils, Classes, IB, Variants, fbTypes, fbSomeFuncs,
+  IniFiles, StrUtils, LDSLogger, IBCustomDataSet, IBDatabase, IBSQLMonitor, DB, SyncObjs;
 
 type
   TFBDatasetList = class(TComponent)
   private
-    FList: THashedStringList; // Список датасетов
+    FList: THashedStringList; // РЎРїРёСЃРѕРє РґР°С‚Р°СЃРµС‚РѕРІ
   protected
     procedure Notification(AComponent: TComponent;
       Operation: TOperation); override;
@@ -66,160 +75,188 @@ type
     destructor Destroy; override;
   end;
 
-{Создает объект соединения в базой данных. Дополнительно позволяет создать
- транзакцию (если TranType>trNone), а также открыть соединение с базой данных.
- Обратите внимание также на пул подключений, реализованный в модуле fbUtilsPool.pas}
+{РЎРѕР·РґР°РµС‚ РѕР±СЉРµРєС‚ СЃРѕРµРґРёРЅРµРЅРёСЏ РІ Р±Р°Р·РѕР№ РґР°РЅРЅС‹С…. Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕ РїРѕР·РІРѕР»СЏРµС‚ СЃРѕР·РґР°С‚СЊ
+ С‚СЂР°РЅР·Р°РєС†РёСЋ (РµСЃР»Рё TranType>trNone), Р° С‚Р°РєР¶Рµ РѕС‚РєСЂС‹С‚СЊ СЃРѕРµРґРёРЅРµРЅРёРµ СЃ Р±Р°Р·РѕР№ РґР°РЅРЅС‹С….
+ РћР±СЂР°С‚РёС‚Рµ РІРЅРёРјР°РЅРёРµ С‚Р°РєР¶Рµ РЅР° РїСѓР» РїРѕРґРєР»СЋС‡РµРЅРёР№, СЂРµР°Р»РёР·РѕРІР°РЅРЅС‹Р№ РІ РјРѕРґСѓР»Рµ fbUtilsPool.pas.
+ Р’РЅРёРјР°РЅРёРµ! РРјСЏ Р±Р°Р·С‹ РґР°РЅРЅС‹С… ADataBase РЅРµ РґРѕР»Р¶РЅРѕ СЃРѕРґРµСЂР¶Р°С‚СЊ СЃРёРјРІРѕР»РѕРІ РќР•Р»Р°С‚РёРЅСЃРєРѕРіРѕ Р°Р»С„Р°РІРёС‚Р° }
 function FBCreateConnection(AServerName: string; APort: Integer; ADataBase: string;
       AUserName, APassword, ACodePage: string; TranType: TTransactionType;
       DoOpen: Boolean; AOwner: TComponent; AModuleName: string): TIBDataBase;
 
-{Возвращает строку с полным именем базы данных, включая (при необходимости) имя сервера и TCP-порт.
- Если имя сервера не указано, то используется тип подключения LOCAL}
+{Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃС‚СЂРѕРєСѓ СЃ РїРѕР»РЅС‹Рј РёРјРµРЅРµРј Р±Р°Р·С‹ РґР°РЅРЅС‹С…, РІРєР»СЋС‡Р°СЏ (РїСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё) РёРјСЏ СЃРµСЂРІРµСЂР° Рё TCP-РїРѕСЂС‚.
+ Р•СЃР»Рё РёРјСЏ СЃРµСЂРІРµСЂР° РЅРµ СѓРєР°Р·Р°РЅРѕ, С‚Рѕ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ С‚РёРї РїРѕРґРєР»СЋС‡РµРЅРёСЏ LOCAL}
 function FBGetFullDatabaseName(AServerName: string; APort: Integer; ADBName: string): string;
 
-{Подключение к базе данных}
+{РџРѕРґРєР»СЋС‡РµРЅРёРµ Рє Р±Р°Р·Рµ РґР°РЅРЅС‹С…}
 procedure FBConnectDB(FDB: TIBDatabase; AModuleName: string = '');
 
-{Отключение от базы данных}
+{РћС‚РєР»СЋС‡РµРЅРёРµ РѕС‚ Р±Р°Р·С‹ РґР°РЅРЅС‹С…}
 procedure FBDisconnectDB(FDB: TIBDatabase; AModuleName: string = '');
 
-{Удаление объекта подключения к базе данных}
+{РЈРґР°Р»РµРЅРёРµ РѕР±СЉРµРєС‚Р° РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р±Р°Р·Рµ РґР°РЅРЅС‹С…}
 procedure FBFreeConnection(FDB: TIBDatabase; AModuleName: string);
 
-{Создает тразакцию в соответствии с заданным TranType }
+{РЎРѕР·РґР°РµС‚ С‚СЂР°Р·Р°РєС†РёСЋ РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРё СЃ Р·Р°РґР°РЅРЅС‹Рј TranType }
 function FBCreateTransaction(FDB: TIBDataBase; TranType: TTransactionType; AutoStart: Boolean;
   AOwner: TComponent; AModuleName: string): TIBTransaction;
 
-{Создает набор данных TIBDataSet.
- По умолчанию ParamCheck=True. Это требуется в большинстве случаев.
- Внимание! В Delphi XE2 возникает ошибка при указании в качестве AOwner объектов
- TIBDataBase или TIBTransaction}
+{РЎРѕР·РґР°РµС‚ РЅР°Р±РѕСЂ РґР°РЅРЅС‹С… TIBDataSet.
+ РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ ParamCheck=True. Р­С‚Рѕ С‚СЂРµР±СѓРµС‚СЃСЏ РІ Р±РѕР»СЊС€РёРЅСЃС‚РІРµ СЃР»СѓС‡Р°РµРІ.
+ Р’РЅРёРјР°РЅРёРµ! Р’ Delphi XE2 РІРѕР·РЅРёРєР°РµС‚ РѕС€РёР±РєР° РїСЂРё СѓРєР°Р·Р°РЅРёРё РІ РєР°С‡РµСЃС‚РІРµ AOwner РѕР±СЉРµРєС‚РѕРІ
+ TIBDataBase РёР»Рё TIBTransaction}
 function FBCreateDataSet(FDB: TIBDatabase; FTran: TIBTransaction; TranAutoStart: Boolean;
   AOwner: TComponent; AModuleName: string): TIBDataSet;
 
-{Создает набор данных TIBDataSet и автоматически открывает заданный запрос. Пример:
+{РЎРѕР·РґР°РµС‚ РЅР°Р±РѕСЂ РґР°РЅРЅС‹С… TIBDataSet Рё Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РѕС‚РєСЂС‹РІР°РµС‚ Р·Р°РґР°РЅРЅС‹Р№ Р·Р°РїСЂРѕСЃ. РџСЂРёРјРµСЂ:
  ds := FBCreateAndOpenDataSet(MyDB, MyTran, 'SELECT * FROM MYTABLE', [], [], nil, '')
- FetchAll вызывается автоматически}
+ FetchAll РІС‹Р·С‹РІР°РµС‚СЃСЏ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё}
 function FBCreateAndOpenDataSet(FDB: TIBDatabase; FTran: TIBTransaction; SQL: string;
   ParamNames: array of string; ParamValues: array of Variant;
   AOwner: TComponent; AModuleName: string): TIBDataSet;
 
-{Создает набор данных TIBDataSet и выполняет SELECT-запрос к одной таблице}
+{РЎРѕР·РґР°РµС‚ РЅР°Р±РѕСЂ РґР°РЅРЅС‹С… TIBDataSet Рё РІС‹РїРѕР»РЅСЏРµС‚ SELECT-Р·Р°РїСЂРѕСЃ Рє РѕРґРЅРѕР№ С‚Р°Р±Р»РёС†Рµ}
 function FBCreateAndOpenTable(FDB: TIBDatabase; FTran: TIBTransaction;
   ATable, AFilter, AOrder: string;
   ParamNames: array of string; ParamValues: array of Variant;
   AOwner: TComponent; AModuleName: string): TIBDataSet;
 
-{Возвращает набор данных TIBDataSet по SQL-запросу. Если объект TIBDataSet не был создан,
- то создаёт его. Объекты TIBDataSet будут уничтожены автоматически при удалении транзакции, т.е.
- удалять объект TIBDataSet не обязательно! }
+{Р’РѕР·РІСЂР°С‰Р°РµС‚ РЅР°Р±РѕСЂ РґР°РЅРЅС‹С… TIBDataSet РїРѕ SQL-Р·Р°РїСЂРѕСЃСѓ. Р•СЃР»Рё РѕР±СЉРµРєС‚ TIBDataSet РЅРµ Р±С‹Р» СЃРѕР·РґР°РЅ,
+ С‚Рѕ СЃРѕР·РґР°С‘С‚ РµРіРѕ. РћР±СЉРµРєС‚С‹ TIBDataSet Р±СѓРґСѓС‚ СѓРЅРёС‡С‚РѕР¶РµРЅС‹ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РїСЂРё СѓРґР°Р»РµРЅРёРё С‚СЂР°РЅР·Р°РєС†РёРё, С‚.Рµ.
+ СѓРґР°Р»СЏС‚СЊ РѕР±СЉРµРєС‚ TIBDataSet РЅРµ РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ! }
 function FBGetDataSet(FDB: TIBDatabase; FTran: TIBTransaction; SQL: string; AModuleName: string): TIBDataSet;
 
-{ Получает набор данных (с помощью функции FBGetDataSet), выставляет параметры и выполняет запрос }
+{ РџРѕР»СѓС‡Р°РµС‚ РЅР°Р±РѕСЂ РґР°РЅРЅС‹С… (СЃ РїРѕРјРѕС‰СЊСЋ С„СѓРЅРєС†РёРё FBGetDataSet), РІС‹СЃС‚Р°РІР»СЏРµС‚ РїР°СЂР°РјРµС‚СЂС‹ Рё РІС‹РїРѕР»РЅСЏРµС‚ Р·Р°РїСЂРѕСЃ }
 function FBGetAndOpenDataSet(FDB: TIBDatabase; FTran: TIBTransaction; SQL: string;
   ParamNames: array of string; ParamValues: array of Variant; AModuleName: string): TIBDataSet;
 
-{Выполняет указанный SQL-запрос.
- Внимание! Транзакция НЕ ЗАВЕРШАЕТСЯ!}
+{Р’С‹РїРѕР»РЅСЏРµС‚ СѓРєР°Р·Р°РЅРЅС‹Р№ SQL-Р·Р°РїСЂРѕСЃ.
+ Р’РЅРёРјР°РЅРёРµ! РўСЂР°РЅР·Р°РєС†РёСЏ РќР• Р—РђР’Р•Р РЁРђР•РўРЎРЇ!}
 procedure FBExecQuery(FDB: TIBDatabase; FTran: TIBTransaction; SQL: string;
   ParamNames: array of string; ParamValues: array of Variant; AModuleName: string);
 
-{ Возвращает массив значений заданных полей указанной таблицы для первой найденной записи }
+{ Р’РѕР·РІСЂР°С‰Р°РµС‚ РјР°СЃСЃРёРІ Р·РЅР°С‡РµРЅРёР№ Р·Р°РґР°РЅРЅС‹С… РїРѕР»РµР№ СѓРєР°Р·Р°РЅРЅРѕР№ С‚Р°Р±Р»РёС†С‹ РґР»СЏ РїРµСЂРІРѕР№ РЅР°Р№РґРµРЅРЅРѕР№ Р·Р°РїРёСЃРё }
 function FBGetTableFieldValues(FDB: TIBDataBase; FTran: TIBTransaction; TableName: string; FieldNames: array of string;
   KeyFields: array of string; KeyValues: array of Variant; DefValues: array of Variant; AModuleName: string): OleVariant;
 
-{Изменение записи. В FieldNames должны быть все поля, в том числе и ключевые.
- Ключевые поля подставляются в секцию WHERE}
+{РР·РјРµРЅРµРЅРёРµ Р·Р°РїРёСЃРё. Р’ FieldNames РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РІСЃРµ РїРѕР»СЏ, РІ С‚РѕРј С‡РёСЃР»Рµ Рё РєР»СЋС‡РµРІС‹Рµ.
+ РљР»СЋС‡РµРІС‹Рµ РїРѕР»СЏ РїРѕРґСЃС‚Р°РІР»СЏСЋС‚СЃСЏ РІ СЃРµРєС†РёСЋ WHERE}
 procedure FBUpdateRecordBase(FDB: TIBDataBase; FTran: TIBTransaction;
   TableName: string; KeyFields: array of string; KeyValues: array of Variant;
   FieldNames: array of string; AFieldValues: array of Variant; AModuleName: string);
 
-{Добавляет запись в таблицу произвольной базы данных }
+{Р”РѕР±Р°РІР»СЏРµС‚ Р·Р°РїРёСЃСЊ РІ С‚Р°Р±Р»РёС†Сѓ РїСЂРѕРёР·РІРѕР»СЊРЅРѕР№ Р±Р°Р·С‹ РґР°РЅРЅС‹С… }
 procedure FBInsertRecordBase(FDB: TIBDataBase; FTran: TIBTransaction;
   TableName: string; FieldNames: array of string; AFieldValues: array of Variant; AModuleName: string);
 
-{Удаление строк из таблицы TableName базы данных IBdb. Если массив KeyFields пустой,
- то выполняется полная очистка таблицы}
+{РЈРґР°Р»РµРЅРёРµ СЃС‚СЂРѕРє РёР· С‚Р°Р±Р»РёС†С‹ TableName Р±Р°Р·С‹ РґР°РЅРЅС‹С… IBdb. Р•СЃР»Рё РјР°СЃСЃРёРІ KeyFields РїСѓСЃС‚РѕР№,
+ С‚Рѕ РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ РїРѕР»РЅР°СЏ РѕС‡РёСЃС‚РєР° С‚Р°Р±Р»РёС†С‹}
 procedure FBDeleteRecordBase(FDB: TIBDataBase; FTran: TIBTransaction;
   TableName: string; KeyFields: array of string; KeyValues: array of Variant; AModuleName: string);
 
-{Добавляет или обновляет запись (появилось в FB v.2.1)}
+{Р”РѕР±Р°РІР»СЏРµС‚ РёР»Рё РѕР±РЅРѕРІР»СЏРµС‚ Р·Р°РїРёСЃСЊ (РїРѕСЏРІРёР»РѕСЃСЊ РІ FB v.2.1)}
 procedure FBUpdateOrInsertRecordBase(FDB: TIBDataBase; FTran: TIBTransaction;
   TableName: string; FieldNames: array of string; AFieldValues: array of Variant;
   KeyFields: array of string; AModuleName: string);
 
-{Возвращает версию библиотеки. Эту информацию имеет смысл использовать только
- если загружена библиотека FBUTILS.DLL. Для целей совместимости}
+{Р’РѕР·РІСЂР°С‰Р°РµС‚ РІРµСЂСЃРёСЋ Р±РёР±Р»РёРѕС‚РµРєРё. Р­С‚Сѓ РёРЅС„РѕСЂРјР°С†РёСЋ РёРјРµРµС‚ СЃРјС‹СЃР» РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ
+ РµСЃР»Рё Р·Р°РіСЂСѓР¶РµРЅР° Р±РёР±Р»РёРѕС‚РµРєР° FBUTILS.DLL. Р”Р»СЏ С†РµР»РµР№ СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё}
 function FBUtilsVersion: Integer;
 
-{Следующие 4 функции позволяют сохранить имя и пароль пользователя в переменные
- FBUserName и FBPassword и прочитать их. Библиотека FBUtils не использует данные
- переменные для каких-либо целей. Они нужны для удобства использования библиотеки.
- В том случае, если используется FBUTILS.DLL, переменные будут общими для всех
- модулей. Устанавливать значения переменных следует только из одного места}
+{РЎР»РµРґСѓСЋС‰РёРµ 4 С„СѓРЅРєС†РёРё РїРѕР·РІРѕР»СЏСЋС‚ СЃРѕС…СЂР°РЅРёС‚СЊ РёРјСЏ Рё РїР°СЂРѕР»СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РІ РїРµСЂРµРјРµРЅРЅС‹Рµ
+ FBUserName Рё FBPassword Рё РїСЂРѕС‡РёС‚Р°С‚СЊ РёС…. Р‘РёР±Р»РёРѕС‚РµРєР° FBUtils РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚ РґР°РЅРЅС‹Рµ
+ РїРµСЂРµРјРµРЅРЅС‹Рµ РґР»СЏ РєР°РєРёС…-Р»РёР±Рѕ С†РµР»РµР№. РћРЅРё РЅСѓР¶РЅС‹ РґР»СЏ СѓРґРѕР±СЃС‚РІР° РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ Р±РёР±Р»РёРѕС‚РµРєРё.
+ Р’ С‚РѕРј СЃР»СѓС‡Р°Рµ, РµСЃР»Рё РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ FBUTILS.DLL, РїРµСЂРµРјРµРЅРЅС‹Рµ Р±СѓРґСѓС‚ РѕР±С‰РёРјРё РґР»СЏ РІСЃРµС…
+ РјРѕРґСѓР»РµР№. РЈСЃС‚Р°РЅР°РІР»РёРІР°С‚СЊ Р·РЅР°С‡РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅС‹С… СЃР»РµРґСѓРµС‚ С‚РѕР»СЊРєРѕ РёР· РѕРґРЅРѕРіРѕ РјРµСЃС‚Р°}
 procedure FBSetUserName(AUserName: string);
 function FBGetUserName: string;
 procedure FBSetPassword(APassword: string);
 function FBGetPassword: string;
+procedure FBSetPort(APort: Integer);
+function FBGetPort: Integer;
+procedure FBSetCodePage(ACodePage: string);
+function FBGetCodePage: string;
 
-{Осуществляет пересчет индексной статистики (операция может занять длительное время).
- Полученная информация не хранится в базе данных и теряется после перезагрузки компьютера.
- Функцию не рекомендуется вызывать, если выполняется интенсивная работа с базой данных.
- Вместо пересчета статистики рекомендуется периодически делать Backup/Restore}
+{РћСЃСѓС‰РµСЃС‚РІР»СЏРµС‚ РїРµСЂРµСЃС‡РµС‚ РёРЅРґРµРєСЃРЅРѕР№ СЃС‚Р°С‚РёСЃС‚РёРєРё (РѕРїРµСЂР°С†РёСЏ РјРѕР¶РµС‚ Р·Р°РЅСЏС‚СЊ РґР»РёС‚РµР»СЊРЅРѕРµ РІСЂРµРјСЏ).
+ РџРѕР»СѓС‡РµРЅРЅР°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ РЅРµ С…СЂР°РЅРёС‚СЃСЏ РІ Р±Р°Р·Рµ РґР°РЅРЅС‹С… Рё С‚РµСЂСЏРµС‚СЃСЏ РїРѕСЃР»Рµ РїРµСЂРµР·Р°РіСЂСѓР·РєРё РєРѕРјРїСЊСЋС‚РµСЂР°.
+ Р¤СѓРЅРєС†РёСЋ РЅРµ СЂРµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ РІС‹Р·С‹РІР°С‚СЊ, РµСЃР»Рё РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ РёРЅС‚РµРЅСЃРёРІРЅР°СЏ СЂР°Р±РѕС‚Р° СЃ Р±Р°Р·РѕР№ РґР°РЅРЅС‹С….
+ Р’РјРµСЃС‚Рѕ РїРµСЂРµСЃС‡РµС‚Р° СЃС‚Р°С‚РёСЃС‚РёРєРё СЂРµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ РїРµСЂРёРѕРґРёС‡РµСЃРєРё РґРµР»Р°С‚СЊ Backup/Restore}
 procedure FBRecomputeIndexStatistics(FDB: TIBDatabase; AModuleName: string);
 
-{Увеличивает значение генератора GeneratorName на IncValue и возвращает полученное значение.
- Указывайте двойные кавычки в имени генератора, если в этом есть необходимость}
+{РЈРІРµР»РёС‡РёРІР°РµС‚ Р·РЅР°С‡РµРЅРёРµ РіРµРЅРµСЂР°С‚РѕСЂР° GeneratorName РЅР° IncValue Рё РІРѕР·РІСЂР°С‰Р°РµС‚ РїРѕР»СѓС‡РµРЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ.
+ РЈРєР°Р·С‹РІР°Р№С‚Рµ РґРІРѕР№РЅС‹Рµ РєР°РІС‹С‡РєРё РІ РёРјРµРЅРё РіРµРЅРµСЂР°С‚РѕСЂР°, РµСЃР»Рё РІ СЌС‚РѕРј РµСЃС‚СЊ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚СЊ}
 function FBGenID(FDB: TIBDatabase; GeneratorName: string; IncValue: Integer; AModuleName: string): Int64;
 
 function FBGenIDEx(FDB: TIBDatabase; TranW: TIBTransaction; GeneratorName: string; IncValue: Integer; AModuleName: string): Int64;
 
-{Выполняет команду EXECUTE BLOCK (аналог хранимой процедуры).
- Внимание! Не забывайте про команду SUSPEND, иначе не вернет ни одной строки
- OutFieldsDesc - выходные поля. Если строка пустая, то функция выполняет команду
-   и возвращает NIL
- VarDesc - описание переменных
- Body - тело хранимой процедуры. Начальный и конечный BEGIN..END подставляется автоматически  }
+{Р’С‹РїРѕР»РЅСЏРµС‚ РєРѕРјР°РЅРґСѓ EXECUTE BLOCK (Р°РЅР°Р»РѕРі С…СЂР°РЅРёРјРѕР№ РїСЂРѕС†РµРґСѓСЂС‹).
+ Р’РЅРёРјР°РЅРёРµ! РќРµ Р·Р°Р±С‹РІР°Р№С‚Рµ РїСЂРѕ РєРѕРјР°РЅРґСѓ SUSPEND, РёРЅР°С‡Рµ РЅРµ РІРµСЂРЅРµС‚ РЅРё РѕРґРЅРѕР№ СЃС‚СЂРѕРєРё
+ OutFieldsDesc - РІС‹С…РѕРґРЅС‹Рµ РїРѕР»СЏ. Р•СЃР»Рё СЃС‚СЂРѕРєР° РїСѓСЃС‚Р°СЏ, С‚Рѕ С„СѓРЅРєС†РёСЏ РІС‹РїРѕР»РЅСЏРµС‚ РєРѕРјР°РЅРґСѓ
+   Рё РІРѕР·РІСЂР°С‰Р°РµС‚ NIL
+ VarDesc - РѕРїРёСЃР°РЅРёРµ РїРµСЂРµРјРµРЅРЅС‹С…
+ Body - С‚РµР»Рѕ С…СЂР°РЅРёРјРѕР№ РїСЂРѕС†РµРґСѓСЂС‹. РќР°С‡Р°Р»СЊРЅС‹Р№ Рё РєРѕРЅРµС‡РЅС‹Р№ BEGIN..END РїРѕРґСЃС‚Р°РІР»СЏРµС‚СЃСЏ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё  }
 function FBExecuteBlockFunc(FDB: TIBDataBase; FTran: TIBTransaction; OutFieldsDesc,
   VarDesc, Body: string; AModuleName: string): TIBDataSet;
 
-{Аналогично FBExecuteBlockFunc, но не возвращает никакого результата}
+{РђРЅР°Р»РѕРіРёС‡РЅРѕ FBExecuteBlockFunc, РЅРѕ РЅРµ РІРѕР·РІСЂР°С‰Р°РµС‚ РЅРёРєР°РєРѕРіРѕ СЂРµР·СѓР»СЊС‚Р°С‚Р°}
 procedure FBExecuteBlockProc(FDB: TIBDataBase; FTran: TIBTransaction;
   VarDesc, Body: string; AModuleName: string);
 
-{Производит очистку таблицы ATableName. Использует условие AWhere, если оно задано.
- Если GarbageCollection=True, то выполняет кооперативную сборку мусора. Сборка мусора
- возможно только при FTran=NIL}
+{РџСЂРѕРёР·РІРѕРґРёС‚ РѕС‡РёСЃС‚РєСѓ С‚Р°Р±Р»РёС†С‹ ATableName. РСЃРїРѕР»СЊР·СѓРµС‚ СѓСЃР»РѕРІРёРµ AWhere, РµСЃР»Рё РѕРЅРѕ Р·Р°РґР°РЅРѕ.
+ Р•СЃР»Рё GarbageCollection=True, С‚Рѕ РІС‹РїРѕР»РЅСЏРµС‚ РєРѕРѕРїРµСЂР°С‚РёРІРЅСѓСЋ СЃР±РѕСЂРєСѓ РјСѓСЃРѕСЂР°. РЎР±РѕСЂРєР° РјСѓСЃРѕСЂР°
+ РІРѕР·РјРѕР¶РЅРѕ С‚РѕР»СЊРєРѕ РїСЂРё FTran=NIL}
 procedure FBClearTable(FDB: TIBDataBase; FTran: TIBTransaction; ATableName, AWhere: string;
   GarbageCollection: Boolean; AModuleName: string);
 
-{Проверяет, переданы ли объекты TIBDataBase и TIBTransaction. Если нет, то пытается
- отыскать недостающий объект в недрах объекта-напарника}
+{РџСЂРѕРІРµСЂСЏРµС‚, РїРµСЂРµРґР°РЅС‹ Р»Рё РѕР±СЉРµРєС‚С‹ TIBDataBase Рё TIBTransaction. Р•СЃР»Рё РЅРµС‚, С‚Рѕ РїС‹С‚Р°РµС‚СЃСЏ
+ РѕС‚С‹СЃРєР°С‚СЊ РЅРµРґРѕСЃС‚Р°СЋС‰РёР№ РѕР±СЉРµРєС‚ РІ РЅРµРґСЂР°С… РѕР±СЉРµРєС‚Р°-РЅР°РїР°СЂРЅРёРєР°}
 procedure FBCheckDBAndTransObjects(var FDB: TIBDataBase; var FTran: TIBTransaction);
 
-{Корректирует локальные переменные хранимой процедуры / триггера / EXECUTE BLOCK}
+{РљРѕСЂСЂРµРєС‚РёСЂСѓРµС‚ Р»РѕРєР°Р»СЊРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ С…СЂР°РЅРёРјРѕР№ РїСЂРѕС†РµРґСѓСЂС‹ / С‚СЂРёРіРіРµСЂР° / EXECUTE BLOCK}
 function FBCorrectDeclareVarSection(VarDesc: string): string;
 
-{Проверяет, одинаковые ли версии компонентов IBX используются здесь и в других модулях}
+{РџСЂРѕРІРµСЂСЏРµС‚, РѕРґРёРЅР°РєРѕРІС‹Рµ Р»Рё РІРµСЂСЃРёРё РєРѕРјРїРѕРЅРµРЅС‚РѕРІ IBX РёСЃРїРѕР»СЊР·СѓСЋС‚СЃСЏ Р·РґРµСЃСЊ Рё РІ РґСЂСѓРіРёС… РјРѕРґСѓР»СЏС…}
 function FBPackagesIsCorrect(IBDBClass: TClass): Boolean;
 
-var
-  {Мьютекс для защиты подключений к БД Firebird. Известно, что при попытке
-   одновременного подключения к БД Firebird из параллельных потоков могут
-   возникать ошибки. Здесь эта ситуация учтена.}
-  FBConnectMutex: THandle;
+{РЈСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ СЂРµР¶РёРј РѕС‚Р»Р°РґРєРё SQL-Р·Р°РїСЂРѕСЃРѕРІ РґР»СЏ СѓРєР°Р·Р°РЅРЅРѕРіРѕ РїРѕС‚РѕРєР°. Р’ СЌС‚РѕРј СЂРµР¶РёРјРµ РїСЂРё
+ РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё РѕС€РёР±РѕРє РІ SQL-Р·Р°РїСЂРѕСЃРµ РїСЂРѕРіСЂР°РјРјР° Р±СѓРґРµС‚ РІС‹РІРѕРґРёС‚СЊ РІ СЃРѕРѕР±С‰РµРЅРёРµ РѕР± РѕС€РёР±РєРµ
+ РїРѕР»РЅС‹Р№ С‚РµРєСЃС‚ SQL-Р·Р°РїСЂРѕСЃР° Рё СЃРїРёСЃРѕРє РїР°СЂР°РјРµС‚СЂРѕРІ Р·Р°РїСЂРѕСЃР°}
+procedure FBSetDebugModeForThread(AThreadId: DWORD; EnableDebug: Boolean; DebugOptions: Cardinal);
 
-  // Внешняя функция для подключения к БД
+{Р—Р°РїРёСЃС‹РІР°РµС‚ СѓРєР°Р·Р°РЅРЅСѓСЋ СЃС‚СЂРѕРєСѓ РІ Р»РѕРі-С„Р°Р№Р»}
+procedure FBWriteToLog(AMessage: string; MsgType: TLDSLogType; AModuleName: string);
+
+function CanDebugQueryForThisThread: Boolean;
+
+
+
+var
+  {РњСЊСЋС‚РµРєСЃ РґР»СЏ Р·Р°С‰РёС‚С‹ РїРѕРґРєР»СЋС‡РµРЅРёР№ Рє Р‘Р” Firebird. РР·РІРµСЃС‚РЅРѕ, С‡С‚Рѕ РїСЂРё РїРѕРїС‹С‚РєРµ
+   РѕРґРЅРѕРІСЂРµРјРµРЅРЅРѕРіРѕ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р‘Р” Firebird РёР· РїР°СЂР°Р»Р»РµР»СЊРЅС‹С… РїРѕС‚РѕРєРѕРІ РјРѕРіСѓС‚
+   РІРѕР·РЅРёРєР°С‚СЊ РѕС€РёР±РєРё. Р—РґРµСЃСЊ СЌС‚Р° СЃРёС‚СѓР°С†РёСЏ СѓС‡С‚РµРЅР°.}
+  //FBConnectMutex: THandle;
+
+  {РљСЂРёС‚РёС‡РµСЃРєР°СЏ СЃРµРєС†РёСЏ РґР»СЏ Р·Р°С‰РёС‚С‹ РїРѕРґРєР»СЋС‡РµРЅРёР№ Рє Р‘Р” Firebird. РР·РІРµСЃС‚РЅРѕ, С‡С‚Рѕ РїСЂРё РїРѕРїС‹С‚РєРµ
+   РѕРґРЅРѕРІСЂРµРјРµРЅРЅРѕРіРѕ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р‘Р” Firebird РёР· РїР°СЂР°Р»Р»РµР»СЊРЅС‹С… РїРѕС‚РѕРєРѕРІ РјРѕРіСѓС‚
+   РІРѕР·РЅРёРєР°С‚СЊ РѕС€РёР±РєРё. Р—РґРµСЃСЊ СЌС‚Р° СЃРёС‚СѓР°С†РёСЏ СѓС‡С‚РµРЅР°.}
+  FBConnectCS: TCriticalSection;
+
+  // Р’РЅРµС€РЅСЏСЏ С„СѓРЅРєС†РёСЏ РґР»СЏ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р‘Р”
   FBConnectDBFunc: procedure(FDB: TIBDatabase; AModuleName: string);
 
-  // Внешняя функция для отключения от БД
+  // Р’РЅРµС€РЅСЏСЏ С„СѓРЅРєС†РёСЏ РґР»СЏ РѕС‚РєР»СЋС‡РµРЅРёСЏ РѕС‚ Р‘Р”
   FBDisconnectDBFunc: procedure(FDB: TIBDatabase; AModuleName: string);
 
+  FBLogMsg: procedure(AMessage: string; MsgType: TLDSLogType; Module: string);
 
-{$IFDEF FBUTILSDLL} // Эта опция прописана в проекте FBUTILS.DPR. Если ее там нет,
-                    // то добавьте директиву FBUTILSDLL в опции проекта вручную.
-                    // Если используется FBUTILS.DLL то опцию FBUTILSDLL следует
-                    // также указывать во всех проектах, в которых есть fbUtils.pas
+  DebugLog: Boolean;
+
+  DebugThreadsList: TThreadList;
+
+
+{$IFDEF FBUTILSDLL} // Р­С‚Р° РѕРїС†РёСЏ РїСЂРѕРїРёСЃР°РЅР° РІ РїСЂРѕРµРєС‚Рµ FBUTILS.DPR. Р•СЃР»Рё РµРµ С‚Р°Рј РЅРµС‚,
+                    // С‚Рѕ РґРѕР±Р°РІСЊС‚Рµ РґРёСЂРµРєС‚РёРІСѓ FBUTILSDLL РІ РѕРїС†РёРё РїСЂРѕРµРєС‚Р° РІСЂСѓС‡РЅСѓСЋ.
+                    // Р•СЃР»Рё РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ FBUTILS.DLL С‚Рѕ РѕРїС†РёСЋ FBUTILSDLL СЃР»РµРґСѓРµС‚
+                    // С‚Р°РєР¶Рµ СѓРєР°Р·С‹РІР°С‚СЊ РІРѕ РІСЃРµС… РїСЂРѕРµРєС‚Р°С…, РІ РєРѕС‚РѕСЂС‹С… РµСЃС‚СЊ fbUtils.pas
 exports
   FBPackagesIsCorrect name 'ibxFBPackagesIsCorrect',
   FBCreateConnection name 'ibxFBCreateConnection',
@@ -241,6 +278,10 @@ exports
   FBGetUserName name 'ibxFBGetUserName',
   FBSetPassword name 'ibxFBSetPassword',
   FBGetPassword name 'ibxFBGetPassword',
+  FBSetPort name 'ibxFBSetPort',
+  FBGetPort name 'ibxFBGetPort',
+  FBSetCodePage name 'ibxFBSetCodePage',
+  FBGetCodePage name 'ibxFBGetCodePage',
   FBRecomputeIndexStatistics name 'ibxFBRecomputeIndexStatistics',
   FBGenID name 'ibxFBGenID',
   FBGenIDEx name 'ibxFBGenIDEx',
@@ -248,33 +289,42 @@ exports
   FBExecuteBlockProc name 'ibxFBExecuteBlockProc',
   FBClearTable name 'ibxFBClearTable',
   FBGetDataSet name 'ibxFBGetDataSet',
-  FBGetAndOpenDataSet name 'ibxFBGetAndOpenDataSet';
+  FBGetAndOpenDataSet name 'ibxFBGetAndOpenDataSet',
+  FBSetDebugModeForThread name 'ibxFBSetDebugModeForThread',
+  FBWriteToLog name 'ibxFBWriteToLog';
 {$ENDIF}
 
 resourcestring
-  FBStrCreateConnection = 'Создание подключения к базе данных';
-  FBStrConnectToDB = 'Подключение к базе данных';
-  FBStrDisconnectDB = 'Отключение от базы данных';
-  FBStrFreeConnection = 'Удаление подключения к базе данных';
-  FBStrCreateTransaction = 'Создание транзакции';
-  FBStrCreateDataSet = 'Создание набора данных';
-  FBStrGetDataSet = 'Получение набора данных';
-  FBStrCreateAndOpenDataSet = 'Создание и открытие набора данных';
-  FBStrGetAndOpenDataSet = 'Получение и открытие набора данных';
-  FBStrCreateAndOpenTable = 'Открытие таблицы';
-  FBStrExecQuery = 'Выполнить запрос';
-  FBStrUpdateRec = 'Изменение записи в "%s"';
-  FBStrInsertRec = 'Вставка записи в "%s" (%s)';
-  FBStrUpdateOrInsertRec = 'Обновление или добавление записи в "%s" (%s)';
-  FBStrDeleteRec = 'Удаление записи из "%s"';
+  FBStrCreateConnection = 'РЎРѕР·РґР°РЅРёРµ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р±Р°Р·Рµ РґР°РЅРЅС‹С…';
+  FBStrConnectToDB = 'РџРѕРґРєР»СЋС‡РµРЅРёРµ Рє Р±Р°Р·Рµ РґР°РЅРЅС‹С…';
+  FBStrDisconnectDB = 'РћС‚РєР»СЋС‡РµРЅРёРµ РѕС‚ Р±Р°Р·С‹ РґР°РЅРЅС‹С…';
+  FBStrFreeConnection = 'РЈРґР°Р»РµРЅРёРµ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р±Р°Р·Рµ РґР°РЅРЅС‹С…';
+  FBStrCreateTransaction = 'РЎРѕР·РґР°РЅРёРµ С‚СЂР°РЅР·Р°РєС†РёРё';
+  FBStrCreateDataSet = 'РЎРѕР·РґР°РЅРёРµ РЅР°Р±РѕСЂР° РґР°РЅРЅС‹С…';
+  FBStrGetDataSet = 'РџРѕР»СѓС‡РµРЅРёРµ РЅР°Р±РѕСЂР° РґР°РЅРЅС‹С…';
+  FBStrCreateAndOpenDataSet = 'РЎРѕР·РґР°РЅРёРµ Рё РѕС‚РєСЂС‹С‚РёРµ РЅР°Р±РѕСЂР° РґР°РЅРЅС‹С…';
+  FBStrGetAndOpenDataSet = 'РџРѕР»СѓС‡РµРЅРёРµ Рё РѕС‚РєСЂС‹С‚РёРµ РЅР°Р±РѕСЂР° РґР°РЅРЅС‹С…';
+  FBStrCreateAndOpenTable = 'РћС‚РєСЂС‹С‚РёРµ С‚Р°Р±Р»РёС†С‹';
+  FBStrExecQuery = 'Р’С‹РїРѕР»РЅРёС‚СЊ Р·Р°РїСЂРѕСЃ';
+  FBStrUpdateRec = 'РР·РјРµРЅРµРЅРёРµ Р·Р°РїРёСЃРё РІ "%s"';
+  FBStrInsertRec = 'Р’СЃС‚Р°РІРєР° Р·Р°РїРёСЃРё РІ "%s" (%s)';
+  FBStrUpdateOrInsertRec = 'РћР±РЅРѕРІР»РµРЅРёРµ РёР»Рё РґРѕР±Р°РІР»РµРЅРёРµ Р·Р°РїРёСЃРё РІ "%s" (%s)';
+  FBStrDeleteRec = 'РЈРґР°Р»РµРЅРёРµ Р·Р°РїРёСЃРё РёР· "%s"';
+  FBStrDBNameMustEnglish = 'РќРµРґРѕРїСѓСЃС‚РёРјРѕРµ РЅР°РёРјРµРЅРѕРІР°РЅРёРµ Р±Р°Р·С‹ РґР°РЅРЅС‹С… "%s". Р”РѕР»Р¶РЅС‹ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊСЃСЏ С‚РѕР»СЊРєРѕ Р»Р°С‚РёРЅСЃРєРёРµ СЃРёРјРІРѕР»С‹';
 implementation
 
 var
-  {Текущее имя пользователя для подключения к БД}
-  FBUserName: string = FBDefUser; {По умолчанию равно FBDefUser}
+  {РўРµРєСѓС‰РµРµ РёРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РґР»СЏ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р‘Р”}
+  FBUserName: string = FBDefUser; {РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ СЂР°РІРЅРѕ FBDefUser}
 
-  {Пароль пользователя для подключения к БД}
-  FBPassword: string = FBDefPassword; {По умолчанию равно FBDefPassword}
+  {РџР°СЂРѕР»СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РґР»СЏ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р‘Р”}
+  FBPassword: string = FBDefPassword; {РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ СЂР°РІРЅРѕ FBDefPassword}
+
+  {РџРѕСЂС‚ Firebird}
+  FBPort: Integer = FBDefPort;
+
+  {РљРѕРґРѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р°}
+  FBCodePage: string = 'WIN1251';
 
 function FBGetFullDatabaseName(AServerName: string; APort: Integer; ADBName: string): string;
 begin
@@ -282,6 +332,8 @@ begin
     Result := ADBName
   else
   begin
+    if LowerCase(AServerName) = 'localhost' then
+      AServerName := FBLocalhostIP;
     Result := AServerName;
     if (Result <> '') and (APort > 0) then
       Result := Result +  '/' + IntToStr(APort);
@@ -298,11 +350,21 @@ begin
   try
     Result := TIBDatabase.Create(AOwner);
     try
+      {$IF defined(FPC) and defined(WINDOWS)}
+      //if ADataBase <> UTF8ToWinCP(ADataBase) then
+      //  raise Exception.CreateFmt(FBStrDBNameMustEnglish, [ADataBase]);
+      ADataBase := UTF8ToWinCP(ADataBase);
+      {$IFEND}
+
       if AUserName <> '' then
         Result.Params.Values['user_name'] := AUserName;
 
       if APassword <> '' then
         Result.Params.Values['password'] := APassword;
+
+      {$IFDEF FPC}
+      ACodePage := 'UTF8';
+      {$ENDIF}
 
       if ACodePage <> '' then
         Result.Params.Values['lc_ctype'] := ACodePage;
@@ -322,55 +384,66 @@ begin
     end;  
   except
     on E: Exception do
-      raise ReCreateEObject(E, FBStrCreateConnection); // TODO: учесть AModuleName
+      raise ReCreateEObject(E, FBStrCreateConnection); // TODO: СѓС‡РµСЃС‚СЊ AModuleName
   end;
 end;
 
 procedure FBConnectDB(FDB: TIBDatabase; AModuleName: string);
 begin
+  if Assigned(FBConnectDBFunc) then
+    FBConnectDBFunc(FDB, AModuleName)
+  else
   try
-    if not FDB.TestConnected then // Если подключение еще не установлено
+    IBSQLMonitor.DisableMonitoring();
+    if not FDB.TestConnected then // Р•СЃР»Рё РїРѕРґРєР»СЋС‡РµРЅРёРµ РµС‰Рµ РЅРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅРѕ
     begin
-      if WaitForSingleObject(FBConnectMutex, INFINITE) = WAIT_OBJECT_0 then
+      //if WaitForSingleObject(FBConnectMutex, INFINITE) = WAIT_OBJECT_0 then
+      FBConnectCS.Enter;
       try
-        FDB.Connected := False; // Устанавливаем переменную на всякий случай в False
-        FDB.Connected := True;  // Устанавливаем подключение к базе даных
+        FDB.Connected := False; // РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј РїРµСЂРµРјРµРЅРЅСѓСЋ РЅР° РІСЃСЏРєРёР№ СЃР»СѓС‡Р°Р№ РІ False
+        FDB.Connected := True;  // РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј РїРѕРґРєР»СЋС‡РµРЅРёРµ Рє Р±Р°Р·Рµ РґР°РЅС‹С…
       finally
-        ReleaseMutex(FBConnectMutex);
+        //ReleaseMutex(FBConnectMutex);
+        FBConnectCS.Leave;
       end
-      else
-        RaiseLastOSError;      
+      //else
+      //  RaiseLastOSError;
     end;
   except
     on E: Exception do
-      raise ReCreateEObject(E, FBStrConnectToDB); // TODO: учесть AModuleName
+      raise ReCreateEObject(E, FBStrConnectToDB); // TODO: СѓС‡РµСЃС‚СЊ AModuleName
   end;
 end;
 
 procedure FBDisconnectDB(FDB: TIBDatabase; AModuleName: string);
 begin
+  if Assigned(FBDisconnectDBFunc) then
+    FBDisconnectDBFunc(FDB, AModuleName)
+  else
   try
     if FDB = nil then
       raise Exception.Create('FBDisconnectDB -> FDB = nil');
     if not (FDB is TIBDatabase) then
       raise Exception.Create('FBDisconnectDB -> FDB is not TIBDatabase');
 
-    if WaitForSingleObject(FBConnectMutex, INFINITE) = WAIT_OBJECT_0 then
+    //if WaitForSingleObject(FBConnectMutex, INFINITE) = WAIT_OBJECT_0 then
+    FBConnectCS.Enter;
     try
       try
         FDB.Connected := False;
       except
-        // Не следует выбрасывать исключение, т.к. работа с БД завершена.
-        // Всё-равно ПО не сможет обработать такое исключение!
+        // РќРµ СЃР»РµРґСѓРµС‚ РІС‹Р±СЂР°СЃС‹РІР°С‚СЊ РёСЃРєР»СЋС‡РµРЅРёРµ, С‚.Рє. СЂР°Р±РѕС‚Р° СЃ Р‘Р” Р·Р°РІРµСЂС€РµРЅР°.
+        // Р’СЃС‘-СЂР°РІРЅРѕ РџРћ РЅРµ СЃРјРѕР¶РµС‚ РѕР±СЂР°Р±РѕС‚Р°С‚СЊ С‚Р°РєРѕРµ РёСЃРєР»СЋС‡РµРЅРёРµ!
       end;
     finally
-      ReleaseMutex(FBConnectMutex);
+      //ReleaseMutex(FBConnectMutex);
+      FBConnectCS.Leave;
     end
-    else
-      RaiseLastOSError;
+    //else
+    //  RaiseLastOSError;
   except
     on E: Exception do
-      raise ReCreateEObject(E, FBStrDisconnectDB); // TODO: учесть AModuleName
+      raise ReCreateEObject(E, FBStrDisconnectDB); // TODO: СѓС‡РµСЃС‚СЊ AModuleName
   end;
 end;
 
@@ -386,7 +459,7 @@ begin
     end;
   except
     on E: Exception do
-      raise ReCreateEObject(E, FBStrFreeConnection); // TODO: учесть AModuleName
+      raise ReCreateEObject(E, FBStrFreeConnection); // TODO: СѓС‡РµСЃС‚СЊ AModuleName
   end;
 end;
 
@@ -407,7 +480,7 @@ begin
     end;  
   except
     on E: Exception do 
-      raise ReCreateEObject(E, FBStrCreateTransaction); // TODO: учесть AModuleName
+      raise ReCreateEObject(E, FBStrCreateTransaction); // TODO: СѓС‡РµСЃС‚СЊ AModuleName
   end;
 end;
 
@@ -431,7 +504,7 @@ begin
     
   except
     on E: Exception do
-      raise ReCreateEObject(E, 'FBCheckDBAndTransObjects'); // TODO: учесть AModuleName
+      raise ReCreateEObject(E, 'FBCheckDBAndTransObjects'); // TODO: СѓС‡РµСЃС‚СЊ AModuleName
   end;
 
 end;
@@ -443,7 +516,7 @@ var
 begin  
   try
     FBCheckDBAndTransObjects(FDB, FTran);
-    
+
     OwnerIsDBorTran := Assigned(AOwner) and ((AOwner is TIBDatabase) or (AOwner is TIBTransaction));
     try
       Result := TIBDataSet.Create(AOwner);
@@ -451,12 +524,12 @@ begin
       on E: Exception do
       begin
         if OwnerIsDBorTran then
-          raise ReCreateEObject(E, 'IBX bug!') // Не факт, что это сообщение увидят...
+          raise ReCreateEObject(E, 'IBX bug!') // РќРµ С„Р°РєС‚, С‡С‚Рѕ СЌС‚Рѕ СЃРѕРѕР±С‰РµРЅРёРµ СѓРІРёРґСЏС‚...
         else
           raise;
       end;
-    end;  
-    
+    end;
+
     try
       Result.Database := FDB;
       Result.Transaction := FTran;
@@ -471,7 +544,7 @@ begin
     end;
   except
     on E: Exception do
-      raise ReCreateEObject(E, FBStrCreateDataSet); // TODO: учесть AModuleName
+      raise ReCreateEObject(E, FBStrCreateDataSet); // TODO: СѓС‡РµСЃС‚СЊ AModuleName
   end;
 end;
 
@@ -488,7 +561,7 @@ begin
     if SQL = '' then
       raise Exception.Create('SQL is empty');
 
-    // Ищем в списке дочерних объектов транзакции объект TFBDatasetList
+    // РС‰РµРј РІ СЃРїРёСЃРєРµ РґРѕС‡РµСЂРЅРёС… РѕР±СЉРµРєС‚РѕРІ С‚СЂР°РЅР·Р°РєС†РёРё РѕР±СЉРµРєС‚ TFBDatasetList
     DSList := nil;
     for I := 0 to FTran.ComponentCount - 1 do
       if FTran.Components[I] is TFBDatasetList then
@@ -499,13 +572,16 @@ begin
     if DSList = nil then
       DSList := TFBDatasetList.Create(FTran);
 
-    // Пытаемся найти датасет по SQL-запросу
+    // РџС‹С‚Р°РµРјСЃСЏ РЅР°Р№С‚Рё РґР°С‚Р°СЃРµС‚ РїРѕ SQL-Р·Р°РїСЂРѕСЃСѓ
     Idx := DSList.FList.IndexOf(SQL);
     if Idx = -1 then
     begin
       ds := FBCreateDataSet(FDB, FTran, True, DSList, AModuleName);
       ds.SelectSQL.Text := SQL;
       Idx := DSList.FList.AddObject(SQL, ds);
+
+      if DebugLog then
+        FBLogMsg('FBGetDataSet: New dataset. Count=' + IntToStr(DSList.FList.Count), tlpInformation, AModuleName);
     end;
 
     Result := DSList.FList.Objects[Idx] as TIBDataSet;
@@ -519,24 +595,64 @@ function FBGetAndOpenDataSet(FDB: TIBDatabase; FTran: TIBTransaction; SQL: strin
   ParamNames: array of string; ParamValues: array of Variant; AModuleName: string): TIBDataSet;
 var
   I: Integer;
+  sErr, sParVal, sValue: string;
+  CanDebug: Boolean;
+  IsNull: Boolean;
 begin
+  //CanDebug := CanDebugQueryForThisThread;
+  CanDebug := True;
+
   try
+    if DebugLog then
+      FBLogMsg('FBGetAndOpenDataSet - BEGIN...', tlpInformation, AModuleName);
+
     if Length(ParamNames) <> Length(ParamValues) then
       raise Exception.Create('Params and values have different size');
-      
+
+    if CanDebug then
+    begin
+      for I := 0 to High(ParamNames) do
+      begin
+        if sParVal <> '' then sParVal := sParVal + ';';
+        IsNull := VarIsNull(ParamValues[I]);
+        try
+          sValue := IfThen(IsNull, 'Null', ParamValues[I]);
+        except
+          sValue := '???';
+        end;
+        sParVal := sParVal + ParamNames[I] + '=' + sValue;
+      end;
+      if sParVal = '' then sParVal := 'NONE';
+    end;
+
+    //if DebugLog and Assigned(FBLogMsg) then FBLogMsg('FBGetAndOpenDataSet - BEGIN...', tlpInformation, AModuleName);
     Result := FBGetDataSet(FDB, FTran, SQL, AModuleName);
     Result.Active := False;
     for I := 0 to High(ParamNames) do
-      if VarIsNull(ParamValues[I]) then
+    begin
+      IsNull := VarIsNull(ParamValues[I]);
+      if IsNull then
         Result.ParamByName(ParamNames[I]).Clear
       else
         Result.ParamByName(ParamNames[I]).Value := ParamValues[I];
+    end;
 
+    //if DebugLog and Assigned(FBLogMsg) then FBLogMsg('FBGetAndOpenDataSet - BEFORE OPEN...', tlpInformation, AModuleName);
     Result.Open;
+    //if DebugLog and Assigned(FBLogMsg) then FBLogMsg('FBGetAndOpenDataSet - BEFORE FetchAll...', tlpInformation, AModuleName);
     Result.FetchAll;
+    //if DebugLog and Assigned(FBLogMsg) then FBLogMsg('FBGetAndOpenDataSet - END...', tlpInformation, AModuleName);
+
+    if DebugLog then
+      FBLogMsg('FBGetAndOpenDataSet - END', tlpInformation, AModuleName);    
   except
     on E: Exception do
-      raise ReCreateEObject(E, FBStrGetAndOpenDataSet);
+    begin
+      sErr := FBStrGetAndOpenDataSet;
+      if CanDebug then
+        sErr := sErr + Format(' SQL: %s; Params: %s', [SQL, sParVal]);
+      raise ReCreateEObject(E, sErr);
+    end;
   end;
 end;
 
@@ -547,6 +663,8 @@ var
   I: Integer;
 begin
   try
+    if DebugLog then
+      FBLogMsg('FBCreateAndOpenDataSet - BEGIN...', tlpInformation, AModuleName);
     Result := FBCreateDataSet(FDB, FTran, True, AOwner, AModuleName);
     try
       if Length(ParamNames) <> Length(ParamValues) then
@@ -565,10 +683,12 @@ begin
     except
       Result.Free;
       raise;
-    end;  
+    end;
+    if DebugLog then
+      FBLogMsg('FBCreateAndOpenDataSet - END', tlpInformation, AModuleName);
   except
     on E: Exception do
-      raise ReCreateEObject(E, FBStrCreateAndOpenDataSet); // TODO: учесть AModuleName
+      raise ReCreateEObject(E, FBStrCreateAndOpenDataSet); // TODO: СѓС‡РµСЃС‚СЊ AModuleName
   end;
 end;
 
@@ -585,19 +705,19 @@ begin
     begin
       if Pos('WHERE', UpperCase(AFilter)) = 0 then
         AFilter := 'WHERE ' + AFilter;
-      SQL := SQL + AFilter + ' ';  
+      SQL := SQL + AFilter + ' ';
     end;
     if AOrder <> '' then
     begin
       if Pos('ORDER BY', UpperCase(AOrder)) = 0 then
-        AOrder := 'ORDER BY ' + AOrder; 
-      SQL := SQL + AOrder;    
+        AOrder := 'ORDER BY ' + AOrder;
+      SQL := SQL + AOrder;
     end;
 
     Result := FBCreateAndOpenDataSet(FDB, FTran, SQL, ParamNames, ParamValues, AOwner, AModuleName);
   except
     on E: Exception do
-      raise ReCreateEObject(E, FBStrCreateAndOpenTable); // TODO: учесть AModuleName
+      raise ReCreateEObject(E, FBStrCreateAndOpenTable); // TODO: СѓС‡РµСЃС‚СЊ AModuleName
   end;  
 end;
 
@@ -609,6 +729,9 @@ var
 begin
 
   try
+    if DebugLog then
+      FBLogMsg('FBExecQuery - BEGIN...', tlpInformation, AModuleName);
+
     if Length(ParamNames) <> Length(ParamValues) then
       raise Exception.Create('Params and values have different size');
 
@@ -626,9 +749,13 @@ begin
     finally
       ds.Free;
     end;
+
+    if DebugLog then
+      FBLogMsg('FBExecQuery - END', tlpInformation, AModuleName);
+
   except
     on E: Exception do
-      raise ReCreateEObject(E, FBStrExecQuery); // TODO: учесть AModuleName
+      raise ReCreateEObject(E, FBStrExecQuery); // TODO: СѓС‡РµСЃС‚СЊ AModuleName
   end;
 end;
 
@@ -710,6 +837,9 @@ var
   ds: TIBDataSet;
 begin
   try
+    if DebugLog then
+      FBLogMsg('FBUpdateRecordBase - BEGIN...', tlpInformation, AModuleName);
+
     SQL := TStringList.Create;
     try
       if Length(FieldNames) <> Length(AFieldValues) then
@@ -752,9 +882,12 @@ begin
     finally
       SQL.Free;
     end;
+
+    if DebugLog then
+      FBLogMsg('FBUpdateRecordBase - END', tlpInformation, AModuleName);    
   except
     on E: Exception do
-      raise ReCreateEObject(E, Format(FBStrUpdateRec, [TableName]));  // TODO: учесть AModuleName
+      raise ReCreateEObject(E, Format(FBStrUpdateRec, [TableName]));  // TODO: СѓС‡РµСЃС‚СЊ AModuleName
   end;
 end;
 
@@ -767,6 +900,9 @@ var
   ds: TIBDataSet;
 begin
   try
+    if DebugLog then
+      FBLogMsg('FBInsertRecordBase - BEGIN...', tlpInformation, AModuleName);
+
     SQL := TStringList.Create;
     try
       if Length(FieldNames) <> Length(AFieldValues) then
@@ -798,9 +934,13 @@ begin
     finally
       SQL.Free;
     end;
+
+    if DebugLog then
+      FBLogMsg('FBInsertRecordBase - END', tlpInformation, AModuleName);
+
   except
     on E: Exception do
-      raise ReCreateEObject(E, Format(FBStrInsertRec, [TableName, ErrStr])); // TODO: учесть AModuleName
+      raise ReCreateEObject(E, Format(FBStrInsertRec, [TableName, ErrStr])); // TODO: СѓС‡РµСЃС‚СЊ AModuleName
   end;
 end;
 
@@ -814,6 +954,9 @@ var
   ds: TIBDataSet;
 begin
   try
+    if DebugLog then
+      FBLogMsg('FBUpdateOrInsertRecordBase - BEGIN...', tlpInformation, AModuleName);
+
     SQL := TStringList.Create;
     try
       if Length(FieldNames) <> Length(AFieldValues) then
@@ -856,9 +999,12 @@ begin
     finally
       SQL.Free;
     end;
+
+    if DebugLog then
+      FBLogMsg('FBUpdateOrInsertRecordBase - END', tlpInformation, AModuleName);    
   except
     on E: Exception do
-      raise ReCreateEObject(E, Format(FBStrUpdateOrInsertRec, [TableName, ErrStr])); // TODO: учесть AModuleName
+      raise ReCreateEObject(E, Format(FBStrUpdateOrInsertRec, [TableName, ErrStr])); // TODO: СѓС‡РµСЃС‚СЊ AModuleName
   end;
 end;
 
@@ -871,6 +1017,9 @@ var
   ds: TIBDataSet;
 begin
   try
+    if DebugLog then
+      FBLogMsg('FBDeleteRecordBase - BEGIN...', tlpInformation, AModuleName);
+
     SQL := TStringList.Create;
     try
 
@@ -898,9 +1047,12 @@ begin
     finally
       SQL.Free;
     end;
+
+    if DebugLog then
+      FBLogMsg('FBDeleteRecordBase - END', tlpInformation, AModuleName);
   except
     on E: Exception do
-      raise ReCreateEObject(E, Format(FBStrDeleteRec, [TableName])); // TODO: учесть AModuleName
+      raise ReCreateEObject(E, Format(FBStrDeleteRec, [TableName])); // TODO: СѓС‡РµСЃС‚СЊ AModuleName
   end;
 end;
 
@@ -929,6 +1081,26 @@ begin
   Result := FBPassword;
 end;
 
+procedure FBSetPort(APort: Integer);
+begin
+  FBPort := APort;
+end;
+
+function FBGetPort: Integer;
+begin
+  Result := FBPort;
+end;
+
+procedure FBSetCodePage(ACodePage: string);
+begin
+  FBCodePage := ACodePage;
+end;
+
+function FBGetCodePage: string;
+begin
+  Result := FBCodePage;
+end;
+
 procedure FBRecomputeIndexStatistics(FDB: TIBDatabase; AModuleName: string);
 var
   tran: TIBTransaction;
@@ -953,7 +1125,7 @@ begin
     end;
   except
     on E: Exception do
-      raise ReCreateEObject(E, 'FBRecomputeIndexStatistics'); // TODO: учесть AModuleName
+      raise ReCreateEObject(E, 'FBRecomputeIndexStatistics'); // TODO: СѓС‡РµСЃС‚СЊ AModuleName
   end;
 end;
 
@@ -969,7 +1141,7 @@ begin
   try
     sql := Format('SELECT GEN_ID(%s, CAST(:v AS INTEGER)) AS ID FROM RDB$DATABASE', [GeneratorName]);
     ds := FBGetAndOpenDataSet(FDB, TranW, sql, ['v'], [IncValue], AModuleName);
-    Result := Round(ds.Fields[0].AsFloat); // AsInt64 отсутствует в Delphi7
+    Result := TLargeintField(ds.Fields[0]).AsLargeInt; // AsInt64 РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РІ Delphi7
     ds.Close;
   finally
     if not TranExists then   
@@ -992,11 +1164,11 @@ begin
   begin
     AList := TStringList.Create;
     try
-      while Pos('  ', VarDesc) > 0 do // Избавляемся от двойных пробелов
+      while Pos('  ', VarDesc) > 0 do // РР·Р±Р°РІР»СЏРµРјСЃСЏ РѕС‚ РґРІРѕР№РЅС‹С… РїСЂРѕР±РµР»РѕРІ
         VarDesc := FastStringReplace(VarDesc, '  ', ' ');
       VarDesc := FastStringReplace(VarDesc, ',', ';');
       AList.Text := FastStringReplace(VarDesc, ';', sLineBreak);
-      for I := 0 to AList.Count - 1 do // Добавляем DECLARE VARIABLE
+      for I := 0 to AList.Count - 1 do // Р”РѕР±Р°РІР»СЏРµРј DECLARE VARIABLE
         if Pos('DECLARE VARIABLE', UpperCase(AList[I])) = 0 then
           AList[I] := 'DECLARE VARIABLE ' + AList[I];
       VarDesc := FastStringReplace(Trim(AList.Text), sLineBreak, ';');
@@ -1019,9 +1191,12 @@ var
 begin
   Result := nil;
   try
+    if DebugLog then
+      FBLogMsg('FBExecuteBlockFunc - BEGIN...', tlpInformation, AModuleName);
+
     ds := FBCreateDataSet(FDB, FTran, True, nil, AModuleName);
     try
-      // Отключаем проверку параметров, т.к. переменные в PSQL объявляются с символом ":"
+      // РћС‚РєР»СЋС‡Р°РµРј РїСЂРѕРІРµСЂРєСѓ РїР°СЂР°РјРµС‚СЂРѕРІ, С‚.Рє. РїРµСЂРµРјРµРЅРЅС‹Рµ РІ PSQL РѕР±СЉСЏРІР»СЏСЋС‚СЃСЏ СЃ СЃРёРјРІРѕР»РѕРј ":"
       ds.ParamCheck := False;
 
       PSQL := 'EXECUTE BLOCK ';
@@ -1054,7 +1229,10 @@ begin
     if OutFieldsDesc = '' then
       ds.Free
     else
-      Result := ds;  
+      Result := ds;
+
+    if DebugLog then
+      FBLogMsg('FBExecuteBlockFunc - END', tlpInformation, AModuleName);
   except
     on E: Exception do
       raise ReCreateEObject(E, 'FBExecuteBlockFunc');
@@ -1093,7 +1271,7 @@ begin
     begin
       FTran.Commit;
       if GarbageCollection then
-      begin // Выполняем сборку мусора
+      begin // Р’С‹РїРѕР»РЅСЏРµРј СЃР±РѕСЂРєСѓ РјСѓСЃРѕСЂР°
         FTran.StartTransaction;
         SQL := 'SELECT COUNT(*) FROM "' + UpperCase(ATableName) + '" ' + AWhere;
         FBCreateAndOpenDataSet(FDB, FTran, SQL, [], [], nil, AModuleName).Free;
@@ -1108,6 +1286,29 @@ end;
 function FBPackagesIsCorrect(IBDBClass: TClass): Boolean;
 begin
   Result := IBDBClass = TIBDatabase;
+end;
+
+procedure FBSetDebugModeForThread(AThreadId: DWORD; EnableDebug: Boolean; DebugOptions: Cardinal);
+begin
+  if EnableDebug then
+    DebugThreadsList.Add(TObject(AThreadId))
+  else
+    DebugThreadsList.Remove(TObject(AThreadId));
+end;
+
+procedure FBWriteToLog(AMessage: string; MsgType: TLDSLogType; AModuleName: string);
+begin
+  if Assigned(FBLogMsg) then
+    FBLogMsg(AMessage, MsgType, AModuleName);
+end;
+
+function CanDebugQueryForThisThread: Boolean;
+var
+  L: TList;
+begin
+  L := DebugThreadsList.LockList;
+  Result := L.IndexOf(TObject(GetCurrentThreadId)) >= 0;
+  DebugThreadsList.UnlockList;
 end;
 
 { TFBDatasetList }
@@ -1138,10 +1339,13 @@ begin
 end;
 
 initialization
-  FBConnectMutex := CreateMutexShared(GenerateFileMutexName('FBUtilsMutex', ParamStr(0)));
-
+  DebugThreadsList := TThreadList.Create;
+  //FBConnectMutex := CreateMutexShared(GenerateFileMutexName('FBUtilsMutex', ParamStr(0)));
+  FBConnectCS := TCriticalSection.Create;
+  DebugLog := DirectoryExists('C:\KMAZS\FBDebugLogFlag');
 finalization
-  CloseHandle(FBConnectMutex);
-  FBConnectMutex := 0;
-
+  //CloseHandle(FBConnectMutex);
+  //FBConnectMutex := 0;
+  FreeAndNil(FBConnectCS);
+  FreeAndNil(DebugThreadsList);
 end.

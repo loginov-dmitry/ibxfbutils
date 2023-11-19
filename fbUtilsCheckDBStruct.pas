@@ -27,20 +27,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 {                                                                             }
 {                                                                             }
 {                                                                             }
-{ Модуль fbUtilsCheckDBStruct - модуль коррекции структуры БД                 }
-{ (c) 2012 Логинов Дмитрий Сергеевич                                          }
-{ Последнее обновление: 09.05.2012                                            }
-{ Протестировано на D7, D2007, D2010, D-XE2                                   }
-{ Адрес сайта: http://loginovprojects.ru/                                     }
+{ РњРѕРґСѓР»СЊ fbUtilsCheckDBStruct - РјРѕРґСѓР»СЊ РєРѕСЂСЂРµРєС†РёРё СЃС‚СЂСѓРєС‚СѓСЂС‹ Р‘Р”                 }
+{ (c) 2012 Р›РѕРіРёРЅРѕРІ Р”РјРёС‚СЂРёР№ РЎРµСЂРіРµРµРІРёС‡                                          }
+{ РџРѕСЃР»РµРґРЅРµРµ РѕР±РЅРѕРІР»РµРЅРёРµ: 09.05.2012                                            }
+{ РџСЂРѕС‚РµСЃС‚РёСЂРѕРІР°РЅРѕ РЅР° D7, D2007, D2010, D-XE2                                   }
+{ РђРґСЂРµСЃ СЃР°Р№С‚Р°: http://loginovprojects.ru/                                     }
 { e-mail: loginov_d@inbox.ru                                                  }
 {                                                                             }
 { *************************************************************************** }
+
+{$IFDEF FPC}
+{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
+{$ENDIF}
 
 unit fbUtilsCheckDBStruct;
 
 interface
 uses
-  Windows, Messages, SysUtils, Classes, IBDatabase, Variants, IniFiles,
+{$IFnDEF FPC}
+  Windows,
+{$ELSE}
+  LCLIntf, LCLType, LMessages,
+{$ENDIF}
+  Messages, SysUtils, Classes, IBDatabase, Variants, IniFiles,
   IBCustomDataSet, DB, fbUtilsDBStruct, fbTypes, fbSomeFuncs, fbUtilsBase;
 
 type
@@ -64,21 +73,21 @@ type
 
     function BuildCreateTableScript(ATable: TfbTableDesc): string;
     procedure CheckDomains;
-    procedure FillTableList; // Заполняет список таблиц
-    procedure FillFieldsList; // Заполняет список полей
-    procedure FillIndexList; // Заполняет список индексов
-    procedure FillGeneratorsList; // Заполняет список генераторов
-    procedure FillTriggerList; // Заполняет список триггеров
-    procedure FillProcedureList; // Заполняет список хранимых процедур
-    procedure FillCheckList; // Заполняет список имен проверок CHECK
-    procedure CheckTable(ATable: TfbTableDesc); // Осуществляет проверку полей таблицы
-    procedure CheckForeignKeys; // Проверяет внешние ключи
-    procedure CheckGenerators; // Проверяет наличие генераторов
-    procedure CheckDefaultValues; // Устанавливаем значения по умолчанию
-    procedure CheckDefaultException; // Проверяет наличие исключения "ERR"
-    procedure CheckTrigger(ATrigger: TfbTriggerDesc); // Проверяет наличие триггера в базе данных
-    procedure CheckTriggers; // Проверяет наличие триггеров
-    procedure CheckProcedure(AProc: TfbProcedureDesc); // Проверяет наличие хранимой процедуры
+    procedure FillTableList; // Р—Р°РїРѕР»РЅСЏРµС‚ СЃРїРёСЃРѕРє С‚Р°Р±Р»РёС†
+    procedure FillFieldsList; // Р—Р°РїРѕР»РЅСЏРµС‚ СЃРїРёСЃРѕРє РїРѕР»РµР№
+    procedure FillIndexList; // Р—Р°РїРѕР»РЅСЏРµС‚ СЃРїРёСЃРѕРє РёРЅРґРµРєСЃРѕРІ
+    procedure FillGeneratorsList; // Р—Р°РїРѕР»РЅСЏРµС‚ СЃРїРёСЃРѕРє РіРµРЅРµСЂР°С‚РѕСЂРѕРІ
+    procedure FillTriggerList; // Р—Р°РїРѕР»РЅСЏРµС‚ СЃРїРёСЃРѕРє С‚СЂРёРіРіРµСЂРѕРІ
+    procedure FillProcedureList; // Р—Р°РїРѕР»РЅСЏРµС‚ СЃРїРёСЃРѕРє С…СЂР°РЅРёРјС‹С… РїСЂРѕС†РµРґСѓСЂ
+    procedure FillCheckList; // Р—Р°РїРѕР»РЅСЏРµС‚ СЃРїРёСЃРѕРє РёРјРµРЅ РїСЂРѕРІРµСЂРѕРє CHECK
+    procedure CheckTable(ATable: TfbTableDesc); // РћСЃСѓС‰РµСЃС‚РІР»СЏРµС‚ РїСЂРѕРІРµСЂРєСѓ РїРѕР»РµР№ С‚Р°Р±Р»РёС†С‹
+    procedure CheckForeignKeys; // РџСЂРѕРІРµСЂСЏРµС‚ РІРЅРµС€РЅРёРµ РєР»СЋС‡Рё
+    procedure CheckGenerators; // РџСЂРѕРІРµСЂСЏРµС‚ РЅР°Р»РёС‡РёРµ РіРµРЅРµСЂР°С‚РѕСЂРѕРІ
+    procedure CheckDefaultValues; // РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј Р·РЅР°С‡РµРЅРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+    procedure CheckDefaultException; // РџСЂРѕРІРµСЂСЏРµС‚ РЅР°Р»РёС‡РёРµ РёСЃРєР»СЋС‡РµРЅРёСЏ "ERR"
+    procedure CheckTrigger(ATrigger: TfbTriggerDesc); // РџСЂРѕРІРµСЂСЏРµС‚ РЅР°Р»РёС‡РёРµ С‚СЂРёРіРіРµСЂР° РІ Р±Р°Р·Рµ РґР°РЅРЅС‹С…
+    procedure CheckTriggers; // РџСЂРѕРІРµСЂСЏРµС‚ РЅР°Р»РёС‡РёРµ С‚СЂРёРіРіРµСЂРѕРІ
+    procedure CheckProcedure(AProc: TfbProcedureDesc); // РџСЂРѕРІРµСЂСЏРµС‚ РЅР°Р»РёС‡РёРµ С…СЂР°РЅРёРјРѕР№ РїСЂРѕС†РµРґСѓСЂС‹
     procedure Log(Msg: string; LogEvent: TFBLogEvent);
     procedure LogFmt(Msg: string; Args: array of const; LogEvent: TFBLogEvent);
 
@@ -88,82 +97,82 @@ type
     destructor Destroy; override;
 
 
-    { Запускает процесс проверки структуры базы данных }
+    { Р—Р°РїСѓСЃРєР°РµС‚ РїСЂРѕС†РµСЃСЃ РїСЂРѕРІРµСЂРєРё СЃС‚СЂСѓРєС‚СѓСЂС‹ Р±Р°Р·С‹ РґР°РЅРЅС‹С… }
     procedure StartCheck;
   end;
 
-{ Осуществляет проверку и необходимую коррекцию структуры базы данных }
+{ РћСЃСѓС‰РµСЃС‚РІР»СЏРµС‚ РїСЂРѕРІРµСЂРєСѓ Рё РЅРµРѕР±С…РѕРґРёРјСѓСЋ РєРѕСЂСЂРµРєС†РёСЋ СЃС‚СЂСѓРєС‚СѓСЂС‹ Р±Р°Р·С‹ РґР°РЅРЅС‹С… }
 procedure FBCheckDBStruct(fbDataBaseDesc: TfbDataBaseDesc; AServerName: string;
   APort: Integer; ADataBase: string; AUserName: string; APassword: string;
   ACharSet: string; LogProc: TFBLogEventsProc; AModuleName: string);
 
-{$IFDEF FBUTILSDLL} // Замечания по директиве смотрите в модуле fbUtilsBase.pas
+{$IFDEF FBUTILSDLL} // Р—Р°РјРµС‡Р°РЅРёСЏ РїРѕ РґРёСЂРµРєС‚РёРІРµ СЃРјРѕС‚СЂРёС‚Рµ РІ РјРѕРґСѓР»Рµ fbUtilsBase.pas
 exports
   FBCheckDBStruct name 'ibxFBCheckDBStruct';
 {$ENDIF}
 
 resourcestring
-  FBStrCheckDBStruct = 'Проверка структуры базы данных';
+  FBStrCheckDBStruct = 'РџСЂРѕРІРµСЂРєР° СЃС‚СЂСѓРєС‚СѓСЂС‹ Р±Р°Р·С‹ РґР°РЅРЅС‹С…';
 
-  FBStrCreatingErrObj = 'Будет создан объект исключения ERR!';
-  FBStrErrObjIsCreated = 'Создание объекта исключения ERR завершено!';
-  FBStrErrObjCreating = 'Создание объекта исключение ERR';
+  FBStrCreatingErrObj = 'Р‘СѓРґРµС‚ СЃРѕР·РґР°РЅ РѕР±СЉРµРєС‚ РёСЃРєР»СЋС‡РµРЅРёСЏ ERR!';
+  FBStrErrObjIsCreated = 'РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° РёСЃРєР»СЋС‡РµРЅРёСЏ ERR Р·Р°РІРµСЂС€РµРЅРѕ!';
+  FBStrErrObjCreating = 'РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р° РёСЃРєР»СЋС‡РµРЅРёРµ ERR';
 
-  FBStrSettingDefValues = 'Поле "%s" имеет значение по умолчанию. Будут изменены все записи таблицы "%s"';
-  FBStrDefValuesIsSet = 'Установка значений по умолчанию выполнена!';
-  FBStrDefValuesErr = 'Ошибка установки значений по умолчанию: ';
-  FBStrDefValuesSetting = 'Установка значений по умолчанию';
+  FBStrSettingDefValues = 'РџРѕР»Рµ "%s" РёРјРµРµС‚ Р·РЅР°С‡РµРЅРёРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ. Р‘СѓРґСѓС‚ РёР·РјРµРЅРµРЅС‹ РІСЃРµ Р·Р°РїРёСЃРё С‚Р°Р±Р»РёС†С‹ "%s"';
+  FBStrDefValuesIsSet = 'РЈСЃС‚Р°РЅРѕРІРєР° Р·РЅР°С‡РµРЅРёР№ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РІС‹РїРѕР»РЅРµРЅР°!';
+  FBStrDefValuesErr = 'РћС€РёР±РєР° СѓСЃС‚Р°РЅРѕРІРєРё Р·РЅР°С‡РµРЅРёР№ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ: ';
+  FBStrDefValuesSetting = 'РЈСЃС‚Р°РЅРѕРІРєР° Р·РЅР°С‡РµРЅРёР№ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ';
 
-  FBStrDomainCreating = 'Будет создан домен: ';
-  FBStrDomainIsCreated = 'Создание домена завершено';
-  FBStrCreateDomainProc = 'Создание домена';
+  FBStrDomainCreating = 'Р‘СѓРґРµС‚ СЃРѕР·РґР°РЅ РґРѕРјРµРЅ: ';
+  FBStrDomainIsCreated = 'РЎРѕР·РґР°РЅРёРµ РґРѕРјРµРЅР° Р·Р°РІРµСЂС€РµРЅРѕ';
+  FBStrCreateDomainProc = 'РЎРѕР·РґР°РЅРёРµ РґРѕРјРµРЅР°';
 
-  FBStrFKCreating = 'В таблицу "%s" будет добавлен внешний ключ "%s"';
-  FBStrFKIsCreated = 'Внешний ключ добавлен';
-  FBStrCreateFKProc = 'Добавление внешнего ключа';
+  FBStrFKCreating = 'Р’ С‚Р°Р±Р»РёС†Сѓ "%s" Р±СѓРґРµС‚ РґРѕР±Р°РІР»РµРЅ РІРЅРµС€РЅРёР№ РєР»СЋС‡ "%s"';
+  FBStrFKIsCreated = 'Р’РЅРµС€РЅРёР№ РєР»СЋС‡ РґРѕР±Р°РІР»РµРЅ';
+  FBStrCreateFKProc = 'Р”РѕР±Р°РІР»РµРЅРёРµ РІРЅРµС€РЅРµРіРѕ РєР»СЋС‡Р°';
 
-  FBStrGenCreating = 'Будет добавлен генератор "%s"';
-  FBStrGenIsCreated = 'Генератор "%s" добавлен';
-  FBStrCreateGenProc = 'Добавление генератора';
+  FBStrGenCreating = 'Р‘СѓРґРµС‚ РґРѕР±Р°РІР»РµРЅ РіРµРЅРµСЂР°С‚РѕСЂ "%s"';
+  FBStrGenIsCreated = 'Р“РµРЅРµСЂР°С‚РѕСЂ "%s" РґРѕР±Р°РІР»РµРЅ';
+  FBStrCreateGenProc = 'Р”РѕР±Р°РІР»РµРЅРёРµ РіРµРЅРµСЂР°С‚РѕСЂР°';
 
-  FBStrProcCreating = 'Будет добавлена хранимая процедура "%s"';
-  FBStrProcIsCreated = 'Хранимая процедура добавлена';
-  FBStrCreateProcProc = 'Добавление хранимой процедуры';
+  FBStrProcCreating = 'Р‘СѓРґРµС‚ РґРѕР±Р°РІР»РµРЅР° С…СЂР°РЅРёРјР°СЏ РїСЂРѕС†РµРґСѓСЂР° "%s"';
+  FBStrProcIsCreated = 'РҐСЂР°РЅРёРјР°СЏ РїСЂРѕС†РµРґСѓСЂР° РґРѕР±Р°РІР»РµРЅР°';
+  FBStrCreateProcProc = 'Р”РѕР±Р°РІР»РµРЅРёРµ С…СЂР°РЅРёРјРѕР№ РїСЂРѕС†РµРґСѓСЂС‹';
 
-  FBStrTableCreating = 'Будет создана таблица: ';
-  FBStrTableIsCreated = 'Создание таблицы завершено';
-  FBStrCreateTableProc = 'Создание таблицы';
+  FBStrTableCreating = 'Р‘СѓРґРµС‚ СЃРѕР·РґР°РЅР° С‚Р°Р±Р»РёС†Р°: ';
+  FBStrTableIsCreated = 'РЎРѕР·РґР°РЅРёРµ С‚Р°Р±Р»РёС†С‹ Р·Р°РІРµСЂС€РµРЅРѕ';
+  FBStrCreateTableProc = 'РЎРѕР·РґР°РЅРёРµ С‚Р°Р±Р»РёС†С‹';
 
-  FBStrFieldCreating = 'В таблицу "%s" будет добавлено поле "%s"';
-  FBStrFieldIsCreated = 'Поле успешно добавлено';
-  FBStrCreateFieldProc = 'Добавление поля';
+  FBStrFieldCreating = 'Р’ С‚Р°Р±Р»РёС†Сѓ "%s" Р±СѓРґРµС‚ РґРѕР±Р°РІР»РµРЅРѕ РїРѕР»Рµ "%s"';
+  FBStrFieldIsCreated = 'РџРѕР»Рµ СѓСЃРїРµС€РЅРѕ РґРѕР±Р°РІР»РµРЅРѕ';
+  FBStrCreateFieldProc = 'Р”РѕР±Р°РІР»РµРЅРёРµ РїРѕР»СЏ';
 
-  FBStrFieldIncreasing = 'В таблице "%s" будет увеличен размер поля "%s".'+
-                         'Старый размер: %d. Новый размер: %d.';
-  FBStrFieldIsIncreased = 'Размер поля успешно изменен';
-  FBStrFieldIncreaseProc = 'Изменение размера поля';
+  FBStrFieldIncreasing = 'Р’ С‚Р°Р±Р»РёС†Рµ "%s" Р±СѓРґРµС‚ СѓРІРµР»РёС‡РµРЅ СЂР°Р·РјРµСЂ РїРѕР»СЏ "%s".'+
+                         'РЎС‚Р°СЂС‹Р№ СЂР°Р·РјРµСЂ: %d. РќРѕРІС‹Р№ СЂР°Р·РјРµСЂ: %d.';
+  FBStrFieldIsIncreased = 'Р Р°Р·РјРµСЂ РїРѕР»СЏ СѓСЃРїРµС€РЅРѕ РёР·РјРµРЅРµРЅ';
+  FBStrFieldIncreaseProc = 'РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂР° РїРѕР»СЏ';
 
-  FBStrPKCreating = 'В таблицу "%s" будет добавлен первичный ключ "%s"';
-  FBStrPKIsCreated = 'Первичный ключ добавлен';
-  FBStrCreatePKProc = 'Добавление первичного ключа';
+  FBStrPKCreating = 'Р’ С‚Р°Р±Р»РёС†Сѓ "%s" Р±СѓРґРµС‚ РґРѕР±Р°РІР»РµРЅ РїРµСЂРІРёС‡РЅС‹Р№ РєР»СЋС‡ "%s"';
+  FBStrPKIsCreated = 'РџРµСЂРІРёС‡РЅС‹Р№ РєР»СЋС‡ РґРѕР±Р°РІР»РµРЅ';
+  FBStrCreatePKProc = 'Р”РѕР±Р°РІР»РµРЅРёРµ РїРµСЂРІРёС‡РЅРѕРіРѕ РєР»СЋС‡Р°';
 
-  FBStrIndexCreating = 'В таблицу "%s" будет добавлен индекс "%s"';
-  FBStrIndexIsCreated = 'Индекс добавлен';
-  FBStrCreateIndexProc = 'Добавление индекса';
+  FBStrIndexCreating = 'Р’ С‚Р°Р±Р»РёС†Сѓ "%s" Р±СѓРґРµС‚ РґРѕР±Р°РІР»РµРЅ РёРЅРґРµРєСЃ "%s"';
+  FBStrIndexIsCreated = 'РРЅРґРµРєСЃ РґРѕР±Р°РІР»РµРЅ';
+  FBStrCreateIndexProc = 'Р”РѕР±Р°РІР»РµРЅРёРµ РёРЅРґРµРєСЃР°';
 
-  FBStrCheckCreating   = 'В таблицу "%s" будет добавлена проверка "%s"';
-  FBStrCheckIsCreated  = 'Проверка добавлена';
-  FBStrCreateCheckProc = 'Добавление проверки';
+  FBStrCheckCreating   = 'Р’ С‚Р°Р±Р»РёС†Сѓ "%s" Р±СѓРґРµС‚ РґРѕР±Р°РІР»РµРЅР° РїСЂРѕРІРµСЂРєР° "%s"';
+  FBStrCheckIsCreated  = 'РџСЂРѕРІРµСЂРєР° РґРѕР±Р°РІР»РµРЅР°';
+  FBStrCreateCheckProc = 'Р”РѕР±Р°РІР»РµРЅРёРµ РїСЂРѕРІРµСЂРєРё';
 
-  FBStrTriggerCreating   = 'Для таблицы "%s" будет добавлен триггер "%s": %s';
-  FBStrTriggerIsCreated  = 'Триггер добавлен';
-  FBStrCreateTriggerProc = 'Добавление триггера';
+  FBStrTriggerCreating   = 'Р”Р»СЏ С‚Р°Р±Р»РёС†С‹ "%s" Р±СѓРґРµС‚ РґРѕР±Р°РІР»РµРЅ С‚СЂРёРіРіРµСЂ "%s": %s';
+  FBStrTriggerIsCreated  = 'РўСЂРёРіРіРµСЂ РґРѕР±Р°РІР»РµРЅ';
+  FBStrCreateTriggerProc = 'Р”РѕР±Р°РІР»РµРЅРёРµ С‚СЂРёРіРіРµСЂР°';
 
-  FBStrDBCheckBegin = 'Начало проверки базы данных "%s".';
-  FBStrDBCheckEnd = 'Проверка БД выполнена за %s сек. ';
-  FBStrDBCheckErr = 'Ошибка при проверке БД: %s (код: %d)';
+  FBStrDBCheckBegin = 'РќР°С‡Р°Р»Рѕ РїСЂРѕРІРµСЂРєРё Р±Р°Р·С‹ РґР°РЅРЅС‹С… "%s".';
+  FBStrDBCheckEnd = 'РџСЂРѕРІРµСЂРєР° Р‘Р” РІС‹РїРѕР»РЅРµРЅР° Р·Р° %s СЃРµРє. ';
+  FBStrDBCheckErr = 'РћС€РёР±РєР° РїСЂРё РїСЂРѕРІРµСЂРєРµ Р‘Р”: %s (РєРѕРґ: %d)';
 
-  FBStrCreateDB = 'Создать базу данных';
+  FBStrCreateDB = 'РЎРѕР·РґР°С‚СЊ Р±Р°Р·Сѓ РґР°РЅРЅС‹С…';
 
 
 implementation
@@ -200,7 +209,7 @@ begin
     Add(Format('CREATE TABLE "%s" (', [ATable.TableName]));
     for I := 0 to ATable.FieldList.Count - 1 do
     begin
-      // Собираем поле
+      // РЎРѕР±РёСЂР°РµРј РїРѕР»Рµ
       AField := TfbFieldDesc(ATable.FieldList[I]);
       S := Format('  "%s"  %s ', [AField.FName, AField.FType]);
       if AField.FDefault <> '' then
@@ -213,7 +222,7 @@ begin
       Add(S);
     end;
 
-    // Собираем первичный ключ
+    // РЎРѕР±РёСЂР°РµРј РїРµСЂРІРёС‡РЅС‹Р№ РєР»СЋС‡
     if ATable.PrimaryKey.FName <> '' then
       Add(Format('CONSTRAINT "%s" PRIMARY KEY (%s)',
         [ATable.PrimaryKey.FName, ATable.PrimaryKey.FConstraintFields]));
@@ -281,7 +290,7 @@ begin
             except
               on E: Exception do
               begin
-                Log(FBStrDefValuesErr + E.Message, tlpError); // доб. 2011-04-28
+                Log(FBStrDefValuesErr + E.Message, tlpError); // РґРѕР±. 2011-04-28
                 raise ReCreateEObject(E, FBStrDefValuesSetting, False);
               end;
             end;
@@ -291,8 +300,8 @@ begin
         if FTran.InTransaction then
           FTran.Commit;
       except
-        // Все значения по умолчанию устанавливаются в рамках одной транзакции.
-        // Если транзакция будет отменена из-за ошибки, то потеряется установка всех значений
+        // Р’СЃРµ Р·РЅР°С‡РµРЅРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ СѓСЃС‚Р°РЅР°РІР»РёРІР°СЋС‚СЃСЏ РІ СЂР°РјРєР°С… РѕРґРЅРѕР№ С‚СЂР°РЅР·Р°РєС†РёРё.
+        // Р•СЃР»Рё С‚СЂР°РЅР·Р°РєС†РёСЏ Р±СѓРґРµС‚ РѕС‚РјРµРЅРµРЅР° РёР·-Р·Р° РѕС€РёР±РєРё, С‚Рѕ РїРѕС‚РµСЂСЏРµС‚СЃСЏ СѓСЃС‚Р°РЅРѕРІРєР° РІСЃРµС… Р·РЅР°С‡РµРЅРёР№
         if FTran.InTransaction then
           FTran.Rollback;
       end;
@@ -328,7 +337,7 @@ begin
       begin
         Log(FBStrDomainCreating + ADomain.FName, tlpEvent);
 
-        // Добавляем новый домен
+        // Р”РѕР±Р°РІР»СЏРµРј РЅРѕРІС‹Р№ РґРѕРјРµРЅ
         S := Format('CREATE DOMAIN "%s" AS %s ', [ADomain.FName, ADomain.FType]);
         if ADomain.FDefault <> '' then
           S := S + 'DEFAULT ' + ADomain.FDefault + ' ';
@@ -443,14 +452,14 @@ var
 begin
   Idx := ProcedureList.IndexOf(AProc.FName);
   MustCreateProc := Idx < 0;
-  if Idx >= 0 then // Если такая процедура в базе имеется...
+  if Idx >= 0 then // Р•СЃР»Рё С‚Р°РєР°СЏ РїСЂРѕС†РµРґСѓСЂР° РІ Р±Р°Р·Рµ РёРјРµРµС‚СЃСЏ...
   begin
     AHash := Cardinal(ProcedureList.Objects[Idx]);
-    if AHash <> AProc.FHash then // Если хэши процедур не совпадают...
+    if AHash <> AProc.FHash then // Р•СЃР»Рё С…СЌС€Рё РїСЂРѕС†РµРґСѓСЂ РЅРµ СЃРѕРІРїР°РґР°СЋС‚...
       MustCreateProc := True;
   end;
 
-  if MustCreateProc then // Создаем процедуру
+  if MustCreateProc then // РЎРѕР·РґР°РµРј РїСЂРѕС†РµРґСѓСЂСѓ
   begin
     LogFmt(FBStrProcCreating, [AProc.FName], tlpEvent);
 
@@ -469,9 +478,10 @@ begin
     end;
 
 
-    // Фиксируем хэш
-    S := Format('UPDATE RDB$PROCEDURES SET RDB$DESCRIPTION=%s WHERE RDB$PROCEDURE_NAME=%s',
-                [QuotedStr('Hash=' + IntToStr(Integer(AProc.FHash))), QuotedStr(AProc.FName)]);
+    // Р¤РёРєСЃРёСЂСѓРµРј С…СЌС€
+    S := Format('COMMENT ON PROCEDURE %s IS %s', [AProc.FName, QuotedStr('Hash=' + IntToStr(Integer(AProc.FHash)))]);
+    //S := Format('UPDATE RDB$PROCEDURES SET RDB$DESCRIPTION=%s WHERE RDB$PROCEDURE_NAME=%s',
+    //            [QuotedStr('Hash=' + IntToStr(Integer(AProc.FHash))), QuotedStr(AProc.FName)]);
     Query1.SelectSQL.Text := S;
     try
       Query1.ExecSQL;
@@ -491,9 +501,9 @@ var
   AField: TfbFieldDesc;
   S: string;
   AIndex: TfbIndexDesc;
-
+  fd: TfbFieldDomain;
 begin
-  // Если такой таблице нет в списке TableList, то создаем ее
+  // Р•СЃР»Рё С‚Р°РєРѕР№ С‚Р°Р±Р»РёС†Рµ РЅРµС‚ РІ СЃРїРёСЃРєРµ TableList, С‚Рѕ СЃРѕР·РґР°РµРј РµРµ
   if TableList.IndexOf(ATable.TableName) < 0 then
   begin
     Log(FBStrTableCreating + ATable.TableName, tlpEvent);
@@ -507,16 +517,16 @@ begin
         raise ReCreateEObject(E, FBStrCreateTableProc, False);
     end;
   end else
-  begin // Таблица существует. Проверяем поля, первичные ключи и т.д.
+  begin // РўР°Р±Р»РёС†Р° СЃСѓС‰РµСЃС‚РІСѓРµС‚. РџСЂРѕРІРµСЂСЏРµРј РїРѕР»СЏ, РїРµСЂРІРёС‡РЅС‹Рµ РєР»СЋС‡Рё Рё С‚.Рґ.
 
-    // Проверяем, все ли поля есть в данной таблице
+    // РџСЂРѕРІРµСЂСЏРµРј, РІСЃРµ Р»Рё РїРѕР»СЏ РµСЃС‚СЊ РІ РґР°РЅРЅРѕР№ С‚Р°Р±Р»РёС†Рµ
     for I := 0 to ATable.FieldList.Count - 1 do
     begin
       AField := TfbFieldDesc(ATable.FieldList[I]);
 
       FldIndex := FieldList.IndexOf(ATable.TableName + '=' + AField.FName);
 
-      // Если в таблице данного поля нет, то добавляем его
+      // Р•СЃР»Рё РІ С‚Р°Р±Р»РёС†Рµ РґР°РЅРЅРѕРіРѕ РїРѕР»СЏ РЅРµС‚, С‚Рѕ РґРѕР±Р°РІР»СЏРµРј РµРіРѕ
       if FldIndex < 0 then
       begin
         LogFmt(FBStrFieldCreating, [ATable.TableName, AField.FName], tlpEvent);
@@ -538,9 +548,9 @@ begin
         end;
         Log(FBStrFieldIsCreated, tlpEvent);
 
-        // Сохраняем список добавленных и их значения по умолчанию
-        // В дальнейшем нужно будет пройтись по всей таблице и установить
-        // данное значение для каждой записи
+        // РЎРѕС…СЂР°РЅСЏРµРј СЃРїРёСЃРѕРє РґРѕР±Р°РІР»РµРЅРЅС‹С… Рё РёС… Р·РЅР°С‡РµРЅРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+        // Р’ РґР°Р»СЊРЅРµР№С€РµРј РЅСѓР¶РЅРѕ Р±СѓРґРµС‚ РїСЂРѕР№С‚РёСЃСЊ РїРѕ РІСЃРµР№ С‚Р°Р±Р»РёС†Рµ Рё СѓСЃС‚Р°РЅРѕРІРёС‚СЊ
+        // РґР°РЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РґР»СЏ РєР°Р¶РґРѕР№ Р·Р°РїРёСЃРё
         if AField.FDefault <> '' then
         begin
           DefaultFields.Add(Format('%s<$@$>%s<$@$>%s',
@@ -549,8 +559,8 @@ begin
 
       end else
       begin
-        // Данное поле есть. Если оно объявлено как VARCHAR(X), то определяем
-        // какой размер поля в базе данных и какой размер поля в AField.FType
+        // Р”Р°РЅРЅРѕРµ РїРѕР»Рµ РµСЃС‚СЊ. Р•СЃР»Рё РѕРЅРѕ РѕР±СЉСЏРІР»РµРЅРѕ РєР°Рє VARCHAR(X), С‚Рѕ РѕРїСЂРµРґРµР»СЏРµРј
+        // РєР°РєРѕР№ СЂР°Р·РјРµСЂ РїРѕР»СЏ РІ Р±Р°Р·Рµ РґР°РЅРЅС‹С… Рё РєР°РєРѕР№ СЂР°Р·РјРµСЂ РїРѕР»СЏ РІ AField.FType
         S := UpperCase(AField.FType);
         APos := Pos('VARCHAR', S);
         if APos > 0 then
@@ -564,14 +574,15 @@ begin
              if APos > 0 then
              begin
                S := Trim(Copy(S, 1, APos - 1));
-               OldLen := Integer(FieldList.Objects[FldIndex]);
+               fd := TfbFieldDomain(FieldList.Objects[FldIndex]);
+               OldLen := fd.CurLength;
                NewLen := StrToIntDef(S, 0);
-               if NewLen > OldLen then
+               if (NewLen > OldLen) and (Pos('RDB$', fd.DomainName) = 1) then
                begin
                  LogFmt(FBStrFieldIncreasing, [ATable.TableName, AField.FName, OldLen, NewLen], tlpEvent);
 
-                 // Строим SQL для изменения размера поля
-                 S :=
+                 // РЎС‚СЂРѕРёРј SQL РґР»СЏ РёР·РјРµРЅРµРЅРёСЏ СЂР°Р·РјРµСЂР° РїРѕР»СЏ
+                 {S :=
                     'update RDB$FIELDS set' + sLineBreak +
                     'RDB$FIELD_LENGTH = ' + IntToStr(NewLen) + ',' + sLineBreak +
                     'RDB$CHARACTER_LENGTH = ' + IntToStr(NewLen) + sLineBreak +
@@ -579,7 +590,8 @@ begin
                     '    (SELECT RDB$FIELD_SOURCE' + sLineBreak +
                     '    FROM RDB$RELATION_FIELDS' + sLineBreak +
                     '    WHERE Trim(RDB$RELATION_NAME) = ' + QuotedStr(ATable.TableName) +
-                    ' AND Trim(RDB$FIELD_NAME) = ' + QuotedStr(AField.FName) +')';
+                    ' AND Trim(RDB$FIELD_NAME) = ' + QuotedStr(AField.FName) +')';}
+                 S := Format('ALTER DOMAIN %s TYPE VARCHAR(%d)', [fd.DomainName, NewLen]);
 
                  Query1.SelectSQL.Text := S;
                  try
@@ -596,7 +608,7 @@ begin
       end;
     end; // for
 
-    // Проверяем, есть ли первичный ключ
+    // РџСЂРѕРІРµСЂСЏРµРј, РµСЃС‚СЊ Р»Рё РїРµСЂРІРёС‡РЅС‹Р№ РєР»СЋС‡
     if ATable.PrimaryKey.FName <> '' then
       if IndexList.IndexOf(ATable.PrimaryKey.FName) < 0 then
       begin
@@ -616,7 +628,7 @@ begin
       end;
   end;
 
-  // Добавляем необходимые индексы
+  // Р”РѕР±Р°РІР»СЏРµРј РЅРµРѕР±С…РѕРґРёРјС‹Рµ РёРЅРґРµРєСЃС‹
   for I := 0 to ATable.IndexList.Count - 1 do
   begin
     AIndex := TfbIndexDesc(ATable.IndexList[I]);
@@ -643,7 +655,7 @@ begin
     end;
   end;
 
-  // Добавляем необходимые проверки CHECK
+  // Р”РѕР±Р°РІР»СЏРµРј РЅРµРѕР±С…РѕРґРёРјС‹Рµ РїСЂРѕРІРµСЂРєРё CHECK
   for I := 0 to ATable.ChecksList.Count - 1 do
   begin
     if CheckList.IndexOf(ATable.ChecksList.Names[I]) < 0 then
@@ -677,14 +689,14 @@ var
 begin
   Idx := TriggerList.IndexOf(ATrigger.FName);
   MustCreateTrigger := Idx < 0;
-  if Idx >= 0 then // Если такой триггер в базе имеется...
+  if Idx >= 0 then // Р•СЃР»Рё С‚Р°РєРѕР№ С‚СЂРёРіРіРµСЂ РІ Р±Р°Р·Рµ РёРјРµРµС‚СЃСЏ...
   begin
     AHash := Cardinal(TriggerList.Objects[Idx]);
-    if AHash <> ATrigger.FHash then // Если хэши триггеров не совпадают...
+    if AHash <> ATrigger.FHash then // Р•СЃР»Рё С…СЌС€Рё С‚СЂРёРіРіРµСЂРѕРІ РЅРµ СЃРѕРІРїР°РґР°СЋС‚...
       MustCreateTrigger := True;
   end;
 
-  if MustCreateTrigger then // Создаем триггер
+  if MustCreateTrigger then // РЎРѕР·РґР°РµРј С‚СЂРёРіРіРµСЂ
   begin
     if ATrigger.FState = trsActive then
       SState := 'ACTIVE'
@@ -719,7 +731,7 @@ begin
 
     PSQL := PSQL + Body;
 
-    // Создаем триггер
+    // РЎРѕР·РґР°РµРј С‚СЂРёРіРіРµСЂ
     Query1.ParamCheck := False;
     try
       Query1.SelectSQL.Text := PSQL;
@@ -733,9 +745,11 @@ begin
       Query1.ParamCheck := True;
     end;
 
-    // Фиксируем хэш
-    S := Format('UPDATE RDB$TRIGGERS SET RDB$DESCRIPTION=%s WHERE RDB$TRIGGER_NAME=%s',
-                [QuotedStr('Hash=' + IntToStr(Integer(ATrigger.FHash))), QuotedStr(ATrigger.FName)]);
+    // Р¤РёРєСЃРёСЂСѓРµРј С…СЌС€
+    S := Format('COMMENT ON TRIGGER %s IS %s', [ATrigger.FName, QuotedStr('Hash=' + IntToStr(Integer(ATrigger.FHash)))]);
+
+    //S := Format('UPDATE RDB$TRIGGERS SET RDB$DESCRIPTION=%s WHERE RDB$TRIGGER_NAME=%s',
+    //            [QuotedStr('Hash=' + IntToStr(Integer(ATrigger.FHash))), QuotedStr(ATrigger.FName)]);
     Query1.SelectSQL.Text := S;
     try
       Query1.ExecSQL;
@@ -757,7 +771,7 @@ begin
   begin
     ATable := TfbTableDesc(fbDataBaseDesc.FTableList[I]);
 
-    // Добавляем триггеры
+    // Р”РѕР±Р°РІР»СЏРµРј С‚СЂРёРіРіРµСЂС‹
     for J := 0 to ATable.TriggerList.Count - 1 do
       CheckTrigger(TfbTriggerDesc(ATable.TriggerList[J]));
   end;
@@ -796,27 +810,40 @@ begin
 end;
 
 destructor TDatabaseChecker.Destroy;
+var
+  I: Integer;
 begin
   FDB.Free;
   FTran.Free;
+  if Assigned(FieldList) then
+  begin
+    for I := 0 to FieldList.Count - 1 do
+      FieldList.Objects[I].Free;
+  end;
   inherited;
 end;
 
 procedure TDatabaseChecker.FillFieldsList;
+var
+  fd: TfbFieldDomain;
 begin
   Query1.SelectSQL.Text :=
-    'SELECT Trim(rf.RDB$RELATION_NAME) || ''='' || Trim(rf.RDB$FIELD_NAME) AS ANAME,' + sLineBreak +
-    '    f.RDB$FIELD_LENGTH AS FLEN' + sLineBreak +
-    ' FROM RDB$RELATION_FIELDS rf' + sLineBreak +
-    ' LEFT JOIN RDB$FIELDS f ON f.RDB$FIELD_NAME = rf.RDB$FIELD_SOURCE' + sLineBreak +
-    ' WHERE NOT ((rf.RDB$RELATION_NAME LIKE ''RDB$%'') OR (rf.RDB$RELATION_NAME LIKE ''MON$%''))';
+    'SELECT Trim(rf.RDB$RELATION_NAME) || ''='' || Trim(rf.RDB$FIELD_NAME) AS ANAME,'#13#10+
+    '    f.RDB$FIELD_LENGTH AS FLEN, rf.RDB$FIELD_SOURCE '#13#10+
+    ' FROM RDB$RELATION_FIELDS rf'#13#10+
+    ' LEFT JOIN RDB$FIELDS f ON f.RDB$FIELD_NAME = rf.RDB$FIELD_SOURCE'#13#10+
+    ' WHERE NOT ((rf.RDB$RELATION_NAME LIKE ''RDB$%'') OR (rf.RDB$RELATION_NAME LIKE ''MON$%'') OR '+
+    '            (rf.RDB$RELATION_NAME LIKE ''SEC$%''))';
 
   Query1.Open;
   try
     while not Query1.Eof do
     begin
-      // Записываем имя поля и длину поля
-      FieldList.AddObject(Trim(Query1.Fields[0].AsString), TObject(Query1.Fields[1].AsInteger));
+      // Р—Р°РїРёСЃС‹РІР°РµРј РёРјСЏ РїРѕР»СЏ Рё РґР»РёРЅСѓ РїРѕР»СЏ
+      fd := TfbFieldDomain.Create;
+      fd.DomainName := Trim(Query1.Fields[2].AsString);
+      fd.CurLength  := Query1.Fields[1].AsInteger;
+      FieldList.AddObject(Trim(Query1.Fields[0].AsString), fd);
       Query1.Next;
     end;
   finally
@@ -857,7 +884,7 @@ begin
     AList := TStringList.Create;
     while not Query1.Eof do
     begin
-      // Определяем сохраненный хэш процедуры
+      // РћРїСЂРµРґРµР»СЏРµРј СЃРѕС…СЂР°РЅРµРЅРЅС‹Р№ С…СЌС€ РїСЂРѕС†РµРґСѓСЂС‹
       AList.Text := FastStringReplace(Trim(Query1.Fields[1].AsString), ';', sLineBreak);
       DBHash := StrToIntDef(AList.Values['Hash'], 0);
 
@@ -881,7 +908,7 @@ begin
   try
     while not Query1.Eof do
     begin
-      // Записываем имя таблицы
+      // Р—Р°РїРёСЃС‹РІР°РµРј РёРјСЏ С‚Р°Р±Р»РёС†С‹
       TableList.Add(Trim(Query1.Fields[0].AsString));
       Query1.Next;
     end;
@@ -905,7 +932,7 @@ begin
     AList := TStringList.Create;
     while not Query1.Eof do
     begin
-      // Определяем сохраненный хэш триггера
+      // РћРїСЂРµРґРµР»СЏРµРј СЃРѕС…СЂР°РЅРµРЅРЅС‹Р№ С…СЌС€ С‚СЂРёРіРіРµСЂР°
       AList.Text := FastStringReplace(Trim(Query1.Fields[1].AsString), ';', sLineBreak);
       DBHash := StrToIntDef(AList.Values['Hash'], 0);
 
@@ -975,7 +1002,7 @@ var
   tmCheckDoms, tmCheckTabs, tmCheckFKs, tmCheckGens, tmCheckErr, tmCheckDefs: DWORD;
   tmCheckProc, tmCheckTrig: DWORD;
   tmConn, tmCommit, tmDisconn: DWORD;
-  STimes: string;
+  STimes, sParams, sqlCreate: string;
   Err: Integer;
 begin
   Err := 0;
@@ -984,8 +1011,8 @@ begin
   try
     LogFmt(FBStrDBCheckBegin, [FDB.DatabaseName], tlpEvent);
 
-    // Если файл базы данных существует, и указан сервер localhost или 127.0.0.1,
-    // то не нужно создавать базу данных (это все равно приведет лишь к Exception)
+    // Р•СЃР»Рё С„Р°Р№Р» Р±Р°Р·С‹ РґР°РЅРЅС‹С… СЃСѓС‰РµСЃС‚РІСѓРµС‚, Рё СѓРєР°Р·Р°РЅ СЃРµСЂРІРµСЂ localhost РёР»Рё 127.0.0.1,
+    // С‚Рѕ РЅРµ РЅСѓР¶РЅРѕ СЃРѕР·РґР°РІР°С‚СЊ Р±Р°Р·Сѓ РґР°РЅРЅС‹С… (СЌС‚Рѕ РІСЃРµ СЂР°РІРЅРѕ РїСЂРёРІРµРґРµС‚ Р»РёС€СЊ Рє Exception)
 
     if ((UpperCase(FConnParams.cpServerName) = 'LOCALHOST') or
        (FConnParams.cpServerName = '127.0.0.1')) and FileExists(FConnParams.cpDataBase) then
@@ -997,11 +1024,29 @@ begin
 
     if CanTryCreateDatabase then
     begin
-      // Пытаемся создать базу данных. Если база уже есть, то будет выдано
-      // сообщение об ошибке "database or file exists"
+      // РџС‹С‚Р°РµРјСЃСЏ СЃРѕР·РґР°С‚СЊ Р±Р°Р·Сѓ РґР°РЅРЅС‹С…. Р•СЃР»Рё Р±Р°Р·Р° СѓР¶Рµ РµСЃС‚СЊ, С‚Рѕ Р±СѓРґРµС‚ РІС‹РґР°РЅРѕ
+      // СЃРѕРѕР±С‰РµРЅРёРµ РѕР± РѕС€РёР±РєРµ "database or file exists"
 
       FDB.Params.Clear;
 
+      {$IFDEF FPC}
+
+      sqlCreate := Format(
+        'CREATE DATABASE %s '+
+        'USER %s PASSWORD %s ' +
+        'PAGE_SIZE = %d DEFAULT CHARACTER SET %s',
+        [QuotedStr(FConnParams.cpDataBase), QuotedStr(FConnParams.cpUserName), QuotedStr(FConnParams.cpPassword), FBDefPageSize, FConnParams.cpCharSet]);
+
+      try
+        FDB.CreateDatabase(sqlCreate);
+      except
+        on E: Exception do
+        begin
+          raise ReCreateEObject(E, FBStrCreateDB, False);
+        end;
+      end;
+
+      {$ELSE}
       if FConnParams.cpUserName <> '' then
         FDB.Params.Add(Format('USER %s', [QuotedStr(FConnParams.cpUserName)]));
 
@@ -1013,6 +1058,8 @@ begin
       if FConnParams.cpCharSet <> '' then
         FDB.Params.Add('DEFAULT CHARACTER SET ' + FConnParams.cpCharSet + ';');
 
+      sParams := FDB.Params.Text;
+
       try
         FDB.CreateDatabase;
         FBDisconnectDB(FDB);
@@ -1023,13 +1070,14 @@ begin
             raise ReCreateEObject(E, FBStrCreateDB, False);
         end;
       end;
-
+      {$ENDIF}
       FBDisconnectDB(FDB);
+
     end;
 
     Err := 20;
 
-    // База данных создана! Теперь проверяем наличие необходимых таблиц
+    // Р‘Р°Р·Р° РґР°РЅРЅС‹С… СЃРѕР·РґР°РЅР°! РўРµРїРµСЂСЊ РїСЂРѕРІРµСЂСЏРµРј РЅР°Р»РёС‡РёРµ РЅРµРѕР±С…РѕРґРёРјС‹С… С‚Р°Р±Р»РёС†
     FDB.Params.Clear;
     if FConnParams.cpUserName <> '' then
       FDB.Params.Values['user_name'] := FConnParams.cpUserName;
@@ -1040,11 +1088,12 @@ begin
     if FConnParams.cpCharSet <> '' then
       FDB.Params.Values['lc_ctype'] := FConnParams.cpCharSet;
 
+    Query1.Database := FDB;
     Query1.Transaction := FTran;
 
     Err := 30;
 
-    // Подключаемся к базе данных
+    // РџРѕРґРєР»СЋС‡Р°РµРјСЃСЏ Рє Р±Р°Р·Рµ РґР°РЅРЅС‹С…
     tc := GetTickCount;
     FBConnectDB(FDB);
     Err := 40;
@@ -1055,84 +1104,84 @@ begin
 
     try
 
-      // Извлекаем список таблиц
+      // РР·РІР»РµРєР°РµРј СЃРїРёСЃРѕРє С‚Р°Р±Р»РёС†
       tc := GetTickCount;
       FillTableList;
       tmGetTabs := GetTickCount - tc;
 
       Err := 60;
 
-      // Получаем для каждой таблицы список полей
+      // РџРѕР»СѓС‡Р°РµРј РґР»СЏ РєР°Р¶РґРѕР№ С‚Р°Р±Р»РёС†С‹ СЃРїРёСЃРѕРє РїРѕР»РµР№
       tc := GetTickCount;
       FillFieldsList;
       tmGetFlds := GetTickCount - tc;
       Err := 70;
 
-      // Получаем список индексов
+      // РџРѕР»СѓС‡Р°РµРј СЃРїРёСЃРѕРє РёРЅРґРµРєСЃРѕРІ
       tc := GetTickCount;
       FillIndexList;
       tmGetIxs := GetTickCount - tc;
       Err := 80;
 
-      // Получаем список генераторов
+      // РџРѕР»СѓС‡Р°РµРј СЃРїРёСЃРѕРє РіРµРЅРµСЂР°С‚РѕСЂРѕРІ
       tc := GetTickCount;
       FillGeneratorsList;
       tmGetGens := GetTickCount - tc;
       Err := 90;
 
-      // Получаем список проверок CHECK
+      // РџРѕР»СѓС‡Р°РµРј СЃРїРёСЃРѕРє РїСЂРѕРІРµСЂРѕРє CHECK
       tc := GetTickCount;
       FillCheckList;
       tmGetChecks := GetTickCount - tc;
       Err := 100;
 
-      // Получаем список триггеров
+      // РџРѕР»СѓС‡Р°РµРј СЃРїРёСЃРѕРє С‚СЂРёРіРіРµСЂРѕРІ
       FillTriggerList;
       Err := 110;
 
-      // Получаем список хранимых процедур
+      // РџРѕР»СѓС‡Р°РµРј СЃРїРёСЃРѕРє С…СЂР°РЅРёРјС‹С… РїСЂРѕС†РµРґСѓСЂ
       FillProcedureList;
       Err := 115;
 
-      // Проверяем домены
+      // РџСЂРѕРІРµСЂСЏРµРј РґРѕРјРµРЅС‹
       tc := GetTickCount;
       CheckDomains;
       tmCheckDoms := GetTickCount - tc;
       Err := 120;
 
-      // Проверяем таблицы
+      // РџСЂРѕРІРµСЂСЏРµРј С‚Р°Р±Р»РёС†С‹
       tc := GetTickCount;
       for I := 0 to fbDataBaseDesc.FTableList.Count - 1 do
         CheckTable(TfbTableDesc(fbDataBaseDesc.FTableList[I]));
       tmCheckTabs := GetTickCount - tc;
       Err := 130;
 
-      // Проверяем внешние ключи
+      // РџСЂРѕРІРµСЂСЏРµРј РІРЅРµС€РЅРёРµ РєР»СЋС‡Рё
       tc := GetTickCount;
       CheckForeignKeys();
       tmCheckFKs := GetTickCount - tc;
       Err := 140;
 
-      // Проверяем генераторы
+      // РџСЂРѕРІРµСЂСЏРµРј РіРµРЅРµСЂР°С‚РѕСЂС‹
       tc := GetTickCount;
       CheckGenerators();
       tmCheckGens := GetTickCount - tc;
       Err := 150;
 
-      // Проверяем, есть ли исключение ERR
+      // РџСЂРѕРІРµСЂСЏРµРј, РµСЃС‚СЊ Р»Рё РёСЃРєР»СЋС‡РµРЅРёРµ ERR
       tc := GetTickCount;
       CheckDefaultException;
       tmCheckErr := GetTickCount - tc;
       Err := 160;
 
-      // Проверяем хранимые процедуры
+      // РџСЂРѕРІРµСЂСЏРµРј С…СЂР°РЅРёРјС‹Рµ РїСЂРѕС†РµРґСѓСЂС‹
       tc := GetTickCount;
       for I := 0 to fbDataBaseDesc.FProcedureList.Count - 1 do
         CheckProcedure(TfbProcedureDesc(fbDataBaseDesc.FProcedureList[I]));
       tmCheckProc := GetTickCount - tc;
       Err := 164;
 
-      // Проверяем триггеры
+      // РџСЂРѕРІРµСЂСЏРµРј С‚СЂРёРіРіРµСЂС‹
       tc := GetTickCount;
       CheckTriggers();
       tmCheckTrig := GetTickCount - tc;
@@ -1151,7 +1200,7 @@ begin
       tmDisconn := GetTickCount - tc;
     end;
 
-    // Проверяем значения по умолчанию
+    // РџСЂРѕРІРµСЂСЏРµРј Р·РЅР°С‡РµРЅРёСЏ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
     Err := 180;
     tc := GetTickCount;
     CheckDefaultValues();

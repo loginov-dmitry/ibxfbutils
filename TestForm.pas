@@ -23,17 +23,31 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 }
 
+{$IFDEF FPC}
+{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
+{$ENDIF}
+
 unit TestForm;
 
+{$WARN 6058 off : Call to subroutine "$1" marked as inline is not inlined}
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics,
-  Controls, Forms, Dialogs, IB, IBDatabase, IBCustomDataSet, StdCtrls, IniFiles,
-  ExtCtrls, FileCtrl, fbTypes, ibxFBUtils, fbSomeFuncs, Math;
+{$IFnDEF FPC}
+  Windows,
+{$ELSE}
+  LCLIntf, LCLType, LMessages, LazUTF8,
+{$ENDIF}
+  Messages, SysUtils, Variants, Classes, Graphics,
+  Controls, Forms, Dialogs, IB, IBCustomDataSet, IBDatabase, StdCtrls, IniFiles,
+  ExtCtrls, FileCtrl, fbTypes, ibxFBUtils, fbSomeFuncs, DateUtils, IBBlob, IBSQL;
 
 type
+
+  { TForm1 }
+
   TForm1 = class(TForm)
+    Button1: TButton;
     IBTransaction1: TIBTransaction;
     Memo1: TMemo;
     Memo2: TMemo;
@@ -74,6 +88,7 @@ type
     labInsCount: TLabel;
     Label15: TLabel;
     Label14: TLabel;
+    procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure btnChooseDBClick(Sender: TObject);
     procedure btnTestConnectionClick(Sender: TObject);
@@ -98,12 +113,12 @@ type
 
     procedure TestRecomputeIndexes;
 
-    {Тестирует функционал по корректировке структуры БД}
+    {РўРµСЃС‚РёСЂСѓРµС‚ С„СѓРЅРєС†РёРѕРЅР°Р» РїРѕ РєРѕСЂСЂРµРєС‚РёСЂРѕРІРєРµ СЃС‚СЂСѓРєС‚СѓСЂС‹ Р‘Р”}
     procedure TestDBCorrectStruct;
 
-    procedure TestBaseFunctions; // Тест базовых функций
+    procedure TestBaseFunctions; // РўРµСЃС‚ Р±Р°Р·РѕРІС‹С… С„СѓРЅРєС†РёР№
 
-    procedure TestWorkingWithPool; // Тестирование работы с пулом подключений
+    procedure TestWorkingWithPool; // РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ СЂР°Р±РѕС‚С‹ СЃ РїСѓР»РѕРј РїРѕРґРєР»СЋС‡РµРЅРёР№
 
     procedure TestBackupRestore;
   end;
@@ -120,7 +135,11 @@ procedure LogEventsProc(Msg: string; LogEvent: TFBLogEvent);
 
 implementation
 
+{$IFnDEF FPC}
 {$R *.dfm}
+{$ELSE}
+{$R *.lfm}
+{$ENDIF}
 
 var
   StopThreads: Boolean;
@@ -157,11 +176,11 @@ end;
 
 procedure TForm1.Button2Click(Sender: TObject);
 begin
-  // Запоминаем настройки подключения в профиле по умолчанию
+  // Р—Р°РїРѕРјРёРЅР°РµРј РЅР°СЃС‚СЂРѕР№РєРё РїРѕРґРєР»СЋС‡РµРЅРёСЏ РІ РїСЂРѕС„РёР»Рµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
   AddDefaultConnectionProfile;
 
   case rgSelectTest.ItemIndex of
-    0: ShowMessage('Данный режим не реализован!');
+    0: ShowMessage('Р”Р°РЅРЅС‹Р№ СЂРµР¶РёРј РЅРµ СЂРµР°Р»РёР·РѕРІР°РЅ!');
     1: TestDBCorrectStruct;
     2: TestFBIniFiles;
     3: TestRecomputeIndexes;
@@ -173,12 +192,49 @@ begin
 
 end;
 
+procedure TForm1.Button1Click(Sender: TObject);
+var
+  sMsg, sMsg2: string;
+  I: Integer;
+  fdb: TIBDataBase;
+  tran: TIBTransaction;
+  sql: string;
+  ds: TIBDataSet;
+  EndTime: TDateTime;
+begin
+  fdb := fb.CreateConnection(edServerName.Text, StrToInt(edPort.Text), edFileName.Text,
+    edUserName.Text, edPassword.Text, edCharSet.Text, trNone, True, nil);
+  tran := fb.CreateTransaction(fdb);
+  try
+    {sql := 'select Count(*) from smlog where operator=:oper ';
+
+    ds := fb.CreateAndOpenDataSet(nil, tran, sql, ['oper'], ['Р”РµРЅСЊ']);
+    Log('Count=' + inttostr(ds.Fields[0].AsInteger));     }
+    //EndTime := fb.GetCurrentDateTime(nil, tran) + 1;
+
+    //fb.InsertRecordDB(nil, tran, 'smlog', ['smnum', 50002, 'operator', 'РРІР°РЅРѕРІ РРІР°РЅ', 'begtime', Now, 'endtime', EndTime]);
+    fb.UpdateRecordDB(nil, tran, 'BACKCARD', ['indexsale', 117472], ['tran', 'РџСЂРёРІРµС‚!!!!']);
+    sMsg := fb.GetTableFieldValue(nil, tran, 'BACKCARD', 'tran', ['indexsale'], [117472], '!!!' );
+    Log('tran=' + sMsg);
+    tran.Commit;
+  finally
+    tran.Free;
+    fdb.Free;
+    //ds.Free;
+  end;
+
+  {sMsg := Trim(Memo1.Text);
+  for I := 1 to Length(sMsg) do
+    sMsg2 := sMsg2 + '%' + IntToHex(Ord(sMsg[I]));
+  Memo1.Text := sMsg2; }
+end;
+
 procedure TForm1.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
   if ThreadCounter > 0 then
   begin
     CanClose := False;
-    ShowMessage('Имеются работающие доп. потоки');
+    ShowMessage('РРјРµСЋС‚СЃСЏ СЂР°Р±РѕС‚Р°СЋС‰РёРµ РґРѕРї. РїРѕС‚РѕРєРё');
   end;
 end;
 
@@ -194,7 +250,7 @@ begin
   edCharSet.Text := ini.ReadString('DB', 'CharSet', 'WIN1251');
 
   edSharedPath.Text := ini.ReadString('DB', 'SharedPath', '\\VBOXSVR\Shared\TEMP\');
-  edSharedPathOnServer.Text := ini.ReadString('DB', 'SharedPathOnServer', 'f:\Общая\TEMP\');
+  edSharedPathOnServer.Text := ini.ReadString('DB', 'SharedPathOnServer', 'f:\РћР±С‰Р°СЏ\TEMP\');
 
 end;
 
@@ -218,7 +274,7 @@ var
   S: string;
 begin
   S := edSharedPath.Text;
-  if SelectDirectory('Выберите каталог', '', S) then
+  if SelectDirectory('Р’С‹Р±РµСЂРёС‚Рµ РєР°С‚Р°Р»РѕРі', '', S) then
     edSharedPath.Text := S;
 end;
 
@@ -227,7 +283,7 @@ var
   S: string;
 begin
   S := edSharedPathOnServer.Text;
-  if SelectDirectory('Выберите каталог', '', S) then
+  if SelectDirectory('Р’С‹Р±РµСЂРёС‚Рµ РєР°С‚Р°Р»РѕРі', '', S) then
     edSharedPathOnServer.Text := S;
 end;
 
@@ -239,7 +295,7 @@ begin
     edUserName.Text, edPassword.Text, edCharSet.Text, trNone, True, nil);
   fb.FreeConnection(fdb);
 
-  ShowMessage('Подключение к БД проходит успешно!');
+  ShowMessage('РџРѕРґРєР»СЋС‡РµРЅРёРµ Рє Р‘Р” РїСЂРѕС…РѕРґРёС‚ СѓСЃРїРµС€РЅРѕ!');
 
 end;
 
@@ -247,9 +303,9 @@ procedure TForm1.TestBackupRestore;
 var
   tc: DWORD;
 begin
-  Log('НАЧАЛО ТЕСТА БЭКАПА/РЕСТОРА...');
+  Log('РќРђР§РђР›Рћ РўР•РЎРўРђ Р‘Р­РљРђРџРђ/Р Р•РЎРўРћР Рђ...');
 
-  // Резервирование на сервере
+  // Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ РЅР° СЃРµСЂРІРµСЂРµ
   try
     brtestname := 'b1';
     tc := GetTickCount;
@@ -262,12 +318,12 @@ begin
       Log('BackupDatabaseOnServer: ERROR: ' + E.Message);
   end;
 
-  // Восстановление на сервере
+  // Р’РѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РЅР° СЃРµСЂРІРµСЂРµ
   try
     brtestname := 'r1';
     tc := GetTickCount;
     fb.br.RestoreDatabaseOnServer(edServerName.Text, StrToInt(edPort.Text),
-      edFileName.Text + '_base_copy', // Для восстановления на всякий случай создается новый файл
+      edFileName.Text + '_base_copy', // Р”Р»СЏ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ РЅР° РІСЃСЏРєРёР№ СЃР»СѓС‡Р°Р№ СЃРѕР·РґР°РµС‚СЃСЏ РЅРѕРІС‹Р№ С„Р°Р№Р»
       IncludeTrailingPathDelimiter(edSharedPathOnServer.Text) + 'mytestdbbackup.fbk',
       edUserName.Text, edPassword.Text, FBDefRestoreOptions + [Replace], BackupRestoreProgressProc);
     Log('RestoreDatabaseOnServer: OK. time='+IntToStr(GetTickCount-tc));
@@ -276,41 +332,41 @@ begin
       Log('RestoreDatabaseOnServer: ERROR: ' + E.Message);
   end;
 
-  // Резервирование с копированием файла рез. копии на клиентский компьютер
+  // Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ СЃ РєРѕРїРёСЂРѕРІР°РЅРёРµРј С„Р°Р№Р»Р° СЂРµР·. РєРѕРїРёРё РЅР° РєР»РёРµРЅС‚СЃРєРёР№ РєРѕРјРїСЊСЋС‚РµСЂ
   try
     brtestname := 'b2';
     tc := GetTickCount;
     fb.br.BackupDatabaseAndCopyFromServer(edServerName.Text, StrToInt(edPort.Text), edFileName.Text,
-      IncludeTrailingPathDelimiter(edSharedPathOnServer.Text) + 'mytestdbbackup.fbk', // файл бэкапа относительно сервера
+      IncludeTrailingPathDelimiter(edSharedPathOnServer.Text) + 'mytestdbbackup.fbk', // С„Р°Р№Р» Р±СЌРєР°РїР° РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ СЃРµСЂРІРµСЂР°
       edUserName.Text, edPassword.Text, FBDefBackupOptions, BackupRestoreProgressProc,
-      IncludeTrailingPathDelimiter(edSharedPath.Text) + 'mytestdbbackup.fbk',  // файл бэкапа относительно клиента
-      GetTempPath + 'mytestdbbackup.fbk', // копия файла бэкапа на клиентском компьютере
-      True); // удалить файл бэкапа с сервера
+      IncludeTrailingPathDelimiter(edSharedPath.Text) + 'mytestdbbackup.fbk',  // С„Р°Р№Р» Р±СЌРєР°РїР° РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РєР»РёРµРЅС‚Р°
+      GetTempPath + 'mytestdbbackup.fbk', // РєРѕРїРёСЏ С„Р°Р№Р»Р° Р±СЌРєР°РїР° РЅР° РєР»РёРµРЅС‚СЃРєРѕРј РєРѕРјРїСЊСЋС‚РµСЂРµ
+      True); // СѓРґР°Р»РёС‚СЊ С„Р°Р№Р» Р±СЌРєР°РїР° СЃ СЃРµСЂРІРµСЂР°
     Log('BackupDatabaseAndCopyFromServer: OK. time='+IntToStr(GetTickCount-tc));
   except
     on E: Exception do
       Log('BackupDatabaseAndCopyFromServer: ERROR: ' + E.Message);
   end;
 
-  // Восстановление с копированием файла рез. копии с клиентского компьютера на сервер
+  // Р’РѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ СЃ РєРѕРїРёСЂРѕРІР°РЅРёРµРј С„Р°Р№Р»Р° СЂРµР·. РєРѕРїРёРё СЃ РєР»РёРµРЅС‚СЃРєРѕРіРѕ РєРѕРјРїСЊСЋС‚РµСЂР° РЅР° СЃРµСЂРІРµСЂ
   try
     brtestname := 'r2';
     tc := GetTickCount;
     fb.br.CopyBackupToServerAndRestoreDatabase(edServerName.Text, StrToInt(edPort.Text),
       edFileName.Text + '_base_copy',
-      IncludeTrailingPathDelimiter(edSharedPathOnServer.Text) + 'mytestdbbackup.fbk', // файл бэкапа относительно сервера
+      IncludeTrailingPathDelimiter(edSharedPathOnServer.Text) + 'mytestdbbackup.fbk', // С„Р°Р№Р» Р±СЌРєР°РїР° РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ СЃРµСЂРІРµСЂР°
       edUserName.Text, edPassword.Text, FBDefRestoreOptions + [Replace], BackupRestoreProgressProc,
-      GetTempPath + 'mytestdbbackup.fbk', // копия файла бэкапа на клиентском компьютере
-      IncludeTrailingPathDelimiter(edSharedPath.Text) + 'mytestdbbackup.fbk',  // файл бэкапа на сервере относительно клиента
-      True,  // удалить файл бэкапа с клиента
-      True); // удалить файл бэкапа с сервера
+      GetTempPath + 'mytestdbbackup.fbk', // РєРѕРїРёСЏ С„Р°Р№Р»Р° Р±СЌРєР°РїР° РЅР° РєР»РёРµРЅС‚СЃРєРѕРј РєРѕРјРїСЊСЋС‚РµСЂРµ
+      IncludeTrailingPathDelimiter(edSharedPath.Text) + 'mytestdbbackup.fbk',  // С„Р°Р№Р» Р±СЌРєР°РїР° РЅР° СЃРµСЂРІРµСЂРµ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РєР»РёРµРЅС‚Р°
+      True,  // СѓРґР°Р»РёС‚СЊ С„Р°Р№Р» Р±СЌРєР°РїР° СЃ РєР»РёРµРЅС‚Р°
+      True); // СѓРґР°Р»РёС‚СЊ С„Р°Р№Р» Р±СЌРєР°РїР° СЃ СЃРµСЂРІРµСЂР°
     Log('CopyBackupToServerAndRestoreDatabase: OK. time='+IntToStr(GetTickCount-tc));
   except
     on E: Exception do
       Log('CopyBackupToServerAndRestoreDatabase: ERROR: ' + E.Message);
   end;
 
-  Log('ТЕСТ БЭКАПА/РЕСТОРА ЗАВЕРШЕН');
+  Log('РўР•РЎРў Р‘Р­РљРђРџРђ/Р Р•РЎРўРћР Рђ Р—РђР’Р•Р РЁР•Рќ');
 end;
 
 procedure TForm1.TestBaseFunctions;
@@ -321,7 +377,7 @@ var
   tc: DWORD;
   ID: Integer;
 begin
-  Log('НАЧАЛО ТЕСТА БАЗОВЫХ ФУНКЦИЙ...');
+  Log('РќРђР§РђР›Рћ РўР•РЎРўРђ Р‘РђР—РћР’Р«РҐ Р¤РЈРќРљР¦РР™...');
   tc := GetTickCount;
 
   fdb := fb.CreateConnection(edServerName.Text, StrToInt(edPort.Text), edFileName.Text,
@@ -358,31 +414,31 @@ begin
     Log('GenID: ERROR');
 
   fb.InsertRecord(fdb, ftran,
-    'TESTTABLE',                              // Имя таблицы
-    ['ID', 'NAME', 'RECDATE'],                // Имена полей таблицы
-    [ID, 'FBUTILS-SUPER!', Now]);             // Значения полей
+    'TESTTABLE',                              // РРјСЏ С‚Р°Р±Р»РёС†С‹
+    ['ID', 'NAME', 'RECDATE'],                // РРјРµРЅР° РїРѕР»РµР№ С‚Р°Р±Р»РёС†С‹
+    [ID, 'FBUTILS-SUPER!', Now]);             // Р—РЅР°С‡РµРЅРёСЏ РїРѕР»РµР№
   Log('InsertRecord: OK');
 
   fb.UpdateRecord(fdb, ftran,
-    'TESTTABLE',                              // Имя таблицы
-    ['ID'],                                   // Ключевые поля
-    [ID],                                     // Значени ключевых полей
-    ['SUMMA', 'RECTYPE'],                     // Имена полей таблицы
-    [1000000, 5]);                            // Значения полей
+    'TESTTABLE',                              // РРјСЏ С‚Р°Р±Р»РёС†С‹
+    ['ID'],                                   // РљР»СЋС‡РµРІС‹Рµ РїРѕР»СЏ
+    [ID],                                     // Р—РЅР°С‡РµРЅРё РєР»СЋС‡РµРІС‹С… РїРѕР»РµР№
+    ['SUMMA', 'RECTYPE'],                     // РРјРµРЅР° РїРѕР»РµР№ С‚Р°Р±Р»РёС†С‹
+    [1000000, 5]);                            // Р—РЅР°С‡РµРЅРёСЏ РїРѕР»РµР№
   Log('UpdateRecord: OK');
 
   fb.DeleteRecord(fdb, ftran,
-    'TESTTABLE',                              // Имя таблицы
-    ['ID'],                                   // Ключевые поля
-    [ID+1000]);                               // Значени ключевых полей
+    'TESTTABLE',                              // РРјСЏ С‚Р°Р±Р»РёС†С‹
+    ['ID'],                                   // РљР»СЋС‡РµРІС‹Рµ РїРѕР»СЏ
+    [ID+1000]);                               // Р—РЅР°С‡РµРЅРё РєР»СЋС‡РµРІС‹С… РїРѕР»РµР№
   Log('DeleteRecord: OK');
 
   try
     fb.UpdateOrInsertRecord(fdb, ftran,
-      'TESTTABLE',                              // Имя таблицы
-      ['ID', 'NAME', 'RECDATE', 'SUMMA'],       // Имена полей таблицы
-      [1, 'FB-SUPER!!!', Now, Random(1000000)], // Значения полей
-      ['ID']);                                  // Ключевое поле (для поиска совпадения)
+      'TESTTABLE',                              // РРјСЏ С‚Р°Р±Р»РёС†С‹
+      ['ID', 'NAME', 'RECDATE', 'SUMMA'],       // РРјРµРЅР° РїРѕР»РµР№ С‚Р°Р±Р»РёС†С‹
+      [1, 'FB-SUPER!!!', Now, Random(1000000)], // Р—РЅР°С‡РµРЅРёСЏ РїРѕР»РµР№
+      ['ID']);                                  // РљР»СЋС‡РµРІРѕРµ РїРѕР»Рµ (РґР»СЏ РїРѕРёСЃРєР° СЃРѕРІРїР°РґРµРЅРёСЏ)
     Log('UpdateOrInsertRecord: OK');
   except
     on E: Exception do
@@ -406,41 +462,41 @@ begin
     ['pName', 'pSumma'], ['THE BEST!', 2000000]);
   Log('ExecQuery (AutoInc): OK');
 
-  // Простой SQL-запрос (через механизм EXECUTE BLOCK)
+  // РџСЂРѕСЃС‚РѕР№ SQL-Р·Р°РїСЂРѕСЃ (С‡РµСЂРµР· РјРµС…Р°РЅРёР·Рј EXECUTE BLOCK)
   fb.ExecuteBlock(fdb, ftran, '', 'INSERT INTO TESTTABLE (ID, SUMMA) VALUES (GEN_ID(GEN_TESTTABLE_ID,1), 123456);');
   Log('ExecuteBlock 1: OK');
 
-  // Чуть усложняем
-  fb.ExecuteBlock(fdb, ftran, 'I INTEGER',                      // Объявляем переменные
-    ' I = GEN_ID(GEN_TESTTABLE_ID,1); '+                        // Получаем значение генератора
-    ' INSERT INTO TESTTABLE (ID, SUMMA) VALUES (:I, 123456); ');// Вставляем новую запись
+  // Р§СѓС‚СЊ СѓСЃР»РѕР¶РЅСЏРµРј
+  fb.ExecuteBlock(fdb, ftran, 'I INTEGER',                      // РћР±СЉСЏРІР»СЏРµРј РїРµСЂРµРјРµРЅРЅС‹Рµ
+    ' I = GEN_ID(GEN_TESTTABLE_ID,1); '+                        // РџРѕР»СѓС‡Р°РµРј Р·РЅР°С‡РµРЅРёРµ РіРµРЅРµСЂР°С‚РѕСЂР°
+    ' INSERT INTO TESTTABLE (ID, SUMMA) VALUES (:I, 123456); ');// Р’СЃС‚Р°РІР»СЏРµРј РЅРѕРІСѓСЋ Р·Р°РїРёСЃСЊ
   Log('ExecuteBlock 2: OK');
 
-  // тест  ExecuteBlock с FOR SELECT INTO
+  // С‚РµСЃС‚  ExecuteBlock СЃ FOR SELECT INTO
   fb.ExecuteBlock(fdb, ftran,
-    'vID INTEGER, vName VARCHAR(100)',        // Объявляем переменные
-    ' FOR SELECT ID, NAME FROM TESTTABLE '+   // Для каждой строки запроса
-    '     WHERE NAME IS NULL ORDER BY 1 '+    // с заданным условием и сортировкой
-    ' INTO :vID, :vName '+                    // Сохраняем ID и NAME в переменные
-    ' DO '+                                   // выполнить...
+    'vID INTEGER, vName VARCHAR(100)',        // РћР±СЉСЏРІР»СЏРµРј РїРµСЂРµРјРµРЅРЅС‹Рµ
+    ' FOR SELECT ID, NAME FROM TESTTABLE '+   // Р”Р»СЏ РєР°Р¶РґРѕР№ СЃС‚СЂРѕРєРё Р·Р°РїСЂРѕСЃР°
+    '     WHERE NAME IS NULL ORDER BY 1 '+    // СЃ Р·Р°РґР°РЅРЅС‹Рј СѓСЃР»РѕРІРёРµРј Рё СЃРѕСЂС‚РёСЂРѕРІРєРѕР№
+    ' INTO :vID, :vName '+                    // РЎРѕС…СЂР°РЅСЏРµРј ID Рё NAME РІ РїРµСЂРµРјРµРЅРЅС‹Рµ
+    ' DO '+                                   // РІС‹РїРѕР»РЅРёС‚СЊ...
     ' BEGIN '+
-    '   UPDATE TESTTABLE SET SUMMA=SUMMA+1, NAME=:vName WHERE ID=:vID; '+ // Обновление строки таблицы
+    '   UPDATE TESTTABLE SET SUMMA=SUMMA+1, NAME=:vName WHERE ID=:vID; '+ // РћР±РЅРѕРІР»РµРЅРёРµ СЃС‚СЂРѕРєРё С‚Р°Р±Р»РёС†С‹
     ' END ');
   Log('ExecuteBlock 3: OK');
 
-  // тест ExecuteBlock c выборкой (возвращает кол-во записей и среднюю сумму
+  // С‚РµСЃС‚ ExecuteBlock c РІС‹Р±РѕСЂРєРѕР№ (РІРѕР·РІСЂР°С‰Р°РµС‚ РєРѕР»-РІРѕ Р·Р°РїРёСЃРµР№ Рё СЃСЂРµРґРЅСЋСЋ СЃСѓРјРјСѓ
   ds := fb.ExecuteBlock(fdb, ftran,
-    'CNT INTEGER, AvgSum DOUBLE PRECISION',         // Поля результирующего набора данных
+    'CNT INTEGER, AvgSum DOUBLE PRECISION',         // РџРѕР»СЏ СЂРµР·СѓР»СЊС‚РёСЂСѓСЋС‰РµРіРѕ РЅР°Р±РѕСЂР° РґР°РЅРЅС‹С…
     '',
-    'SELECT COUNT(ID), AVG(SUMMA) FROM TESTTABLE '+ // Выполняем агригирующий запрос
-    'INTO :CNT, :AvgSum; '+                         // сохраняем результат запроса в переменные
-    'SUSPEND;');                                    // Сигнализируем приложению о том, что "запись" создана
+    'SELECT COUNT(ID), AVG(SUMMA) FROM TESTTABLE '+ // Р’С‹РїРѕР»РЅСЏРµРј Р°РіСЂРёРіРёСЂСѓСЋС‰РёР№ Р·Р°РїСЂРѕСЃ
+    'INTO :CNT, :AvgSum; '+                         // СЃРѕС…СЂР°РЅСЏРµРј СЂРµР·СѓР»СЊС‚Р°С‚ Р·Р°РїСЂРѕСЃР° РІ РїРµСЂРµРјРµРЅРЅС‹Рµ
+    'SUSPEND;');                                    // РЎРёРіРЅР°Р»РёР·РёСЂСѓРµРј РїСЂРёР»РѕР¶РµРЅРёСЋ Рѕ С‚РѕРј, С‡С‚Рѕ "Р·Р°РїРёСЃСЊ" СЃРѕР·РґР°РЅР°
   Log('ExecuteBlock 4: OK: CNT=' + ds.FieldByName('CNT').AsString + ' AVG=' + ds.FieldByName('AvgSum').AsString);
   ds.Free;
 
-  // тест ExecuteBlock с генерацией ошибки
+  // С‚РµСЃС‚ ExecuteBlock СЃ РіРµРЅРµСЂР°С†РёРµР№ РѕС€РёР±РєРё
   try
-    fb.ExecuteBlock(fdb, ftran, '', '', 'EXCEPTION ERR ''В хранимой процедуре произошла какая-то ошибка!'';');
+    fb.ExecuteBlock(fdb, ftran, '', '', 'EXCEPTION ERR ''Р’ С…СЂР°РЅРёРјРѕР№ РїСЂРѕС†РµРґСѓСЂРµ РїСЂРѕРёР·РѕС€Р»Р° РєР°РєР°СЏ-С‚Рѕ РѕС€РёР±РєР°!'';');
   except
     on E: EIBInterBaseError do
       if E.SQLCode = -836 then
@@ -450,7 +506,7 @@ begin
           ' SQLCode=' + IntToStr(E.SQLCode) + ' IBErrorCode=' + IntToStr(E.IBErrorCode));
   end;
 
-  // Проверяем вызов хранимой процедуры, возвращающей набор данных
+  // РџСЂРѕРІРµСЂСЏРµРј РІС‹Р·РѕРІ С…СЂР°РЅРёРјРѕР№ РїСЂРѕС†РµРґСѓСЂС‹, РІРѕР·РІСЂР°С‰Р°СЋС‰РµР№ РЅР°Р±РѕСЂ РґР°РЅРЅС‹С…
   ds := fb.CreateAndOpenDataSet(fdb, ftran, 'SELECT * FROM PROCPOWER(3,3)', [], []);
   if ds.Fields[0].AsInteger = 27 then
     Log('Call stored proc: OK')
@@ -458,28 +514,28 @@ begin
     Log('Call stored proc: ERROR');
   ds.Free;
 
-  // Проверяем вызов хранимой процедуры, НЕ возвращающей набор данных
+  // РџСЂРѕРІРµСЂСЏРµРј РІС‹Р·РѕРІ С…СЂР°РЅРёРјРѕР№ РїСЂРѕС†РµРґСѓСЂС‹, РќР• РІРѕР·РІСЂР°С‰Р°СЋС‰РµР№ РЅР°Р±РѕСЂ РґР°РЅРЅС‹С…
   fb.ExecQuery(fdb, ftran, 'EXECUTE PROCEDURE PROCADDSUMMA(:A)', ['A'], [5]);
   Log('Execute procedure: OK');
 
   fb.ClearTable(fdb, ftran, 'TESTTABLE', 'ID BETWEEN 500 AND 700', False);
-  Log('ClearTable 1: OK (частично, БЕЗ сборки мусора)');
+  Log('ClearTable 1: OK (С‡Р°СЃС‚РёС‡РЅРѕ, Р‘Р•Р— СЃР±РѕСЂРєРё РјСѓСЃРѕСЂР°)');
 
   ftran.Commit;
 
   fb.ClearTable(fdb, nil, 'TESTTABLE', 'ID BETWEEN 800 AND 1000', True);
-  Log('ClearTable 2: OK (частично, СО сборкой мусора)');
+  Log('ClearTable 2: OK (С‡Р°СЃС‚РёС‡РЅРѕ, РЎРћ СЃР±РѕСЂРєРѕР№ РјСѓСЃРѕСЂР°)');
 
 
   fb.ClearTable(fdb, nil, 'TESTTABLE');
-  Log('ClearTable 3: OK (полностью, СО сборкой мусора)');
+  Log('ClearTable 3: OK (РїРѕР»РЅРѕСЃС‚СЊСЋ, РЎРћ СЃР±РѕСЂРєРѕР№ РјСѓСЃРѕСЂР°)');
 
 
   ftran.Free;
   fb.FreeConnection(fdb);
 
   tc := GetTickCount - tc;
-  Log('ТЕСТ БАЗОВЫХ ФУНКЦИЙ ЗАВЕРШЕН ЗА ' + IntToStr(Tc) + ' мс');
+  Log('РўР•РЎРў Р‘РђР—РћР’Р«РҐ Р¤РЈРќРљР¦РР™ Р—РђР’Р•Р РЁР•Рќ Р—Рђ ' + IntToStr(Tc) + ' РјСЃ');
 end;
 
 procedure TForm1.TestDBCorrectStruct;
@@ -489,18 +545,18 @@ begin
   fb.DBStruct.ReCreateDefDataBaseDesc();
 
   // ===========================
-  // Добавляем описание доменов
+  // Р”РѕР±Р°РІР»СЏРµРј РѕРїРёСЃР°РЅРёРµ РґРѕРјРµРЅРѕРІ
   // ===========================
   fb.DBStruct.DefDBDesc.AddDomain('T_YESNO',  'INTEGER',       '0', CanNull, '(VALUE IS NULL) OR (VALUE IN (0,1))');
   fb.DBStruct.DefDBDesc.AddDomain('T_NUMBER', 'NUMERIC(15,4)', '', CanNull, '');
 
   // ===========================
-  // Добавляем описание таблиц
+  // Р”РѕР±Р°РІР»СЏРµРј РѕРїРёСЃР°РЅРёРµ С‚Р°Р±Р»РёС†
   // ===========================
   ATable := fb.DBStruct.DefDBDesc.AddTable('TESTTABLE');
   with ATable do
   begin
-    // Добавляем описание полей
+    // Р”РѕР±Р°РІР»СЏРµРј РѕРїРёСЃР°РЅРёРµ РїРѕР»РµР№
     AddField('ID',           'INTEGER',     '',   NotNull);
     AddField('RECTYPE',      'SMALLINT',    '',   CanNull);
     AddField('NAME',         'VARCHAR(20)', '',   CanNull);
@@ -509,34 +565,34 @@ begin
 
     AddField('f234567890123456789012345678901',        'T_NUMBER',    '0',  CanNull);
 
-    // Описание первичного ключа
+    // РћРїРёСЃР°РЅРёРµ РїРµСЂРІРёС‡РЅРѕРіРѕ РєР»СЋС‡Р°
     SetPrimaryKey('TESTTABLE_PK', '"ID"');
 
-    // Описание индексов
-    AddIndex('TESTTABLE_IDX1', False, Ascending, '"RECDATE"'); // По возрастанию
-    AddIndex('TESTTABLE_IDX2', False, Descending, '"ID"');     // По убыванию
+    // РћРїРёСЃР°РЅРёРµ РёРЅРґРµРєСЃРѕРІ
+    AddIndex('TESTTABLE_IDX1', False, Ascending, '"RECDATE"'); // РџРѕ РІРѕР·СЂР°СЃС‚Р°РЅРёСЋ
+    AddIndex('TESTTABLE_IDX2', False, Descending, '"ID"');     // РџРѕ СѓР±С‹РІР°РЅРёСЋ
 
-    // Подключаем триггер для обновления поля MODIFYDATE (поле будет создано автоматически)
+    // РџРѕРґРєР»СЋС‡Р°РµРј С‚СЂРёРіРіРµСЂ РґР»СЏ РѕР±РЅРѕРІР»РµРЅРёСЏ РїРѕР»СЏ MODIFYDATE (РїРѕР»Рµ Р±СѓРґРµС‚ СЃРѕР·РґР°РЅРѕ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё)
     UseModifyDateTrigger := trsActive;
 
-    // Создаем генератор (описание генератора можно дать в любом месте. Здесь оно для наглядности)
+    // РЎРѕР·РґР°РµРј РіРµРЅРµСЂР°С‚РѕСЂ (РѕРїРёСЃР°РЅРёРµ РіРµРЅРµСЂР°С‚РѕСЂР° РјРѕР¶РЅРѕ РґР°С‚СЊ РІ Р»СЋР±РѕРј РјРµСЃС‚Рµ. Р—РґРµСЃСЊ РѕРЅРѕ РґР»СЏ РЅР°РіР»СЏРґРЅРѕСЃС‚Рё)
     //fb.DBStruct.DefDBDesc.AddGenerator('GEN_TESTTABLE_ID', 0);
 
-    // Триггер для создания автоинкремента на поле ID (используется генератор GEN_TESTTABLE_ID)
+    // РўСЂРёРіРіРµСЂ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ Р°РІС‚РѕРёРЅРєСЂРµРјРµРЅС‚Р° РЅР° РїРѕР»Рµ ID (РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РіРµРЅРµСЂР°С‚РѕСЂ GEN_TESTTABLE_ID)
     {
     AddTrigger(trBefore, [trInsert], 0, trsActive,
-      '', // Имя триггера - будет сгенерировано автоматически
-      '', // Локальные переменные - отсутствуют
+      '', // РРјСЏ С‚СЂРёРіРіРµСЂР° - Р±СѓРґРµС‚ СЃРіРµРЅРµСЂРёСЂРѕРІР°РЅРѕ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё
+      '', // Р›РѕРєР°Р»СЊРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ - РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚
       'IF (NEW.ID IS NULL) THEN NEW.ID=GEN_ID(GEN_TESTTABLE_ID, 1);');
     }
 
-    // Триггер для создания автоинкремента на поле ID
-    // Генератор GEN_TESTTABLE_ID будет создан автоматически
-    // Имя триггера будет сгенерировано автоматически
+    // РўСЂРёРіРіРµСЂ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ Р°РІС‚РѕРёРЅРєСЂРµРјРµРЅС‚Р° РЅР° РїРѕР»Рµ ID
+    // Р“РµРЅРµСЂР°С‚РѕСЂ GEN_TESTTABLE_ID Р±СѓРґРµС‚ СЃРѕР·РґР°РЅ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё
+    // РРјСЏ С‚СЂРёРіРіРµСЂР° Р±СѓРґРµС‚ СЃРіРµРЅРµСЂРёСЂРѕРІР°РЅРѕ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё
     AddAutoIncTrigger('', 'ID', 'GEN_TESTTABLE_ID', True);
 
-    // Триггер для автоматического заполнения поля RECTYPE
-    // Содержит вызов хранимой процедуры PROCGETRECTYPE
+    // РўСЂРёРіРіРµСЂ РґР»СЏ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРіРѕ Р·Р°РїРѕР»РЅРµРЅРёСЏ РїРѕР»СЏ RECTYPE
+    // РЎРѕРґРµСЂР¶РёС‚ РІС‹Р·РѕРІ С…СЂР°РЅРёРјРѕР№ РїСЂРѕС†РµРґСѓСЂС‹ PROCGETRECTYPE
     AddTrigger(trBefore, [trInsert], 1, trsActive, 'TRIG_CORRECTRECTYPE_BI',
       'A INTEGER',
       '  IF (NEW.RECTYPE IS NULL) THEN' + sLineBreak +
@@ -548,16 +604,16 @@ begin
   end;
 
 
-  // Создаем таблицу CONFIGPARAMS для работы с INI
+  // РЎРѕР·РґР°РµРј С‚Р°Р±Р»РёС†Сѓ CONFIGPARAMS РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ INI
   ATable := fb.DBStruct.DefDBDesc.AddTable('CONFIGPARAMS');
   with ATable do
   begin
-    AddField('FILENAME',      'VARCHAR(100)',   '', NotNull);
-    AddField('COMPUTERNAME',  'VARCHAR(100)',   '', NotNull);
-    AddField('USERNAME',      'VARCHAR(100)',   '', NotNull);
-    AddField('SECTIONNAME',   'VARCHAR(100)',   '', NotNull);
-    AddField('PARAMNAME',     'VARCHAR(100)',   '', NotNull);
-    AddField('PARAMVALUE',    'VARCHAR(10000)', '', CanNull);
+    AddField('FILENAME',      'VARCHAR(70)',   '', NotNull);
+    AddField('COMPUTERNAME',  'VARCHAR(70)',   '', NotNull);
+    AddField('USERNAME',      'VARCHAR(70)',   '', NotNull);
+    AddField('SECTIONNAME',   'VARCHAR(70)',   '', NotNull);
+    AddField('PARAMNAME',     'VARCHAR(70)',   '', NotNull);
+    AddField('PARAMVALUE',    'VARCHAR(5000)', '', CanNull);
     AddField('PARAMBLOB',     'BLOB',           '', CanNull);
     AddField('PARAMBLOBHASH', 'VARCHAR(50)',    '', CanNull);
     AddField('MODIFYDATE',    'TIMESTAMP',      '', CanNull);
@@ -567,14 +623,14 @@ begin
   end;
 
 
-  // Создаем хранимую процедуру (для возведения числа в заданную целую положительную степень)
+  // РЎРѕР·РґР°РµРј С…СЂР°РЅРёРјСѓСЋ РїСЂРѕС†РµРґСѓСЂСѓ (РґР»СЏ РІРѕР·РІРµРґРµРЅРёСЏ С‡РёСЃР»Р° РІ Р·Р°РґР°РЅРЅСѓСЋ С†РµР»СѓСЋ РїРѕР»РѕР¶РёС‚РµР»СЊРЅСѓСЋ СЃС‚РµРїРµРЅСЊ)
   fb.DBStruct.DefDBDesc.AddProcedure(
-    'PROCPOWER',             // Имя процедуры
-    'X INTEGER, P INTEGER',  // Входные параметры (возводимое число и степень)
-    'Y INTEGER',             // Выходные параметры
-    'I INTEGER',             // Локальные переменные (I - счетчик цикла)
+    'PROCPOWER',             // РРјСЏ РїСЂРѕС†РµРґСѓСЂС‹
+    'X INTEGER, P INTEGER',  // Р’С…РѕРґРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ (РІРѕР·РІРѕРґРёРјРѕРµ С‡РёСЃР»Рѕ Рё СЃС‚РµРїРµРЅСЊ)
+    'Y INTEGER',             // Р’С‹С…РѕРґРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹
+    'I INTEGER',             // Р›РѕРєР°Р»СЊРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ (I - СЃС‡РµС‚С‡РёРє С†РёРєР»Р°)
 
-    // Тело хранимой процедуры...
+    // РўРµР»Рѕ С…СЂР°РЅРёРјРѕР№ РїСЂРѕС†РµРґСѓСЂС‹...
     '  Y = 1;'           + sLineBreak +
     '  I = P;'           + sLineBreak +
     '  WHILE (I > 0) DO' + sLineBreak +
@@ -582,29 +638,29 @@ begin
     '    Y = Y * X;'     + sLineBreak +
     '    I = I - 1;'     + sLineBreak +
     '  END'              + sLineBreak +
-    '  SUSPEND;' // Передача результата клиенту
+    '  SUSPEND;' // РџРµСЂРµРґР°С‡Р° СЂРµР·СѓР»СЊС‚Р°С‚Р° РєР»РёРµРЅС‚Сѓ
   );
 
-  // Создаем хранимую процедуру, не возвращающую результат
+  // РЎРѕР·РґР°РµРј С…СЂР°РЅРёРјСѓСЋ РїСЂРѕС†РµРґСѓСЂСѓ, РЅРµ РІРѕР·РІСЂР°С‰Р°СЋС‰СѓСЋ СЂРµР·СѓР»СЊС‚Р°С‚
   fb.DBStruct.DefDBDesc.AddProcedure(
-    'PROCADDSUMMA', // Процедура PROCADDSUMMA - увеличивает значение поля SUMMA на указанное число
-    'A INTEGER',    // Входной параметр (величина приращения для поля SUMMA)
-    '', '',         // Выходные параметры и локальные переменные - отсутствуют
-    '  UPDATE TESTTABLE SET SUMMA = SUMMA + :A;' // SQL - запрос на обновления поля SUMMA
+    'PROCADDSUMMA', // РџСЂРѕС†РµРґСѓСЂР° PROCADDSUMMA - СѓРІРµР»РёС‡РёРІР°РµС‚ Р·РЅР°С‡РµРЅРёРµ РїРѕР»СЏ SUMMA РЅР° СѓРєР°Р·Р°РЅРЅРѕРµ С‡РёСЃР»Рѕ
+    'A INTEGER',    // Р’С…РѕРґРЅРѕР№ РїР°СЂР°РјРµС‚СЂ (РІРµР»РёС‡РёРЅР° РїСЂРёСЂР°С‰РµРЅРёСЏ РґР»СЏ РїРѕР»СЏ SUMMA)
+    '', '',         // Р’С‹С…РѕРґРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ Рё Р»РѕРєР°Р»СЊРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ - РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚
+    '  UPDATE TESTTABLE SET SUMMA = SUMMA + :A;' // SQL - Р·Р°РїСЂРѕСЃ РЅР° РѕР±РЅРѕРІР»РµРЅРёСЏ РїРѕР»СЏ SUMMA
   );
 
-  // Создаем хранимую процедуру, которая будет вызываться из триггера
+  // РЎРѕР·РґР°РµРј С…СЂР°РЅРёРјСѓСЋ РїСЂРѕС†РµРґСѓСЂСѓ, РєРѕС‚РѕСЂР°СЏ Р±СѓРґРµС‚ РІС‹Р·С‹РІР°С‚СЊСЃСЏ РёР· С‚СЂРёРіРіРµСЂР°
   fb.DBStruct.DefDBDesc.AddProcedure(
-    'PROCGETRECTYPE',   // Имя процедуры
-    '',                 // Входные параметры - отсутствуют
-    'ATYPE INTEGER',    // Выходной параметр - тип записи
-    '',                 // Локальные переменные - отсутствуют
+    'PROCGETRECTYPE',   // РРјСЏ РїСЂРѕС†РµРґСѓСЂС‹
+    '',                 // Р’С…РѕРґРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ - РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚
+    'ATYPE INTEGER',    // Р’С‹С…РѕРґРЅРѕР№ РїР°СЂР°РјРµС‚СЂ - С‚РёРї Р·Р°РїРёСЃРё
+    '',                 // Р›РѕРєР°Р»СЊРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ - РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚
     '  ATYPE = 12345;' + sLineBreak +
     '  SUSPEND;'
   );
 
-  // Создаем объект исключения ERR. Благодаря этому в хр.процедурах можно
-  // генерировать исключения: EXCEPTION ERR 'Произошла такая-то ошибка'
+  // РЎРѕР·РґР°РµРј РѕР±СЉРµРєС‚ РёСЃРєР»СЋС‡РµРЅРёСЏ ERR. Р‘Р»Р°РіРѕРґР°СЂСЏ СЌС‚РѕРјСѓ РІ С…СЂ.РїСЂРѕС†РµРґСѓСЂР°С… РјРѕР¶РЅРѕ
+  // РіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ РёСЃРєР»СЋС‡РµРЅРёСЏ: EXCEPTION ERR 'РџСЂРѕРёР·РѕС€Р»Р° С‚Р°РєР°СЏ-С‚Рѕ РѕС€РёР±РєР°'
   fb.DBStruct.DefDBDesc.AddDefaultException;
 
   fb.DBStruct.CheckDefDataBaseStruct(edServerName.Text, StrToInt(edPort.Text), edFileName.Text,
@@ -623,7 +679,7 @@ var
   S: string;
   B: Boolean;
   F: Double;
-  dt, dt2: TDateTime;
+  dt: TDateTime;
   I: Integer;
   Ar1, Ar2: array[0..100] of Byte;
   AList: TStringList;
@@ -632,11 +688,11 @@ begin
   tc := GetTickCount;
   fb.Ini.CreateDefIni(FBIniDefFileName, FBDefDB, False);
 
-  Log('НАЧАЛО ТЕСТОВ РАБОТЫ С TFBIniFile');
+  Log('РќРђР§РђР›Рћ РўР•РЎРўРћР’ Р РђР‘РћРўР« РЎ TFBIniFile');
 
   fb.Ini.DefIni.BeginWork;
   try
-    S := 'Тест TFBIniFile';
+    S := 'РўРµСЃС‚ TFBIniFile';
     fb.Ini.DefIni.WriteString('String', S);
     if fb.Ini.DefIni.ReadString('String', '') = S then
       Log('WriteString/ReadString: OK')
@@ -652,14 +708,14 @@ begin
 
     F := 12345.50;
     fb.Ini.DefIni.WriteFloat('Float', F);
-    if fb.Ini.DefIni.ReadFloat('Float', 0) = F then // Ошибка округления не должна влиять
+    if fb.Ini.DefIni.ReadFloat('Float', 0) = F then // РћС€РёР±РєР° РѕРєСЂСѓРіР»РµРЅРёСЏ РЅРµ РґРѕР»Р¶РЅР° РІР»РёСЏС‚СЊ
       Log('WriteFloat/ReadFloat: OK')
     else
       Log('WriteFloat/ReadFloat: ERROR');
 
     dt := Now;
     fb.Ini.DefIni.WriteDateTime('DateTime', dt);
-    if fb.Ini.DefIni.ReadDateTime('DateTime', 0) = dt then // Работает (несмотря на "неочевидные особенности...")
+    if fb.Ini.DefIni.ReadDateTime('DateTime', 0) = dt then // Р Р°Р±РѕС‚Р°РµС‚ (РЅРµСЃРјРѕС‚СЂСЏ РЅР° "РЅРµРѕС‡РµРІРёРґРЅС‹Рµ РѕСЃРѕР±РµРЅРЅРѕСЃС‚Рё...")
       Log('WriteDateTime/ReadDateTime: OK')
     else
       Log('WriteDateTime/ReadDateTime: ERROR');
@@ -680,8 +736,7 @@ begin
 
     dt := Time;
     fb.Ini.DefIni.WriteTime('Time', dt);
-    dt2 := fb.Ini.DefIni.ReadTime('Time', 0);
-    if SameValue(dt2, dt) then
+    if fb.Ini.DefIni.ReadTime('Time', 0) = dt then
       Log('WriteTime/ReadTime: OK')
     else
       Log('WriteTime/ReadTime: ERROR');
@@ -690,7 +745,7 @@ begin
     Ar2 := Ar1;
 
     fb.Ini.DefIni.WriteBinaryData('Binary', Ar1, SizeOf(Ar1));
-    for I := Low(Ar1) to High(Ar1) do Ar1[I] := 0; // Обнуляем массив
+    for I := Low(Ar1) to High(Ar1) do Ar1[I] := 0; // РћР±РЅСѓР»СЏРµРј РјР°СЃСЃРёРІ
     I := fb.Ini.DefIni.ReadBinaryData('Binary', Ar1, SizeOf(Ar1));
     if (I = SizeOf(Ar1)) and CompareMem(@Ar1, @Ar2, SizeOf(Ar1)) then
       Log('WriteBinaryData/ReadBinaryData (WriteStream/ReadStream): OK')
@@ -762,7 +817,7 @@ begin
   AList.Free;
 
   tc := GetTickCount - tc;
-  Log('ТЕСТЫ ЗАВЕРШЕНЫ ЗА ' + IntToStr(tc) + ' мс. УБЕДИТЕСЬ, ЧТО ВЕЗДЕ "ОК"!');
+  Log('РўР•РЎРўР« Р—РђР’Р•Р РЁР•РќР« Р—Рђ ' + IntToStr(tc) + ' РјСЃ. РЈР‘Р•Р”РРўР•РЎР¬, Р§РўРћ Р’Р•Р—Р”Р• "РћРљ"!');
 end;
 
 procedure TForm1.TestRecomputeIndexes;
@@ -770,14 +825,14 @@ var
   FDB: TIBDatabase;
   tc: DWORD;
 begin
-  Log('НАЧАЛО ТЕСТА ПЕРЕСЧЕТА СТАТИСТИКИ...');
+  Log('РќРђР§РђР›Рћ РўР•РЎРўРђ РџР•Р Р•РЎР§Р•РўРђ РЎРўРђРўРРЎРўРРљР...');
   FDB := fb.Pool.GetDefaultConnection;
   try
     tc := GetTickCount;
     fb.RecomputeIndexStatistics(FDB);
     Log('RecomputeIndexStatistics: OK');
     tc := GetTickCount - tc;
-    Log('ПЕРЕСЧЕТ СТАТИСТИКИ ЗАВЕРШЕН ЗА ' + IntToStr(Tc) + ' мс');
+    Log('РџР•Р Р•РЎР§Р•Рў РЎРўРђРўРРЎРўРРљР Р—РђР’Р•Р РЁР•Рќ Р—Рђ ' + IntToStr(Tc) + ' РјСЃ');
   finally
     fb.Pool.ReturnConnection(FDB);
   end;
@@ -790,20 +845,25 @@ begin
   StopThreads := False;
   ErrorCounter := 0;
 
-  // Создаем объект для работы с INI
+  // РЎРѕР·РґР°РµРј РѕР±СЉРµРєС‚ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ INI
   fb.Ini.CreateDefIni(FBIniDefFileName, FBDefDB, False);
 
-  // Создаем 100 потоков для работы с БД Firebird
+  // РЎРѕР·РґР°РµРј 100 РїРѕС‚РѕРєРѕРІ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ Р‘Р” Firebird
   for I := 1 to 100 do
     TTestThread.Create(False);
 
   ShowMessage(
-    'Тест запущен.'+sLineBreak+
-    'Для 100 потоков достаточно'+sLineBreak+
-    'всего несколько подключений'+ sLineBreak+
-    'Нажмите ОК для окончания.');
+    'РўРµСЃС‚ Р·Р°РїСѓС‰РµРЅ.'+sLineBreak+
+    'Р”Р»СЏ 100 РїРѕС‚РѕРєРѕРІ РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ'+sLineBreak+
+    'РІСЃРµРіРѕ РЅРµСЃРєРѕР»СЊРєРѕ РїРѕРґРєР»СЋС‡РµРЅРёР№'+ sLineBreak+
+    'РќР°Р¶РјРёС‚Рµ РћРљ РґР»СЏ РѕРєРѕРЅС‡Р°РЅРёСЏ.');
 
   StopThreads := True;
+
+
+  //Project fbUtilsTest raised exception class 'EIBClientError' with message:
+  //SQL Param No. 6 (PARAMBLOB) is uninitialised
+
 end;
 
 procedure TForm1.Timer1Timer(Sender: TObject);
@@ -831,26 +891,26 @@ var
   AvgSumma: Double;
 begin
   FreeOnTerminate := True;
-  Sleep(Random(1000)); // Разносим врема начала работы потоков
+  Sleep(Random(1000)); // Р Р°Р·РЅРѕСЃРёРј РІСЂРµРјР° РЅР°С‡Р°Р»Р° СЂР°Р±РѕС‚С‹ РїРѕС‚РѕРєРѕРІ
   InterlockedIncrement(ThreadCounter);
   try
     while not StopThreads do
     begin
       try
-        // Тестируем многопоточную работу с INI
+        // РўРµСЃС‚РёСЂСѓРµРј РјРЅРѕРіРѕРїРѕС‚РѕС‡РЅСѓСЋ СЂР°Р±РѕС‚Сѓ СЃ INI
         Val := fb.Ini.DefIni.ReadInteger('THREADS', IntToStr(GetCurrentThreadId), 0);
         Val := Val + 1;
         fb.Ini.DefIni.WriteInteger('THREADS', IntToStr(GetCurrentThreadId), Val);
 
-        // Тестируем пул
+        // РўРµСЃС‚РёСЂСѓРµРј РїСѓР»
         fdb := fb.Pool.GetDefaultConnection(nil, @tran);
         try
-          // Определяем среднее значение суммы
+          // РћРїСЂРµРґРµР»СЏРµРј СЃСЂРµРґРЅРµРµ Р·РЅР°С‡РµРЅРёРµ СЃСѓРјРјС‹
           ds := fb.CreateAndOpenDataSet(fdb, tran, 'SELECT AVG(SUMMA) FROM TESTTABLE', [], []);
           AvgSumma := ds.Fields[0].AsFloat;
           ds.Free;
 
-          // Добавляем запись в TESTTABLE
+          // Р”РѕР±Р°РІР»СЏРµРј Р·Р°РїРёСЃСЊ РІ TESTTABLE
           ID := fb.GenID(fdb, 'GEN_TESTTABLE_ID');
           fb.InsertRecord(fdb, tran, 'TESTTABLE', ['ID', 'NAME', 'RECDATE', 'SUMMA'], [ID, 'TEST', Now, AvgSumma]);
           tran.Commit;
@@ -861,7 +921,7 @@ begin
       except
         on E: Exception do
         begin
-          sErrInThread := DateTimeToStr(Now) + Format(': ошибка в потоке %d: %s', [GetCurrentThreadId, E.Message]);
+          sErrInThread := DateTimeToStr(Now) + Format(': РѕС€РёР±РєР° РІ РїРѕС‚РѕРєРµ %d: %s', [GetCurrentThreadId, E.Message]);
           InterlockedIncrement(ErrorCounter);
         end;
 

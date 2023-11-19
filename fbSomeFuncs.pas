@@ -1,4 +1,4 @@
-{
+п»ї{
 Copyright (c) 2012-2013, Loginov Dmitry Sergeevich
 All rights reserved.
 
@@ -27,71 +27,80 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 {                                                                             }
 {                                                                             }
 {                                                                             }
-{ Модуль fbSomeFuncs - содержит некоторые вспомогательные функции для fbUtils }
-{ (c) 2012 Логинов Дмитрий Сергеевич                                          }
-{ Последнее обновление: 09.05.2012                                            }
-{ Протестировано на D7, D2007, D2010, D-XE2                                   }
-{ Адрес сайта: http://loginovprojects.ru/                                     }
+{ РњРѕРґСѓР»СЊ fbSomeFuncs - СЃРѕРґРµСЂР¶РёС‚ РЅРµРєРѕС‚РѕСЂС‹Рµ РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё РґР»СЏ fbUtils }
+{ (c) 2012 Р›РѕРіРёРЅРѕРІ Р”РјРёС‚СЂРёР№ РЎРµСЂРіРµРµРІРёС‡                                          }
+{ РџРѕСЃР»РµРґРЅРµРµ РѕР±РЅРѕРІР»РµРЅРёРµ: 09.05.2012                                            }
+{ РџСЂРѕС‚РµСЃС‚РёСЂРѕРІР°РЅРѕ РЅР° D7, D2007, D2010, D-XE2                                   }
+{ РђРґСЂРµСЃ СЃР°Р№С‚Р°: http://loginovprojects.ru/                                     }
 { e-mail: loginov_d@inbox.ru                                                  }
 {                                                                             }
 { *************************************************************************** }
 
 {
-Функции, представленные в данном модуле, не имеют никакого отношения к базам
-данных Firebird, автор их очень часто использует в различных своих проектах.
-Все они протестированы годами.
-Здесь находятся только те функции, которые используются в fbUtils
+Р¤СѓРЅРєС†РёРё, РїСЂРµРґСЃС‚Р°РІР»РµРЅРЅС‹Рµ РІ РґР°РЅРЅРѕРј РјРѕРґСѓР»Рµ, РЅРµ РёРјРµСЋС‚ РЅРёРєР°РєРѕРіРѕ РѕС‚РЅРѕС€РµРЅРёСЏ Рє Р±Р°Р·Р°Рј
+РґР°РЅРЅС‹С… Firebird, Р°РІС‚РѕСЂ РёС… РѕС‡РµРЅСЊ С‡Р°СЃС‚Рѕ РёСЃРїРѕР»СЊР·СѓРµС‚ РІ СЂР°Р·Р»РёС‡РЅС‹С… СЃРІРѕРёС… РїСЂРѕРµРєС‚Р°С….
+Р’СЃРµ РѕРЅРё РїСЂРѕС‚РµСЃС‚РёСЂРѕРІР°РЅС‹ РіРѕРґР°РјРё.
+Р—РґРµСЃСЊ РЅР°С…РѕРґСЏС‚СЃСЏ С‚РѕР»СЊРєРѕ С‚Рµ С„СѓРЅРєС†РёРё, РєРѕС‚РѕСЂС‹Рµ РёСЃРїРѕР»СЊР·СѓСЋС‚СЃСЏ РІ fbUtils
 }
 
-
+{$IFDEF FPC}
+{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
+{$ENDIF}
 
 unit fbSomeFuncs;
 
 interface
 
 uses
-  Windows, SysUtils, Classes, IniFiles, IB;
+{$IFnDEF FPC}
+  Windows,
+{$ELSE}
+  {$IFDEF MSWINDOWS}Windows, {$ENDIF}LCLIntf, LCLType, LMessages, LazUTF8, LCLProc, Process,
+{$ENDIF}
+  SysUtils, Classes, IniFiles, IB;
 
-{Директива D2009PLUS определяет, что текущая версия Delphi: 2009 или выше}
+{Р”РёСЂРµРєС‚РёРІР° D2009PLUS РѕРїСЂРµРґРµР»СЏРµС‚, С‡С‚Рѕ С‚РµРєСѓС‰Р°СЏ РІРµСЂСЃРёСЏ Delphi: 2009 РёР»Рё РІС‹С€Рµ}
+{$IFnDEF FPC}
 {$IF RTLVersion >= 20.00}
    {$DEFINE D2009PLUS}
 {$IFEND}
+{$ENDIF}
 
 {$OVERFLOWCHECKS OFF}
 
 type
-  { Базовый класс, упрощающий управление временем жизни объектов. Благодаря
-    данному классу можно минимизировать количество операторов TRY..FINALLY
-    и тем самым улучшить читабельность кода.
-    ОН НЕ ДОЛЖЕН СОДЕРЖАТЬ НИЧЕГО ЛИШНЕГО! }
+  { Р‘Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ, СѓРїСЂРѕС‰Р°СЋС‰РёР№ СѓРїСЂР°РІР»РµРЅРёРµ РІСЂРµРјРµРЅРµРј Р¶РёР·РЅРё РѕР±СЉРµРєС‚РѕРІ. Р‘Р»Р°РіРѕРґР°СЂСЏ
+    РґР°РЅРЅРѕРјСѓ РєР»Р°СЃСЃСѓ РјРѕР¶РЅРѕ РјРёРЅРёРјРёР·РёСЂРѕРІР°С‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ РѕРїРµСЂР°С‚РѕСЂРѕРІ TRY..FINALLY
+    Рё С‚РµРј СЃР°РјС‹Рј СѓР»СѓС‡С€РёС‚СЊ С‡РёС‚Р°Р±РµР»СЊРЅРѕСЃС‚СЊ РєРѕРґР°.
+    РћРќ РќР• Р”РћР›Р–Р•Рќ РЎРћР”Р•Р Р–РђРўР¬ РќРР§Р•Р“Рћ Р›РРЁРќР•Р“Рћ! }
   TBaseObject = class(TObject)
   private
     FRefList: TList;
 
-    { Очищает список ссылок FRefList }
+    { РћС‡РёС‰Р°РµС‚ СЃРїРёСЃРѕРє СЃСЃС‹Р»РѕРє FRefList }
     procedure ClearRefList;
 
-    { Регистрирует объект в списоке для автоматического удаления.
-      Внимание!!! Если объект зарегистрирован в списке, то его удалять в
-      других местах нельзя.
-      Пример кода создания объекта:
+    { Р РµРіРёСЃС‚СЂРёСЂСѓРµС‚ РѕР±СЉРµРєС‚ РІ СЃРїРёСЃРѕРєРµ РґР»СЏ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРіРѕ СѓРґР°Р»РµРЅРёСЏ.
+      Р’РЅРёРјР°РЅРёРµ!!! Р•СЃР»Рё РѕР±СЉРµРєС‚ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ РІ СЃРїРёСЃРєРµ, С‚Рѕ РµРіРѕ СѓРґР°Р»СЏС‚СЊ РІ
+      РґСЂСѓРіРёС… РјРµСЃС‚Р°С… РЅРµР»СЊР·СЏ.
+      РџСЂРёРјРµСЂ РєРѕРґР° СЃРѕР·РґР°РЅРёСЏ РѕР±СЉРµРєС‚Р°:
       AList := RegObj(TStringList.Create) as TStringList; }
     function DoRegObj(Obj: TObject): TObject;
 
   protected
-    { Выполняет уничтожение объекта. Можно перекрыть. }
+    { Р’С‹РїРѕР»РЅСЏРµС‚ СѓРЅРёС‡С‚РѕР¶РµРЅРёРµ РѕР±СЉРµРєС‚Р°. РњРѕР¶РЅРѕ РїРµСЂРµРєСЂС‹С‚СЊ. }
     procedure ClearObjectRef(ARef: TObject); virtual;
   public
     constructor Create;
     destructor Destroy; override;
 
-    { Создает объкт, регистрирует его в списке FRefList и записывает в параметр Ref }
+    { РЎРѕР·РґР°РµС‚ РѕР±СЉРєС‚, СЂРµРіРёСЃС‚СЂРёСЂСѓРµС‚ РµРіРѕ РІ СЃРїРёСЃРєРµ FRefList Рё Р·Р°РїРёСЃС‹РІР°РµС‚ РІ РїР°СЂР°РјРµС‚СЂ Ref }
     procedure RegObj(var Ref; Obj: TObject); overload;
 
-    { Удаляет объект Obj из списка и уничтожает его }
+    { РЈРґР°Р»СЏРµС‚ РѕР±СЉРµРєС‚ Obj РёР· СЃРїРёСЃРєР° Рё СѓРЅРёС‡С‚РѕР¶Р°РµС‚ РµРіРѕ }
     procedure FreeObj(Obj: TObject);
 
-    { Создает список строк, удаляемый автоматически }
+    { РЎРѕР·РґР°РµС‚ СЃРїРёСЃРѕРє СЃС‚СЂРѕРє, СѓРґР°Р»СЏРµРјС‹Р№ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё }
     function CreateStringList: TStringList;
 
     function CreateMemoryStream: TMemoryStream;
@@ -100,46 +109,48 @@ type
 
   end;
 
-  { Тот же TBaseObject, но с другим названием. Для того, чтобы логически выделить
-    его назначение: простой список ссылок на объекты. Тот же TObjectList, но
-    гораздо удобнее }
+  { РўРѕС‚ Р¶Рµ TBaseObject, РЅРѕ СЃ РґСЂСѓРіРёРј РЅР°Р·РІР°РЅРёРµРј. Р”Р»СЏ С‚РѕРіРѕ, С‡С‚РѕР±С‹ Р»РѕРіРёС‡РµСЃРєРё РІС‹РґРµР»РёС‚СЊ
+    РµРіРѕ РЅР°Р·РЅР°С‡РµРЅРёРµ: РїСЂРѕСЃС‚РѕР№ СЃРїРёСЃРѕРє СЃСЃС‹Р»РѕРє РЅР° РѕР±СЉРµРєС‚С‹. РўРѕС‚ Р¶Рµ TObjectList, РЅРѕ
+    РіРѕСЂР°Р·РґРѕ СѓРґРѕР±РЅРµРµ }
   TObjHolder = class(TBaseObject);
 
-{Пересоздает объект исключения, дописывая в его текст имя функции, в
- которой произошло данное исключение}
+{РџРµСЂРµСЃРѕР·РґР°РµС‚ РѕР±СЉРµРєС‚ РёСЃРєР»СЋС‡РµРЅРёСЏ, РґРѕРїРёСЃС‹РІР°СЏ РІ РµРіРѕ С‚РµРєСЃС‚ РёРјСЏ С„СѓРЅРєС†РёРё, РІ
+ РєРѕС‚РѕСЂРѕР№ РїСЂРѕРёР·РѕС€Р»Рѕ РґР°РЅРЅРѕРµ РёСЃРєР»СЋС‡РµРЅРёРµ}
 function ReCreateEObject(E: Exception; FuncName: string; WriteExceptClass: Boolean = True): Exception;
 
-{Делает то же самое, что и стандартная функция StringReplace, только в сотни раз быстрее}
+{Р”РµР»Р°РµС‚ С‚Рѕ Р¶Рµ СЃР°РјРѕРµ, С‡С‚Рѕ Рё СЃС‚Р°РЅРґР°СЂС‚РЅР°СЏ С„СѓРЅРєС†РёСЏ StringReplace, С‚РѕР»СЊРєРѕ РІ СЃРѕС‚РЅРё СЂР°Р· Р±С‹СЃС‚СЂРµРµ}
 function FastStringReplace(const S: string; OldPattern: string; const NewPattern: string;
   Flags: TReplaceFlags = [rfReplaceAll]): string;
 
-{Генерирует имя мьютекса для заданного файла для целей обеспечения его блокировки}
-function GenerateFileMutexName(const MutexPrefix, AFileName: string): string;
+{Р“РµРЅРµСЂРёСЂСѓРµС‚ РёРјСЏ РјСЊСЋС‚РµРєСЃР° РґР»СЏ Р·Р°РґР°РЅРЅРѕРіРѕ С„Р°Р№Р»Р° РґР»СЏ С†РµР»РµР№ РѕР±РµСЃРїРµС‡РµРЅРёСЏ РµРіРѕ Р±Р»РѕРєРёСЂРѕРІРєРё}
+//function GenerateFileMutexName(const MutexPrefix, AFileName: string): string;
 
-{ Создает общедоступный мьютекс с именем  AName. Мюьтекс можно использовать
-  одновременно под разными пользователями. Мьютекс создается "незанятым".
-  Для того, чтобы занять мьютекс, используйте WaitForSingleObject().
-  Для освобождения мьютекса используйте ReleaseMutex().
-  Если по каким-то причинам не удается создать мьютекс, то генерируется Exception}
-function CreateMutexShared(AName: string; LastError: PCardinal = nil): THandle;
+{ РЎРѕР·РґР°РµС‚ РѕР±С‰РµРґРѕСЃС‚СѓРїРЅС‹Р№ РјСЊСЋС‚РµРєСЃ СЃ РёРјРµРЅРµРј  AName. РњСЋСЊС‚РµРєСЃ РјРѕР¶РЅРѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ
+  РѕРґРЅРѕРІСЂРµРјРµРЅРЅРѕ РїРѕРґ СЂР°Р·РЅС‹РјРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏРјРё. РњСЊСЋС‚РµРєСЃ СЃРѕР·РґР°РµС‚СЃСЏ "РЅРµР·Р°РЅСЏС‚С‹Рј".
+  Р”Р»СЏ С‚РѕРіРѕ, С‡С‚РѕР±С‹ Р·Р°РЅСЏС‚СЊ РјСЊСЋС‚РµРєСЃ, РёСЃРїРѕР»СЊР·СѓР№С‚Рµ WaitForSingleObject().
+  Р”Р»СЏ РѕСЃРІРѕР±РѕР¶РґРµРЅРёСЏ РјСЊСЋС‚РµРєСЃР° РёСЃРїРѕР»СЊР·СѓР№С‚Рµ ReleaseMutex().
+  Р•СЃР»Рё РїРѕ РєР°РєРёРј-С‚Рѕ РїСЂРёС‡РёРЅР°Рј РЅРµ СѓРґР°РµС‚СЃСЏ СЃРѕР·РґР°С‚СЊ РјСЊСЋС‚РµРєСЃ, С‚Рѕ РіРµРЅРµСЂРёСЂСѓРµС‚СЃСЏ Exception}
+//function CreateMutexShared(AName: string; LastError: PCardinal = nil): THandle;
 
-{ Создает общедоступный объект FileMapping}
-function CreateFileMappingShared(hFile: THandle; flProtect, dwMaximumSizeHigh,
-  dwMaximumSizeLow: DWORD; lpName: string; LastError: PCardinal = nil): THandle;
+{ РЎРѕР·РґР°РµС‚ РѕР±С‰РµРґРѕСЃС‚СѓРїРЅС‹Р№ РѕР±СЉРµРєС‚ FileMapping}
+//function CreateFileMappingShared(hFile: THandle; flProtect, dwMaximumSizeHigh,
+//  dwMaximumSizeLow: DWORD; lpName: string; LastError: PCardinal = nil): THandle;
 
-{ Возвращает имя данного компьютера }
+{ Р’РѕР·РІСЂР°С‰Р°РµС‚ РёРјСЏ РґР°РЅРЅРѕРіРѕ РєРѕРјРїСЊСЋС‚РµСЂР°.
+  РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РІ РјРѕРґСѓР»Рµ fbUtilsIniFiles.pas }
 function GetCurrentComputerName: string;
 
-{ Возвращает имя пользователя }
+{ Р’РѕР·РІСЂР°С‰Р°РµС‚ РёРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ.
+  РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РІ РјРѕРґСѓР»Рµ fbUtilsIniFiles.pas }
 function GetCurrentUserName: string;
 
-{ Возвращает временный каталог }
+{ Р’РѕР·РІСЂР°С‰Р°РµС‚ РІСЂРµРјРµРЅРЅС‹Р№ РєР°С‚Р°Р»РѕРі }
 function GetTempPath: string;
 
-{ Вычисляет хэш для TStream (используется несколько алгоритмов вычисления хэша) }
+{ Р’С‹С‡РёСЃР»СЏРµС‚ С…СЌС€ РґР»СЏ TStream (РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РЅРµСЃРєРѕР»СЊРєРѕ Р°Р»РіРѕСЂРёС‚РјРѕРІ РІС‹С‡РёСЃР»РµРЅРёСЏ С…СЌС€Р°) }
 function CalcStreamHash(S: TStream): string;
 
-{ Вычисляет хэш строки HashLY }
+{ Р’С‹С‡РёСЃР»СЏРµС‚ С…СЌС€ СЃС‚СЂРѕРєРё HashLY }
 function GenerateStringHashLY(S: string): Cardinal;
 
 {$IFNDEF D2009PLUS}
@@ -150,22 +161,45 @@ implementation
 
 type
   IBExceptClass = class of EIBError;
+  {$IFDEF FPC}
+  InterBaseErrorClass = class of EIBInterBaseError;
+  {$ENDIF}
 
 function ReCreateEObject(E: Exception; FuncName: string;
   WriteExceptClass: Boolean = True): Exception;
 var
   S: string;
 begin
-  S := Format('%s -> %s', [FuncName, E.Message]);
+  S := E.Message;
 
-  if WriteExceptClass then
+  {$IFDEF FPC}
+  {$IFDEF WINDOWS}
+  // Р•СЃР»Рё РѕС€РёР±РєР° РёР· IBX, Рё "<#" РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚, С‚Рѕ РїСЂРµРѕР±СЂР°Р·СѓРµРј С‚РµРєСЃС‚ РІ UTF8
+  // Р­С‚Рѕ РёРјРµРµС‚ СЃРјС‹СЃР» С‚РѕР»СЊРєРѕ РґР»СЏ СЃРѕРѕР±С‰РµРЅРёР№, РєРѕС‚РѕСЂС‹Рµ РІРѕР·РІСЂР°С‰Р°РµС‚ РћРЎ Windows (РѕРЅРё
+  // РјРѕРіСѓС‚ Р±С‹С‚СЊ РЅР° СЂСѓСЃСЃРєРѕРј СЏР·С‹РєРµ РІ РєРѕРґРёСЂРѕРІРєРµ WIN1251). Р•СЃР»Рё РІСЃС‚СЂРµС‡Р°РµС‚СЃСЏ "-ERR",
+  // С‚Рѕ РїРµСЂРµРєРѕРґРёСЂРѕРІРєСѓ РЅРµ РґРµР»Р°РµРј, С‚.Рє. СЌС‚Рѕ РѕС€РёР±РєР°, СЃРіРµРЅРµСЂРёСЂРѕРІР°РЅРЅР°СЏ РІ SQL-Р·Р°РїСЂРѕСЃРµ.
+  //if (E is EIBError) and (Pos(' <# ', S) = 0) and (Pos('-ERR', S) = 0) then
+  //  S := WinCPToUTF8(S);
+  {$ENDIF}
+  {$ENDIF}
+
+  S := Format('%s -> %s', [FuncName, S]);
+
+  if WriteExceptClass or (E is EIBError) then
   begin
     if Pos(' <# ', S) = 0 then
       S := S + ' <# ' + E.ClassName + ' #>';
   end;
 
+  {$IFnDEF FPC}
   if E is EIBError then
     Result := IBExceptClass(E.ClassType).Create(EIBError(E).SQLCode, EIBError(E).IBErrorCode, S)
+  {$ELSE}
+  if E is EIBInterBaseError then
+    Result := InterBaseErrorClass(E.ClassType).Create(EIBInterBaseError(E).SQLCode, EIBInterBaseError(E).IBErrorCode, S)
+  else if E is EIBError then
+    Result := IBExceptClass(E.ClassType).Create(EIBError(E).SQLCode, S)
+  {$ENDIF}
   else
     Result := ExceptClass(E.ClassType).Create(S);
 end;
@@ -184,7 +218,7 @@ var
   I, J, Idx: Integer;
   IsEqual: Boolean;
   UpperFindStr: string;
-  pS: PChar; // Указатель на массив для сравнения символов
+  pS: PChar; // РЈРєР°Р·Р°С‚РµР»СЊ РЅР° РјР°СЃСЃРёРІ РґР»СЏ СЃСЂР°РІРЅРµРЅРёСЏ СЃРёРјРІРѕР»РѕРІ
   CanReplace: Boolean;
 begin
   if OldPattern = '' then
@@ -200,19 +234,19 @@ begin
   begin
     OldPattern := AnsiUpperCase(OldPattern);
 
-    // Для режима "не учитывать регистр"
-    // потребуется дополнительная строка
+    // Р”Р»СЏ СЂРµР¶РёРјР° "РЅРµ СѓС‡РёС‚С‹РІР°С‚СЊ СЂРµРіРёСЃС‚СЂ"
+    // РїРѕС‚СЂРµР±СѓРµС‚СЃСЏ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅР°СЏ СЃС‚СЂРѕРєР°
     UpperFindStr := AnsiUpperCase(S);
 
     pS := PChar(UpperFindStr);
   end else
     pS := PChar(S);
 
-  // Если новая подстрока не превышает старой, то...
+  // Р•СЃР»Рё РЅРѕРІР°СЏ РїРѕРґСЃС‚СЂРѕРєР° РЅРµ РїСЂРµРІС‹С€Р°РµС‚ СЃС‚Р°СЂРѕР№, С‚Рѕ...
   if Length(OldPattern) >= Length(NewPattern) then
   begin
     SetLength(Result, Length(S));
-  end else // Точный размер буфера не известен...
+  end else // РўРѕС‡РЅС‹Р№ СЂР°Р·РјРµСЂ Р±СѓС„РµСЂР° РЅРµ РёР·РІРµСЃС‚РµРЅ...
     SetLength(Result, (Length(S) + Length(OldPattern) +
       Length(NewPattern)) * 2);
 
@@ -223,10 +257,10 @@ begin
   begin
     IsEqual := False;
 
-    if CanReplace then // Если замена разрешена
+    if CanReplace then // Р•СЃР»Рё Р·Р°РјРµРЅР° СЂР°Р·СЂРµС€РµРЅР°
     begin
-      // Если I-й символ совпадает с OldPattern[1]
-      if pS[I - 1] = OldPattern[1] then // Запускаем цикл поиска
+      // Р•СЃР»Рё I-Р№ СЃРёРјРІРѕР» СЃРѕРІРїР°РґР°РµС‚ СЃ OldPattern[1]
+      if pS[I - 1] = OldPattern[1] then // Р—Р°РїСѓСЃРєР°РµРј С†РёРєР» РїРѕРёСЃРєР°
       begin
         IsEqual := True;
         for J := 2 to Length(OldPattern) do
@@ -234,39 +268,39 @@ begin
           if pS[I + J - 2] <> OldPattern[J] then
           begin
             IsEqual := False;
-            Break; // Прерываем внутренний цикл
+            Break; // РџСЂРµСЂС‹РІР°РµРј РІРЅСѓС‚СЂРµРЅРЅРёР№ С†РёРєР»
           end;
         end;
 
-        // Совпадение найдено! Выполняем замену
+        // РЎРѕРІРїР°РґРµРЅРёРµ РЅР°Р№РґРµРЅРѕ! Р’С‹РїРѕР»РЅСЏРµРј Р·Р°РјРµРЅСѓ
         if IsEqual then
         begin
           for J := 1 to Length(NewPattern) do
           begin
             Inc(Idx);
 
-            // Расширяем строку Result при необходимости
+            // Р Р°СЃС€РёСЂСЏРµРј СЃС‚СЂРѕРєСѓ Result РїСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё
             if Idx > Length(Result) then
               SetLength(Result, Length(Result) * 2);
 
             Result[Idx] := NewPattern[J];
           end;
 
-          // Пропускаем байты в исходной строке
+          // РџСЂРѕРїСѓСЃРєР°РµРј Р±Р°Р№С‚С‹ РІ РёСЃС…РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ
           Inc(I, Length(OldPattern));
 
           if not (rfReplaceAll in Flags) then
-            CanReplace := False; // Запрещаем дальнейшую замену
+            CanReplace := False; // Р—Р°РїСЂРµС‰Р°РµРј РґР°Р»СЊРЅРµР№С€СѓСЋ Р·Р°РјРµРЅСѓ
         end;
       end;
     end;
 
-    // Если подстрока не найдена, то просто копируем символ
+    // Р•СЃР»Рё РїРѕРґСЃС‚СЂРѕРєР° РЅРµ РЅР°Р№РґРµРЅР°, С‚Рѕ РїСЂРѕСЃС‚Рѕ РєРѕРїРёСЂСѓРµРј СЃРёРјРІРѕР»
     if not IsEqual then
     begin
       Inc(Idx);
 
-      // Расширяем строку Result при необходимости
+      // Р Р°СЃС€РёСЂСЏРµРј СЃС‚СЂРѕРєСѓ Result РїСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё
       if Idx > Length(Result) then
         SetLength(Result, Length(Result) * 2);
 
@@ -275,27 +309,27 @@ begin
     end;
   end; // while I <= Length(S) do
 
-  // Ограничиваем длину строки-результата
+  // РћРіСЂР°РЅРёС‡РёРІР°РµРј РґР»РёРЅСѓ СЃС‚СЂРѕРєРё-СЂРµР·СѓР»СЊС‚Р°С‚Р°
   SetLength(Result, Idx);
 end;
 
 
-function GenerateFileMutexName(const MutexPrefix, AFileName: string): string;
+{function GenerateFileMutexName(const MutexPrefix, AFileName: string): string;
 var
   I: Integer;
 begin
   Result := MutexPrefix + AnsiLowerCase(AFileName);
 
-  // Удаляем все двойные символы backslash
+  // РЈРґР°Р»СЏРµРј РІСЃРµ РґРІРѕР№РЅС‹Рµ СЃРёРјРІРѕР»С‹ backslash
   while Pos('\\', Result) > 0 do
     Result := StringReplace(Result, '\\', '\', [rfReplaceAll]);
 
   for I := 1 to Length(Result) do
     if CharInSet(Result[I], ['\', '/', ':', '*', '"', '?', '|', '<', '>']) then
       Result[I] := '_';
-end;
+end;}
 
-function CreateMutexShared(AName: string; LastError: PCardinal = nil): THandle;
+{function CreateMutexShared(AName: string; LastError: PCardinal = nil): THandle;
 var
   SD:TSecurityDescriptor;
   SA:TSecurityAttributes;
@@ -314,9 +348,9 @@ begin
 
     pSA := @SA;
 
-    Result := CreateMutex(pSA, False, PChar('Global\' + AName)); // Пытаемся создать с директивой Global
+    Result := CreateMutex(pSA, False, PChar('Global\' + AName)); // РџС‹С‚Р°РµРјСЃСЏ СЃРѕР·РґР°С‚СЊ СЃ РґРёСЂРµРєС‚РёРІРѕР№ Global
     if Result = 0 then
-      Result := CreateMutex(pSA, False, PChar(AName)); // Пытаемся создать без директивы Global
+      Result := CreateMutex(pSA, False, PChar(AName)); // РџС‹С‚Р°РµРјСЃСЏ СЃРѕР·РґР°С‚СЊ Р±РµР· РґРёСЂРµРєС‚РёРІС‹ Global
 
     if Assigned(LastError) then
       LastError^ := GetLastError;
@@ -327,9 +361,9 @@ begin
     on E: Exception do
       raise ReCreateEObject(E, 'CreateMutexShared');
   end;
-end;
+end;}
 
-function CreateFileMappingShared(hFile: THandle; flProtect, dwMaximumSizeHigh, dwMaximumSizeLow: DWORD; lpName: string; LastError: PCardinal = nil): THandle;
+{function CreateFileMappingShared(hFile: THandle; flProtect, dwMaximumSizeHigh, dwMaximumSizeLow: DWORD; lpName: string; LastError: PCardinal = nil): THandle;
 var
   SD:TSecurityDescriptor;
   SA:TSecurityAttributes;
@@ -348,9 +382,9 @@ begin
 
     pSA := @SA;
 
-    Result := CreateFileMapping(hFile, pSA, flProtect, dwMaximumSizeHigh, dwMaximumSizeLow, PChar('Global\' + lpName)); // Пытаемся создать с директивой Global
+    Result := CreateFileMapping(hFile, pSA, flProtect, dwMaximumSizeHigh, dwMaximumSizeLow, PChar('Global\' + lpName)); // РџС‹С‚Р°РµРјСЃСЏ СЃРѕР·РґР°С‚СЊ СЃ РґРёСЂРµРєС‚РёРІРѕР№ Global
     if Result = 0 then
-      Result := CreateFileMapping(hFile, pSA, flProtect, dwMaximumSizeHigh, dwMaximumSizeLow, PChar(lpName)); // Пытаемся создать без директивы Global
+      Result := CreateFileMapping(hFile, pSA, flProtect, dwMaximumSizeHigh, dwMaximumSizeLow, PChar(lpName)); // РџС‹С‚Р°РµРјСЃСЏ СЃРѕР·РґР°С‚СЊ Р±РµР· РґРёСЂРµРєС‚РёРІС‹ Global
 
     if Assigned(LastError) then
       LastError^ := GetLastError;
@@ -361,17 +395,57 @@ begin
     on E: Exception do
       raise ReCreateEObject(E, 'CreateFileMappingShared');
   end;
-end;
+end;}
+
+var
+  sSavedComputerName: string;
 
 function GetCurrentComputerName: string;
 var
+  {$IFDEF MSWINDOWS}
   AComputerName: string;
   ASize: Cardinal;
+  {$ELSE}
+  p: TProcess;
+  sl: TStringList;
+  {$ENDIF}
 begin
-  SetLength(AComputerName, MAX_COMPUTERNAME_LENGTH + 1);
-  ASize := MAX_COMPUTERNAME_LENGTH + 1;
-  GetComputerName(PChar(AComputerName), ASize);
-  Result := PChar(AComputerName);
+  if sSavedComputerName <> '' then
+  begin
+    Result := sSavedComputerName;
+  end else
+  begin
+    {$IFDEF MSWINDOWS}
+    SetLength(AComputerName, MAX_COMPUTERNAME_LENGTH + 1);
+    ASize := MAX_COMPUTERNAME_LENGTH + 1;
+    GetComputerName(PChar(AComputerName), ASize);
+    Result := PChar(AComputerName);
+    {$ELSE}
+    Result := GetEnvironmentVariableUTF8('HOSTNAME');
+    if Result = '' then
+      Result := GetEnvironmentVariableUTF8('HOST');
+    if Result = '' then
+    begin
+      p := TProcess.Create(nil);
+      sl := TStringList.Create;
+      try
+        p.CommandLine := 'hostname';
+        p.Options := p.Options + [poWaitOnExit, poUsePipes];
+        p.ShowWindow := swoHIDE;
+        p.Execute;
+        sl.LoadFromStream(p.Output);
+        Result := Trim(sl.Text);
+        Result := SysToUTF8(Result);
+      finally
+        p.Free;
+        sl.Free;
+      end;
+    end;
+    {$ENDIF}
+    if Result = '' then
+      Result := 'unknown_comp';
+    sSavedComputerName := Result;
+  end;
 end;
 
 function GetCurrentUserName: string;
@@ -393,7 +467,7 @@ var
   Ar: PByteArray;
   WasGetMem: Boolean;
 begin
-  HashLY := 0; // Данные отсутствуют
+  HashLY := 0; // Р”Р°РЅРЅС‹Рµ РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚
   HashRot13 := 0;
   if S.Size > 0 then
   begin
@@ -410,7 +484,7 @@ begin
         S.Read(Ar[0], S.Size);
       end;
 
-      // Вычисляем HashLY
+      // Р’С‹С‡РёСЃР»СЏРµРј HashLY
       for I := 0 to S.Size - 1 do
       begin
         HashLY := HashLY * 1664525 + Ar[I] + 1013904223;
@@ -419,9 +493,9 @@ begin
       if HashLY = 0 then
         HashRot13 := $ABCDABCD
       else
-        HashRot13 := HashLY; // Берем за основу ранее вычисленный хэш HashLY
+        HashRot13 := HashLY; // Р‘РµСЂРµРј Р·Р° РѕСЃРЅРѕРІСѓ СЂР°РЅРµРµ РІС‹С‡РёСЃР»РµРЅРЅС‹Р№ С…СЌС€ HashLY
 
-      // Вычисляем ROT13
+      // Р’С‹С‡РёСЃР»СЏРµРј ROT13
       for I := 0 to S.Size - 1 do
       begin
         HashRot13 := HashRot13 + Ar[I];
@@ -430,7 +504,7 @@ begin
 
       if (HashLY = 0) and (HashRot13 = 0) then
       begin
-        // Ситуация маловероятная.
+        // РЎРёС‚СѓР°С†РёСЏ РјР°Р»РѕРІРµСЂРѕСЏС‚РЅР°СЏ.
         HashRot13 := $ABCDEFAB;
       end;
 
@@ -450,7 +524,7 @@ var
   aStr: AnsiString;
 begin
   Hash := 0;
-  aStr := AnsiString(S); // Для юникодных Дельфи: преобразуем в Ansi-строку
+  aStr := AnsiString(S); // Р”Р»СЏ СЋРЅРёРєРѕРґРЅС‹С… Р”РµР»СЊС„Рё: РїСЂРµРѕР±СЂР°Р·СѓРµРј РІ Ansi-СЃС‚СЂРѕРєСѓ
 
   for I := 1 to Length(aStr) do
   begin
@@ -464,9 +538,13 @@ function GetTempPath: string;
 var
   I: Integer;
 begin
+  {$IFDEF MSWINDOWS}
   SetLength(Result, MAX_PATH);
   I := Windows.GetTempPath(MAX_PATH, PChar(Result));
   SetLength(Result, I);
+  {$ELSE}
+  Result := IncludeTrailingPathDelimiter(GetTempDir);
+  {$ENDIF}
 end;
 
 { TBaseObject }
@@ -516,7 +594,7 @@ destructor TBaseObject.Destroy;
 begin
   if Assigned(FRefList) then
   begin
-    ClearRefList; // Будут уничтожены все объекты, находящиеся в списке
+    ClearRefList; // Р‘СѓРґСѓС‚ СѓРЅРёС‡С‚РѕР¶РµРЅС‹ РІСЃРµ РѕР±СЉРµРєС‚С‹, РЅР°С…РѕРґСЏС‰РёРµСЃСЏ РІ СЃРїРёСЃРєРµ
     FRefList.Free;
   end
   else

@@ -27,127 +27,132 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 {                                                                             }
 {                                                                             }
 {                                                                             }
-{ Модуль ibxFBUtils - интерфейсный модуль для библиотеки функций IBXFBUtils   }
-{ (c) 2012-2013 Логинов Дмитрий Сергеевич                                     }
-{ Начало разработки проекта: 24.03.2012                                       }
-{ Последнее обновление: 09.05.2012                                            }
-{ Протестировано на D7, D2007, D2010, D-XE2 (32-разрядная)                    }
-{ Адрес сайта: http://loginovprojects.ru/                                     }
+{ РњРѕРґСѓР»СЊ ibxFBUtils - РёРЅС‚РµСЂС„РµР№СЃРЅС‹Р№ РјРѕРґСѓР»СЊ РґР»СЏ Р±РёР±Р»РёРѕС‚РµРєРё С„СѓРЅРєС†РёР№ IBXFBUtils   }
+{ (c) 2012-2013 Р›РѕРіРёРЅРѕРІ Р”РјРёС‚СЂРёР№ РЎРµСЂРіРµРµРІРёС‡                                     }
+{ РќР°С‡Р°Р»Рѕ СЂР°Р·СЂР°Р±РѕС‚РєРё РїСЂРѕРµРєС‚Р°: 24.03.2012                                       }
+{ РџРѕСЃР»РµРґРЅРµРµ РѕР±РЅРѕРІР»РµРЅРёРµ: 09.05.2012                                            }
+{ РџСЂРѕС‚РµСЃС‚РёСЂРѕРІР°РЅРѕ РЅР° D7, D2007, D2010, D-XE2 (32-СЂР°Р·СЂСЏРґРЅР°СЏ)                    }
+{ РђРґСЂРµСЃ СЃР°Р№С‚Р°: http://loginovprojects.ru/                                     }
 { e-mail: loginov_d@inbox.ru                                                  }
 {                                                                             }
 { *************************************************************************** }
 
 {
-Библиотека IBXFBUtils содержит функции, существенным образом облегчающие
-работу с базами данных Firebird.
-Библиотека основана на компонентах Interbase Express (IBE).
-Может компилироваться в EXE, либо в пакет BPL, либо в DLL.
+Р‘РёР±Р»РёРѕС‚РµРєР° IBXFBUtils СЃРѕРґРµСЂР¶РёС‚ С„СѓРЅРєС†РёРё, СЃСѓС‰РµСЃС‚РІРµРЅРЅС‹Рј РѕР±СЂР°Р·РѕРј РѕР±Р»РµРіС‡Р°СЋС‰РёРµ
+СЂР°Р±РѕС‚Сѓ СЃ Р±Р°Р·Р°РјРё РґР°РЅРЅС‹С… Firebird.
+Р‘РёР±Р»РёРѕС‚РµРєР° РѕСЃРЅРѕРІР°РЅР° РЅР° РєРѕРјРїРѕРЅРµРЅС‚Р°С… Interbase Express (IBE).
+РњРѕР¶РµС‚ РєРѕРјРїРёР»РёСЂРѕРІР°С‚СЊСЃСЏ РІ EXE, Р»РёР±Рѕ РІ РїР°РєРµС‚ BPL, Р»РёР±Рѕ РІ DLL.
 
-Компиляция в DLL (fbUtils.dll) имеет смысл при разработке сложного многомодульного
-приложения и позволяет сократить общий объем исполняемого кода и предоставить
-доступ к глобальным объектам библиотеки IBXFBUtils из любого двоичного модуля.
-При использовании fbUtils.dll:
-- DLL должна быть скомпилирована в той же версии Delphi, что и EXE
-- должна быть включена опция компиляции FBUTILSDLL (см. подробности в модуле fbUtilsBase)
-- DLL и EXE должны быть скомпилированы с run-time пакетами BPL. ibxpress - обязательно!
-- в EXE (в секции Uses) должны быть указаны модули fbUtils и fbTypes
-- приложение не будет работать, если что-то сделано не правильно. Вы увидите причину ошибки.
+РљРѕРјРїРёР»СЏС†РёСЏ РІ DLL (fbUtils.dll) РёРјРµРµС‚ СЃРјС‹СЃР» РїСЂРё СЂР°Р·СЂР°Р±РѕС‚РєРµ СЃР»РѕР¶РЅРѕРіРѕ РјРЅРѕРіРѕРјРѕРґСѓР»СЊРЅРѕРіРѕ
+РїСЂРёР»РѕР¶РµРЅРёСЏ Рё РїРѕР·РІРѕР»СЏРµС‚ СЃРѕРєСЂР°С‚РёС‚СЊ РѕР±С‰РёР№ РѕР±СЉРµРј РёСЃРїРѕР»РЅСЏРµРјРѕРіРѕ РєРѕРґР° Рё РїСЂРµРґРѕСЃС‚Р°РІРёС‚СЊ
+РґРѕСЃС‚СѓРї Рє РіР»РѕР±Р°Р»СЊРЅС‹Рј РѕР±СЉРµРєС‚Р°Рј Р±РёР±Р»РёРѕС‚РµРєРё IBXFBUtils РёР· Р»СЋР±РѕРіРѕ РґРІРѕРёС‡РЅРѕРіРѕ РјРѕРґСѓР»СЏ.
+РџСЂРё РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРё fbUtils.dll:
+- DLL РґРѕР»Р¶РЅР° Р±С‹С‚СЊ СЃРєРѕРјРїРёР»РёСЂРѕРІР°РЅР° РІ С‚РѕР№ Р¶Рµ РІРµСЂСЃРёРё Delphi, С‡С‚Рѕ Рё EXE
+- РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РІРєР»СЋС‡РµРЅР° РѕРїС†РёСЏ РєРѕРјРїРёР»СЏС†РёРё FBUTILSDLL (СЃРј. РїРѕРґСЂРѕР±РЅРѕСЃС‚Рё РІ РјРѕРґСѓР»Рµ fbUtilsBase)
+- DLL Рё EXE РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ СЃРєРѕРјРїРёР»РёСЂРѕРІР°РЅС‹ СЃ run-time РїР°РєРµС‚Р°РјРё BPL. ibxpress - РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ!
+- РІ EXE (РІ СЃРµРєС†РёРё Uses) РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ СѓРєР°Р·Р°РЅС‹ РјРѕРґСѓР»Рё fbUtils Рё fbTypes
+- РїСЂРёР»РѕР¶РµРЅРёРµ РЅРµ Р±СѓРґРµС‚ СЂР°Р±РѕС‚Р°С‚СЊ, РµСЃР»Рё С‡С‚Рѕ-С‚Рѕ СЃРґРµР»Р°РЅРѕ РЅРµ РїСЂР°РІРёР»СЊРЅРѕ. Р’С‹ СѓРІРёРґРёС‚Рµ РїСЂРёС‡РёРЅСѓ РѕС€РёР±РєРё.
 
-ВНИМАНИЕ! ЕСЛИ ВЫ ИСПОЛЬЗУЕТЕ DELPHI 7, то ОБЯЗАТЕЛЬНО обновите библиотеку IBX,
-иначе проект может даже не скомпилироваться.
-Ссылка для скачивания: http://ibase.ru/ibx/ibxdp711.zip
+Р’РќРРњРђРќРР•! Р•РЎР›Р Р’Р« РРЎРџРћР›Р¬Р—РЈР•РўР• DELPHI 7, С‚Рѕ РћР‘РЇР—РђРўР•Р›Р¬РќРћ РѕР±РЅРѕРІРёС‚Рµ Р±РёР±Р»РёРѕС‚РµРєСѓ IBX,
+РёРЅР°С‡Рµ РїСЂРѕРµРєС‚ РјРѕР¶РµС‚ РґР°Р¶Рµ РЅРµ СЃРєРѕРјРїРёР»РёСЂРѕРІР°С‚СЊСЃСЏ.
+РЎСЃС‹Р»РєР° РґР»СЏ СЃРєР°С‡РёРІР°РЅРёСЏ: http://ibase.ru/ibx/ibxdp711.zip
 
-ВНИМАНИЕ! ВЫ НЕ МОЖЕТЕ РАБОТАТЬ С БД FIREBIRD, ЕСЛИ КОМПИЛИРУЕТЕ 64-РАЗРЯДНОЕ
-ПРИЛОЖЕНИЕ (НЕСОВМЕСТИМОСТЬ ИЗ-ЗА КОМПОНЕНТОВ IBX)!
+Р’РќРРњРђРќРР•! Р’Р« РќР• РњРћР–Р•РўР• Р РђР‘РћРўРђРўР¬ РЎ Р‘Р” FIREBIRD, Р•РЎР›Р РљРћРњРџРР›РР РЈР•РўР• 64-Р РђР—Р РЇР”РќРћР•
+РџР РР›РћР–Р•РќРР• (РќР•РЎРћР’РњР•РЎРўРРњРћРЎРўР¬ РР—-Р—Рђ РљРћРњРџРћРќР•РќРўРћР’ IBX)!
 
-В данном модуле - только интерсейсные функции, без реализации.
+Р’ РґР°РЅРЅРѕРј РјРѕРґСѓР»Рµ - С‚РѕР»СЊРєРѕ РёРЅС‚РµСЂСЃРµР№СЃРЅС‹Рµ С„СѓРЅРєС†РёРё, Р±РµР· СЂРµР°Р»РёР·Р°С†РёРё.
 
-В данном модуле отсутствуют подробные комментарии для каждой функции. Смотрите
-подробности в том модуле, в котором реализована соответствующая функция.
+Р’ РґР°РЅРЅРѕРј РјРѕРґСѓР»Рµ РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚ РїРѕРґСЂРѕР±РЅС‹Рµ РєРѕРјРјРµРЅС‚Р°СЂРёРё РґР»СЏ РєР°Р¶РґРѕР№ С„СѓРЅРєС†РёРё. РЎРјРѕС‚СЂРёС‚Рµ
+РїРѕРґСЂРѕР±РЅРѕСЃС‚Рё РІ С‚РѕРј РјРѕРґСѓР»Рµ, РІ РєРѕС‚РѕСЂРѕРј СЂРµР°Р»РёР·РѕРІР°РЅР° СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰Р°СЏ С„СѓРЅРєС†РёСЏ.
 
-Всю работу Вам следует выполнять с объектом "fb" класса TfbUtils.
+Р’СЃСЋ СЂР°Р±РѕС‚Сѓ Р’Р°Рј СЃР»РµРґСѓРµС‚ РІС‹РїРѕР»РЅСЏС‚СЊ СЃ РѕР±СЉРµРєС‚РѕРј "fb" РєР»Р°СЃСЃР° TfbUtils.
 
-Все текстовые сообщения (для пользователя) объявлены в разделе resourcestring, поэтому
-для локализации приложения используйте стандартный менеджер трансляции Delphi.
+Р’СЃРµ С‚РµРєСЃС‚РѕРІС‹Рµ СЃРѕРѕР±С‰РµРЅРёСЏ (РґР»СЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ) РѕР±СЉСЏРІР»РµРЅС‹ РІ СЂР°Р·РґРµР»Рµ resourcestring, РїРѕСЌС‚РѕРјСѓ
+РґР»СЏ Р»РѕРєР°Р»РёР·Р°С†РёРё РїСЂРёР»РѕР¶РµРЅРёСЏ РёСЃРїРѕР»СЊР·СѓР№С‚Рµ СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ РјРµРЅРµРґР¶РµСЂ С‚СЂР°РЅСЃР»СЏС†РёРё Delphi.
 
-Имена объектов в БД Firebird должны быть написаны по-английски. Если имена даны
-по русски, то библиотека fbUtils скорее всего откажется с ними работать.
+РРјРµРЅР° РѕР±СЉРµРєС‚РѕРІ РІ Р‘Р” Firebird РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РЅР°РїРёСЃР°РЅС‹ РїРѕ-Р°РЅРіР»РёР№СЃРєРё. Р•СЃР»Рё РёРјРµРЅР° РґР°РЅС‹
+РїРѕ СЂСѓСЃСЃРєРё, С‚Рѕ Р±РёР±Р»РёРѕС‚РµРєР° fbUtils СЃРєРѕСЂРµРµ РІСЃРµРіРѕ РѕС‚РєР°Р¶РµС‚СЃСЏ СЃ РЅРёРјРё СЂР°Р±РѕС‚Р°С‚СЊ.
 
-Перед началом работы рекомендуется ознакомиться с файлом ibxfbutils.html
+РџРµСЂРµРґ РЅР°С‡Р°Р»РѕРј СЂР°Р±РѕС‚С‹ СЂРµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ РѕР·РЅР°РєРѕРјРёС‚СЊСЃСЏ СЃ С„Р°Р№Р»РѕРј ibxfbutils.html
 }
 
-{$IFDEF WIN64}
-КОМПОНЕНТЫ IBX НЕ МОГУТ РАБОТАТЬ С БД FIREBIRD В 64-РАЗРЯДНОМ ПРИЛОЖЕНИИ!
+{$IFDEF FPC}
+{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
 {$ENDIF}
 
 unit ibxFBUtils;
 
 interface
 uses
-  Windows, SysUtils, Classes, IBDatabase, IBCustomDataSet, fbTypes;
+{$IFnDEF FPC}
+  Windows,
+{$ELSE}
+  LCLIntf, LCLType, LazUTF8,
+{$ENDIF}
+  SysUtils, Classes, IBDatabase, IBCustomDataSet, fbTypes, ParamsUtils, Variants;
 
 type
   TfbPool = class(TObject)
   public
-    {Добавляет параметры подключения в профиль с указанным именем}
+    {Р”РѕР±Р°РІР»СЏРµС‚ РїР°СЂР°РјРµС‚СЂС‹ РїРѕРґРєР»СЋС‡РµРЅРёСЏ РІ РїСЂРѕС„РёР»СЊ СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРјРµРЅРµРј}
     procedure AddConnectionProfile(AProfileName: string; AServerName: string; APort: Integer;
       ADataBase: string; AUserName: string; APassword: string; ACharSet: string);
 
-    {Добавляет параметры подключения в профиль "по умолчанию"}
+    {Р”РѕР±Р°РІР»СЏРµС‚ РїР°СЂР°РјРµС‚СЂС‹ РїРѕРґРєР»СЋС‡РµРЅРёСЏ РІ РїСЂРѕС„РёР»СЊ "РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ"}
     procedure AddDefaultConnectionProfile(AServerName: string; APort: Integer;
       ADataBase: string; AUserName: string; APassword: string; ACharSet: string);
 
-    {Получить подключение из пула по имени профиля}
+    {РџРѕР»СѓС‡РёС‚СЊ РїРѕРґРєР»СЋС‡РµРЅРёРµ РёР· РїСѓР»Р° РїРѕ РёРјРµРЅРё РїСЂРѕС„РёР»СЏ}
     function GetConnection(AProfileName: string; ReadTran: PIBTransaction = nil; WriteTran: PIBTransaction = nil;
       ReadTranType: TTransactionType = trRCRO; WriteTranType: TTransactionType = trRCRW): TIBDatabase; overload;
 
-    {Получить подключение из пула по указанным параметрам}
+    {РџРѕР»СѓС‡РёС‚СЊ РїРѕРґРєР»СЋС‡РµРЅРёРµ РёР· РїСѓР»Р° РїРѕ СѓРєР°Р·Р°РЅРЅС‹Рј РїР°СЂР°РјРµС‚СЂР°Рј}
     function GetConnection(AServerName: string; APort: Integer; ADataBase: string;
       AUserName: string; APassword: string; ACharSet: string; ReadTran: PIBTransaction = nil;
       WriteTran: PIBTransaction = nil; ReadTranType: TTransactionType = trRCRO;
       WriteTranType: TTransactionType = trRCRW): TIBDatabase; overload;
 
-    {Получить подключение из пула для профиля "по умолчанию"}
+    {РџРѕР»СѓС‡РёС‚СЊ РїРѕРґРєР»СЋС‡РµРЅРёРµ РёР· РїСѓР»Р° РґР»СЏ РїСЂРѕС„РёР»СЏ "РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ"}
     function GetDefaultConnection(ReadTran: PIBTransaction = nil; WriteTran: PIBTransaction = nil;
       ReadTranType: TTransactionType = trRCRO; WriteTranType: TTransactionType = trRCRW): TIBDatabase;
 
-    {Возвращает ненужное подключение обратно в пул}
+    {Р’РѕР·РІСЂР°С‰Р°РµС‚ РЅРµРЅСѓР¶РЅРѕРµ РїРѕРґРєР»СЋС‡РµРЅРёРµ РѕР±СЂР°С‚РЅРѕ РІ РїСѓР»}
     procedure ReturnConnection(FDB: TIBDatabase);
 
-    { Возвращает количество подключений в пуле }
+    { Р’РѕР·РІСЂР°С‰Р°РµС‚ РєРѕР»РёС‡РµСЃС‚РІРѕ РїРѕРґРєР»СЋС‡РµРЅРёР№ РІ РїСѓР»Рµ }
     function GetPoolSize: Integer;
   end;
 
   TfbBackupRestore = class(TObject)
   public
-    {Осуществляет резервирование базы данных средствами Firebird Service-API}
+    {РћСЃСѓС‰РµСЃС‚РІР»СЏРµС‚ СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ Р±Р°Р·С‹ РґР°РЅРЅС‹С… СЃСЂРµРґСЃС‚РІР°РјРё Firebird Service-API}
     procedure BackupDatabaseOnServer(AServerName: string; APort: Integer; ADBName, ABackupFile,
       AUser, APassw: string; ABackupOptions: TFBBackupOptions; AProgressProc: TBackupRestoreProgressProc);
 
-    {Осуществляет резервирование базы данных и копирует файл резервной копии с сервера
-     на компьютер клиента.}
+    {РћСЃСѓС‰РµСЃС‚РІР»СЏРµС‚ СЂРµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ Р±Р°Р·С‹ РґР°РЅРЅС‹С… Рё РєРѕРїРёСЂСѓРµС‚ С„Р°Р№Р» СЂРµР·РµСЂРІРЅРѕР№ РєРѕРїРёРё СЃ СЃРµСЂРІРµСЂР°
+     РЅР° РєРѕРјРїСЊСЋС‚РµСЂ РєР»РёРµРЅС‚Р°.}
     procedure BackupDatabaseAndCopyFromServer(AServerName: string; APort: Integer; ADBName, ABackupFile,
       AUser, APassw: string; ABackupOptions: TFBBackupOptions; AProgressProc: TBackupRestoreProgressProc;
       ASourBackupFileOnServer, ADestBackupFileOnClient: string; TryDeleteSourBackupFile: Boolean);
 
-    {Осуществляет восстановление базы данных средствами Firebird Service-API}
+    {РћСЃСѓС‰РµСЃС‚РІР»СЏРµС‚ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ Р±Р°Р·С‹ РґР°РЅРЅС‹С… СЃСЂРµРґСЃС‚РІР°РјРё Firebird Service-API}
     procedure RestoreDatabaseOnServer(AServerName: string; APort: Integer; ADBName, ABackupFile,
       AUser, APassw: string; ARestoreOptions: TFBRestoreOptions; AProgressProc: TBackupRestoreProgressProc);
 
-    {Копирует байл резервной копии на сервер и производит восстановление базы данных}
+    {РљРѕРїРёСЂСѓРµС‚ Р±Р°Р№Р» СЂРµР·РµСЂРІРЅРѕР№ РєРѕРїРёРё РЅР° СЃРµСЂРІРµСЂ Рё РїСЂРѕРёР·РІРѕРґРёС‚ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ Р±Р°Р·С‹ РґР°РЅРЅС‹С…}
     procedure CopyBackupToServerAndRestoreDatabase(AServerName: string; APort: Integer; ADBName, ABackupFile,
       AUser, APassw: string; ARestoreOptions: TFBRestoreOptions; AProgressProc: TBackupRestoreProgressProc;
       ABackupFileOnClient, ABackupFileOnServer: string; TryDeleteBackupFileOnClient,
       TryDeleteBackupFileOnServer: Boolean);
   end;
 
-  {Внимание! TFBIniFile - абстрактный класс. Расположение функций относительно друг друга играет очень
-   большое значение. Не изменяйте положение функций.
-   НЕЛЬЗЯ создавать объект таким способом: ini := TFBIniFile.Create(). Вместо этого
-   следует использовать способ: ini := fb.Ini.CreateIni(False)}
+  {Р’РЅРёРјР°РЅРёРµ! TFBIniFile - Р°Р±СЃС‚СЂР°РєС‚РЅС‹Р№ РєР»Р°СЃСЃ. Р Р°СЃРїРѕР»РѕР¶РµРЅРёРµ С„СѓРЅРєС†РёР№ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РґСЂСѓРі РґСЂСѓРіР° РёРіСЂР°РµС‚ РѕС‡РµРЅСЊ
+   Р±РѕР»СЊС€РѕРµ Р·РЅР°С‡РµРЅРёРµ. РќРµ РёР·РјРµРЅСЏР№С‚Рµ РїРѕР»РѕР¶РµРЅРёРµ С„СѓРЅРєС†РёР№.
+   РќР•Р›Р¬Р—РЇ СЃРѕР·РґР°РІР°С‚СЊ РѕР±СЉРµРєС‚ С‚Р°РєРёРј СЃРїРѕСЃРѕР±РѕРј: ini := TFBIniFile.Create(). Р’РјРµСЃС‚Рѕ СЌС‚РѕРіРѕ
+   СЃР»РµРґСѓРµС‚ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ СЃРїРѕСЃРѕР±: ini := fb.Ini.CreateIni(False)}
   TFBIniFile = class(TObject)
   protected
-    { == ВИРТУАЛЬНЫЕ АБСТРАКТНЫЕ ФУНКЦИИ. Не меняйте их! == }
+    { == Р’РР РўРЈРђР›Р¬РќР«Р• РђР‘РЎРўР РђРљРўРќР«Р• Р¤РЈРќРљР¦РР. РќРµ РјРµРЅСЏР№С‚Рµ РёС…! == }
     function GetUserName: string; virtual; abstract;
     procedure SetUserName(const Value: string); virtual; abstract;
     function GetComputerName: string; virtual; abstract;
@@ -189,277 +194,277 @@ type
     procedure DoDeleteKey(AnyComp, AnyUser: Boolean; const Section, Key: String); virtual; abstract;
   public
 
-    {Внимание! Для каждой функции предлагается 3 варианта вызова:
-     1 - "привычный": указывается имя секции и имя параметра, как и при работе с TIniFile.
-         Параметр, записанный таким способом, будет доступен с любого компьютера и
-         для любого пользователя. Предназначен для глобальных, общедоступных параметров
-     2 - "подробный": позволяет задать дополнительно 2 параметра: AnyComp и AnyUser.
-         Если AnyComp (пер. "любой компьютер") равен False, то параметр будет доступен
-         ТОЛЬКО с этого же компьютера. Если AnyUser (пер. "любой пользователь") равен False,
-         то параметр будет доступен ТОЛЬКО для данного пользователя. При необходимости
-         параметры AnyComp и AnyUser можно кобминировать. Например, если AnyComp=True и AnyUser=False,
-         то параметр будет доступен для данного пользователя, независимо от того,
-         за каким компьютером он работает.
-     3 - "упрощенный": аналогичный первому варианту, однако имя секции указывать не
-         требуется (используется секция FBIniDefSection (PARAMS))}
+    {Р’РЅРёРјР°РЅРёРµ! Р”Р»СЏ РєР°Р¶РґРѕР№ С„СѓРЅРєС†РёРё РїСЂРµРґР»Р°РіР°РµС‚СЃСЏ 3 РІР°СЂРёР°РЅС‚Р° РІС‹Р·РѕРІР°:
+     1 - "РїСЂРёРІС‹С‡РЅС‹Р№": СѓРєР°Р·С‹РІР°РµС‚СЃСЏ РёРјСЏ СЃРµРєС†РёРё Рё РёРјСЏ РїР°СЂР°РјРµС‚СЂР°, РєР°Рє Рё РїСЂРё СЂР°Р±РѕС‚Рµ СЃ TIniFile.
+         РџР°СЂР°РјРµС‚СЂ, Р·Р°РїРёСЃР°РЅРЅС‹Р№ С‚Р°РєРёРј СЃРїРѕСЃРѕР±РѕРј, Р±СѓРґРµС‚ РґРѕСЃС‚СѓРїРµРЅ СЃ Р»СЋР±РѕРіРѕ РєРѕРјРїСЊСЋС‚РµСЂР° Рё
+         РґР»СЏ Р»СЋР±РѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ. РџСЂРµРґРЅР°Р·РЅР°С‡РµРЅ РґР»СЏ РіР»РѕР±Р°Р»СЊРЅС‹С…, РѕР±С‰РµРґРѕСЃС‚СѓРїРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
+     2 - "РїРѕРґСЂРѕР±РЅС‹Р№": РїРѕР·РІРѕР»СЏРµС‚ Р·Р°РґР°С‚СЊ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕ 2 РїР°СЂР°РјРµС‚СЂР°: AnyComp Рё AnyUser.
+         Р•СЃР»Рё AnyComp (РїРµСЂ. "Р»СЋР±РѕР№ РєРѕРјРїСЊСЋС‚РµСЂ") СЂР°РІРµРЅ False, С‚Рѕ РїР°СЂР°РјРµС‚СЂ Р±СѓРґРµС‚ РґРѕСЃС‚СѓРїРµРЅ
+         РўРћР›Р¬РљРћ СЃ СЌС‚РѕРіРѕ Р¶Рµ РєРѕРјРїСЊСЋС‚РµСЂР°. Р•СЃР»Рё AnyUser (РїРµСЂ. "Р»СЋР±РѕР№ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ") СЂР°РІРµРЅ False,
+         С‚Рѕ РїР°СЂР°РјРµС‚СЂ Р±СѓРґРµС‚ РґРѕСЃС‚СѓРїРµРЅ РўРћР›Р¬РљРћ РґР»СЏ РґР°РЅРЅРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ. РџСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё
+         РїР°СЂР°РјРµС‚СЂС‹ AnyComp Рё AnyUser РјРѕР¶РЅРѕ РєРѕР±РјРёРЅРёСЂРѕРІР°С‚СЊ. РќР°РїСЂРёРјРµСЂ, РµСЃР»Рё AnyComp=True Рё AnyUser=False,
+         С‚Рѕ РїР°СЂР°РјРµС‚СЂ Р±СѓРґРµС‚ РґРѕСЃС‚СѓРїРµРЅ РґР»СЏ РґР°РЅРЅРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ, РЅРµР·Р°РІРёСЃРёРјРѕ РѕС‚ С‚РѕРіРѕ,
+         Р·Р° РєР°РєРёРј РєРѕРјРїСЊСЋС‚РµСЂРѕРј РѕРЅ СЂР°Р±РѕС‚Р°РµС‚.
+     3 - "СѓРїСЂРѕС‰РµРЅРЅС‹Р№": Р°РЅР°Р»РѕРіРёС‡РЅС‹Р№ РїРµСЂРІРѕРјСѓ РІР°СЂРёР°РЅС‚Сѓ, РѕРґРЅР°РєРѕ РёРјСЏ СЃРµРєС†РёРё СѓРєР°Р·С‹РІР°С‚СЊ РЅРµ
+         С‚СЂРµР±СѓРµС‚СЃСЏ (РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ СЃРµРєС†РёСЏ FBIniDefSection (PARAMS))}
 
-    {== ФУНКЦИИ ДЛЯ ЗАПИСИ В INI ==}
+    {== Р¤РЈРќРљР¦РР Р”Р›РЇ Р—РђРџРРЎР Р’ INI ==}
 
-    {Запись строки}
+    {Р—Р°РїРёСЃСЊ СЃС‚СЂРѕРєРё}
     procedure WriteString(const Section, Key, Value: String); overload;
     procedure WriteString(AnyComp, AnyUser: Boolean; const Section, Key, Value: String); overload;
     procedure WriteString(const Key, Value: String); overload;
 
-    {Запись логического значения}
+    {Р—Р°РїРёСЃСЊ Р»РѕРіРёС‡РµСЃРєРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ}
     procedure WriteBool(const Section, Key: string; Value: Boolean); overload;
     procedure WriteBool(AnyComp, AnyUser: Boolean; const Section, Key: string; Value: Boolean); overload;
     procedure WriteBool(const Key: string; Value: Boolean); overload;
 
-    {Запись вещественного числа Double}
+    {Р—Р°РїРёСЃСЊ РІРµС‰РµСЃС‚РІРµРЅРЅРѕРіРѕ С‡РёСЃР»Р° Double}
     procedure WriteFloat(const Section, Key: string; Value: Double); overload;
     procedure WriteFloat(AnyComp, AnyUser: Boolean; const Section, Key: string; Value: Double); overload;
     procedure WriteFloat(const Key: string; Value: Double); overload;
 
-    {Запись даты и времени}
+    {Р—Р°РїРёСЃСЊ РґР°С‚С‹ Рё РІСЂРµРјРµРЅРё}
     procedure WriteDateTime(const Section, Key: string; Value: TDateTime); overload;
     procedure WriteDateTime(AnyComp, AnyUser: Boolean; const Section, Key: string; Value: TDateTime); overload;
     procedure WriteDateTime(const Key: string; Value: TDateTime); overload;
 
-    {Запись целочисленного значения}
+    {Р—Р°РїРёСЃСЊ С†РµР»РѕС‡РёСЃР»РµРЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ}
     procedure WriteInteger(const Section, Key: string; Value: Integer); overload;
     procedure WriteInteger(AnyComp, AnyUser: Boolean; const Section, Key: string; Value: Integer); overload;
     procedure WriteInteger(const Key: string; Value: Integer); overload;
 
-    {Запись даты}
+    {Р—Р°РїРёСЃСЊ РґР°С‚С‹}
     procedure WriteDate(const Section, Key: string; Value: TDateTime); overload;
     procedure WriteDate(AnyComp, AnyUser: Boolean; const Section, Key: string; Value: TDateTime); overload;
     procedure WriteDate(Key: string; Value: TDateTime); overload;
 
-    {Запись времени}
+    {Р—Р°РїРёСЃСЊ РІСЂРµРјРµРЅРё}
     procedure WriteTime(const Section, Key: string; Value: TDateTime); overload;
     procedure WriteTime(AnyComp, AnyUser: Boolean; const Section, Key: string; Value: TDateTime); overload;
     procedure WriteTime(Key: string; Value: TDateTime); overload;
 
-    {== Функции для записи в INI двоичных объектов (в поле BLOB) ==}
+    {== Р¤СѓРЅРєС†РёРё РґР»СЏ Р·Р°РїРёСЃРё РІ INI РґРІРѕРёС‡РЅС‹С… РѕР±СЉРµРєС‚РѕРІ (РІ РїРѕР»Рµ BLOB) ==}
 
-    {Запись потока TStream}
+    {Р—Р°РїРёСЃСЊ РїРѕС‚РѕРєР° TStream}
     procedure WriteStream(const Section, Key: String; AStream: TStream); overload;
     procedure WriteStream(AnyComp, AnyUser: Boolean; const Section, Key: String; AStream: TStream); overload;
     procedure WriteStream(Key: String; AStream: TStream); overload;
 
-    {Запись текста (любого объема; хранится в формате Unicode)}
+    {Р—Р°РїРёСЃСЊ С‚РµРєСЃС‚Р° (Р»СЋР±РѕРіРѕ РѕР±СЉРµРјР°; С…СЂР°РЅРёС‚СЃСЏ РІ С„РѕСЂРјР°С‚Рµ Unicode)}
     procedure WriteText(const Section, Key: String; Value: string); overload;
     procedure WriteText(AnyComp, AnyUser: Boolean; const Section, Key: String; Value: string); overload;
     procedure WriteText(Key: String; Value: string); overload;
 
-    {Запись произвольного двоичного буфера (например, массива)}
+    {Р—Р°РїРёСЃСЊ РїСЂРѕРёР·РІРѕР»СЊРЅРѕРіРѕ РґРІРѕРёС‡РЅРѕРіРѕ Р±СѓС„РµСЂР° (РЅР°РїСЂРёРјРµСЂ, РјР°СЃСЃРёРІР°)}
     procedure WriteBinaryData(const Section, Key: string; const Buffer; BufSize: Integer); overload;
     procedure WriteBinaryData(AnyComp, AnyUser: Boolean; const Section, Key: string; const Buffer; BufSize: Integer); overload;
     procedure WriteBinaryData(Key: string; const Buffer; BufSize: Integer); overload;
 
-    {== ФУНКЦИИ ДЛЯ ЗАПИСИ В INI ==}
+    {== Р¤РЈРќРљР¦РР Р”Р›РЇ Р—РђРџРРЎР Р’ INI ==}
 
-    {Чтение строки}
+    {Р§С‚РµРЅРёРµ СЃС‚СЂРѕРєРё}
     function ReadString(const Section, Key, Default: String): string; overload;
     function ReadString(AnyComp, AnyUser: Boolean; const Section, Key, Default: String): string; overload;
     function ReadString(const Key, Default: String): string; overload;
 
-    {Чтение целочисленного значения}
+    {Р§С‚РµРЅРёРµ С†РµР»РѕС‡РёСЃР»РµРЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ}
     function ReadInteger(const Section, Key: string; Default: Integer): Integer; overload;
     function ReadInteger(AnyComp, AnyUser: Boolean; const Section, Key: string; Default: Integer): Integer; overload;
     function ReadInteger(const Key: string; Default: Integer): Integer; overload;
 
-    {Чтение логического значения}
+    {Р§С‚РµРЅРёРµ Р»РѕРіРёС‡РµСЃРєРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ}
     function ReadBool(const Section, Key: string; Default: Boolean): Boolean; overload;
     function ReadBool(AnyComp, AnyUser: Boolean; const Section, Key: string; Default: Boolean): Boolean; overload;
     function ReadBool(const Key: string; Default: Boolean): Boolean; overload;
 
-    {Чтение вещественного значения (Double)}
+    {Р§С‚РµРЅРёРµ РІРµС‰РµСЃС‚РІРµРЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ (Double)}
     function ReadFloat(const Section, Key: string; Default: Double): Double; overload;
     function ReadFloat(AnyComp, AnyUser: Boolean; const Section, Key: string; Default: Double): Double; overload;
     function ReadFloat(const Key: string; Default: Double): Double; overload;
 
-    {Чтение даты и времени}
+    {Р§С‚РµРЅРёРµ РґР°С‚С‹ Рё РІСЂРµРјРµРЅРё}
     function ReadDateTime(const Section, Key: string; Default: TDateTime): TDateTime; overload;
     function ReadDateTime(AnyComp, AnyUser: Boolean; const Section, Key: string; Default: TDateTime): TDateTime; overload;
     function ReadDateTime(const Key: string; Default: TDateTime): TDateTime; overload;
 
-    {Чтение даты}
+    {Р§С‚РµРЅРёРµ РґР°С‚С‹}
     function ReadDate(const Section, Key: string; Default: TDateTime): TDateTime; overload;
     function ReadDate(AnyComp, AnyUser: Boolean; const Section, Key: string; Default: TDateTime): TDateTime; overload;
     function ReadDate(Key: string; Default: TDateTime): TDateTime; overload;
 
-    {Чтение времени}
+    {Р§С‚РµРЅРёРµ РІСЂРµРјРµРЅРё}
     function ReadTime(const Section, Key: string; Default: TDateTime): TDateTime; overload;
     function ReadTime(AnyComp, AnyUser: Boolean; const Section, Key: string; Default: TDateTime): TDateTime; overload;
     function ReadTime(Key: string; Default: TDateTime): TDateTime; overload;
 
-    {== Функции для чтения из INI двоичных объектов (из поля BLOB) ==}
+    {== Р¤СѓРЅРєС†РёРё РґР»СЏ С‡С‚РµРЅРёСЏ РёР· INI РґРІРѕРёС‡РЅС‹С… РѕР±СЉРµРєС‚РѕРІ (РёР· РїРѕР»СЏ BLOB) ==}
 
-    {Чтение в поток TStream}
+    {Р§С‚РµРЅРёРµ РІ РїРѕС‚РѕРє TStream}
     function ReadStream(AnyComp, AnyUser: Boolean; const Section, Key: String; AStream: TStream): Boolean; overload;
     function ReadStream(const Section, Key: String; AStream: TStream): Boolean; overload;
     function ReadStream(Key: String; AStream: TStream): Boolean; overload;
 
-    {Чтение текста}
+    {Р§С‚РµРЅРёРµ С‚РµРєСЃС‚Р°}
     function ReadText(AnyComp, AnyUser: Boolean; const Section, Key: String; Default: String): string; overload;
     function ReadText(const Section, Key: String; Default: String): string; overload;
     function ReadText(Key: String; Default: String): string; overload;
 
-    {Чтение в двоичный буфер}
+    {Р§С‚РµРЅРёРµ РІ РґРІРѕРёС‡РЅС‹Р№ Р±СѓС„РµСЂ}
     function ReadBinaryData(AnyComp, AnyUser: Boolean; const Section, Key: string; var Buffer; BufSize: Integer): Integer; overload;
     function ReadBinaryData(const Section, Key: string; var Buffer; BufSize: Integer): Integer; overload;
     function ReadBinaryData(Key: string; var Buffer; BufSize: Integer): Integer; overload;
 
 
-    {== ФУНКЦИИ ДЛЯ РАБОТЫ С СЕКЦИЯМИ ==}
+    {== Р¤РЈРќРљР¦РР Р”Р›РЇ Р РђР‘РћРўР« РЎ РЎР•РљР¦РРЇРњР ==}
 
-    {==ReadSection - считывает список наименований параметров для заданной секции}
+    {==ReadSection - СЃС‡РёС‚С‹РІР°РµС‚ СЃРїРёСЃРѕРє РЅР°РёРјРµРЅРѕРІР°РЅРёР№ РїР°СЂР°РјРµС‚СЂРѕРІ РґР»СЏ Р·Р°РґР°РЅРЅРѕР№ СЃРµРєС†РёРё}
     procedure ReadSection(const Section: string; Strings: TStrings); overload;
     procedure ReadSection(AnyComp, AnyUser: Boolean; const Section: string; Strings: TStrings); overload;
     procedure ReadSection(Strings: TStrings); overload;
 
-    {==ReadSections - считывает наименования секций}
+    {==ReadSections - СЃС‡РёС‚С‹РІР°РµС‚ РЅР°РёРјРµРЅРѕРІР°РЅРёСЏ СЃРµРєС†РёР№}
     procedure ReadSections(Strings: TStrings); overload;
     procedure ReadSections(AnyComp, AnyUser: Boolean; Strings: TStrings); overload;
 
-    {==ReadSectionValues - для указанной секции считывает наименования параметров и их значения}
+    {==ReadSectionValues - РґР»СЏ СѓРєР°Р·Р°РЅРЅРѕР№ СЃРµРєС†РёРё СЃС‡РёС‚С‹РІР°РµС‚ РЅР°РёРјРµРЅРѕРІР°РЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ Рё РёС… Р·РЅР°С‡РµРЅРёСЏ}
     procedure ReadSectionValues(const Section: string; Strings: TStrings); overload;
     procedure ReadSectionValues(AnyComp, AnyUser: Boolean; const Section: string; Strings: TStrings); overload;
     procedure ReadSectionValues(Strings: TStrings); overload;
 
-    {== SectionExists - Проверяет, существует ли заданная секция}
+    {== SectionExists - РџСЂРѕРІРµСЂСЏРµС‚, СЃСѓС‰РµСЃС‚РІСѓРµС‚ Р»Рё Р·Р°РґР°РЅРЅР°СЏ СЃРµРєС†РёСЏ}
     function SectionExists(const Section: string): Boolean; overload;
     function SectionExists(AnyComp, AnyUser: Boolean; const Section: string): Boolean; overload;
     function SectionExists: Boolean; overload;
 
-    {== ValueExists - Проверяет, существует ли заданный параметр}
+    {== ValueExists - РџСЂРѕРІРµСЂСЏРµС‚, СЃСѓС‰РµСЃС‚РІСѓРµС‚ Р»Рё Р·Р°РґР°РЅРЅС‹Р№ РїР°СЂР°РјРµС‚СЂ}
     function ValueExists(const Section, Key: string): Boolean; overload;
     function ValueExists(AnyComp, AnyUser: Boolean; const Section, Key: string): Boolean; overload;
     function ValueExists(Key: string): Boolean; overload;
 
-    {== EraseSection - Удаляет указанную секцию}
+    {== EraseSection - РЈРґР°Р»СЏРµС‚ СѓРєР°Р·Р°РЅРЅСѓСЋ СЃРµРєС†РёСЋ}
     procedure EraseSection(const Section: string); overload;
     procedure EraseSection(AnyComp, AnyUser: Boolean; const Section: string); overload;
     procedure EraseSection; overload;
 
-    {== DeleteKey - Удаляет заданный параметр и его значение}
+    {== DeleteKey - РЈРґР°Р»СЏРµС‚ Р·Р°РґР°РЅРЅС‹Р№ РїР°СЂР°РјРµС‚СЂ Рё РµРіРѕ Р·РЅР°С‡РµРЅРёРµ}
     procedure DeleteKey(const Section, Key: String); overload;
     procedure DeleteKey(AnyComp, AnyUser: Boolean; const Section, Key: String); overload;
     procedure DeleteKey(const Key: String); overload;
   public
-    { Устанавливает параметры подключения к базе данных. Если указано имя профиля
-      (свойство PoolProfileName), то использовать параметры не обязательно }
+    { РЈСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ РїР°СЂР°РјРµС‚СЂС‹ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р±Р°Р·Рµ РґР°РЅРЅС‹С…. Р•СЃР»Рё СѓРєР°Р·Р°РЅРѕ РёРјСЏ РїСЂРѕС„РёР»СЏ
+      (СЃРІРѕР№СЃС‚РІРѕ PoolProfileName), С‚Рѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РїР°СЂР°РјРµС‚СЂС‹ РЅРµ РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ }
     procedure SetConnectionParams(AServerName: string; APort: Integer; ADataBase: string;
       AUserName: string; APassword: string; ACharSet: string); virtual; abstract;
 
-    { Начало работы с объектом (вызывать - при массовом чтении / записи) }
+    { РќР°С‡Р°Р»Рѕ СЂР°Р±РѕС‚С‹ СЃ РѕР±СЉРµРєС‚РѕРј (РІС‹Р·С‹РІР°С‚СЊ - РїСЂРё РјР°СЃСЃРѕРІРѕРј С‡С‚РµРЅРёРё / Р·Р°РїРёСЃРё) }
     procedure BeginWork; virtual; abstract;
 
-    { Окончание работы с объектом }
+    { РћРєРѕРЅС‡Р°РЅРёРµ СЂР°Р±РѕС‚С‹ СЃ РѕР±СЉРµРєС‚РѕРј }
     procedure EndWork; virtual; abstract;
 
-    { Позволяет указать имя пользователя (по умолчанию берется имя текущего пользователя Windows) }
+    { РџРѕР·РІРѕР»СЏРµС‚ СѓРєР°Р·Р°С‚СЊ РёРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ Р±РµСЂРµС‚СЃСЏ РёРјСЏ С‚РµРєСѓС‰РµРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ Windows) }
     property UserName: string read GetUserName write SetUserName;
 
-    { Позволяет указать имя компьютера (по умолчанию берется имя текущего компьютера) }
+    { РџРѕР·РІРѕР»СЏРµС‚ СѓРєР°Р·Р°С‚СЊ РёРјСЏ РєРѕРјРїСЊСЋС‚РµСЂР° (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ Р±РµСЂРµС‚СЃСЏ РёРјСЏ С‚РµРєСѓС‰РµРіРѕ РєРѕРјРїСЊСЋС‚РµСЂР°) }
     property ComputerName: string read GetComputerName write SetComputerName;
 
-    { Позволяет указать имя профиля из пула подключений (по умолчанию берется FBDefDB) }
+    { РџРѕР·РІРѕР»СЏРµС‚ СѓРєР°Р·Р°С‚СЊ РёРјСЏ РїСЂРѕС„РёР»СЏ РёР· РїСѓР»Р° РїРѕРґРєР»СЋС‡РµРЅРёР№ (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ Р±РµСЂРµС‚СЃСЏ FBDefDB) }
     property PoolProfileName: string read GetPoolProfileName write SetPoolProfileName;
   end;
 
-  { Вспомогательный класс для создания объектов TFBIniFile. Допольнительно содержит
-    глобальную переменную DefIni }
+  { Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Р№ РєР»Р°СЃСЃ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ РѕР±СЉРµРєС‚РѕРІ TFBIniFile. Р”РѕРїРѕР»СЊРЅРёС‚РµР»СЊРЅРѕ СЃРѕРґРµСЂР¶РёС‚
+    РіР»РѕР±Р°Р»СЊРЅСѓСЋ РїРµСЂРµРјРµРЅРЅСѓСЋ DefIni }
   TfbIniCreator = class(TObject)
   private
     FDefIni: TFBIniFile;
   public
-    {Глобальная переменная. Перед ее использованием необходимо вызвать процедуру CreateDefIni}
+    {Р“Р»РѕР±Р°Р»СЊРЅР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ. РџРµСЂРµРґ РµРµ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµРј РЅРµРѕР±С…РѕРґРёРјРѕ РІС‹Р·РІР°С‚СЊ РїСЂРѕС†РµРґСѓСЂСѓ CreateDefIni}
     property DefIni: TFBIniFile read FDefIni;
 
-    {Создает объект TFBIniFile и возвращает ссылку на него.
-     Внимание! Если Вы создали объект с помощью CreateIni, то должны самостоятельно
-     его уничтожить (с помощью FreeIni)}
+    {РЎРѕР·РґР°РµС‚ РѕР±СЉРµРєС‚ TFBIniFile Рё РІРѕР·РІСЂР°С‰Р°РµС‚ СЃСЃС‹Р»РєСѓ РЅР° РЅРµРіРѕ.
+     Р’РЅРёРјР°РЅРёРµ! Р•СЃР»Рё Р’С‹ СЃРѕР·РґР°Р»Рё РѕР±СЉРµРєС‚ СЃ РїРѕРјРѕС‰СЊСЋ CreateIni, С‚Рѕ РґРѕР»Р¶РЅС‹ СЃР°РјРѕСЃС‚РѕСЏС‚РµР»СЊРЅРѕ
+     РµРіРѕ СѓРЅРёС‡С‚РѕР¶РёС‚СЊ (СЃ РїРѕРјРѕС‰СЊСЋ FreeIni)}
     function CreateIni(AFileName: string = FBIniDefFileName; PoolProfileName: string = FBDefDB; AlwaysConnected: Boolean = False): TFBIniFile; overload;
 
-    {Создает объект TFBIniFile. Следует указать параметры подключения к БД}
+    {РЎРѕР·РґР°РµС‚ РѕР±СЉРµРєС‚ TFBIniFile. РЎР»РµРґСѓРµС‚ СѓРєР°Р·Р°С‚СЊ РїР°СЂР°РјРµС‚СЂС‹ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р‘Р”}
     function CreateIni(AServerName: string; APort: Integer; ADataBase: string; AUserName: string; APassword: string;
       ACharSet: string; AFileName: string = FBIniDefFileName; AlwaysConnected: Boolean = False): TFBIniFile; overload;
 
-    {Уничтожает заданный объект TFBIniFile}
+    {РЈРЅРёС‡С‚РѕР¶Р°РµС‚ Р·Р°РґР°РЅРЅС‹Р№ РѕР±СЉРµРєС‚ TFBIniFile}
     procedure FreeIni(Ini: TFBIniFile);
 
-    {Создает глобальный объект DefIni}
+    {РЎРѕР·РґР°РµС‚ РіР»РѕР±Р°Р»СЊРЅС‹Р№ РѕР±СЉРµРєС‚ DefIni}
     procedure CreateDefIni(AFileName: string = FBIniDefFileName; PoolProfileName: string = FBDefDB; AlwaysConnected: Boolean = False); overload;
 
-    {Создает глобальный объект DefIni. Следует указать параметры подключения к БД}
+    {РЎРѕР·РґР°РµС‚ РіР»РѕР±Р°Р»СЊРЅС‹Р№ РѕР±СЉРµРєС‚ DefIni. РЎР»РµРґСѓРµС‚ СѓРєР°Р·Р°С‚СЊ РїР°СЂР°РјРµС‚СЂС‹ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р‘Р”}
     procedure CreateDefIni(AServerName: string; APort: Integer; ADataBase: string; AUserName: string; APassword: string;
       ACharSet: string; AFileName: string = FBIniDefFileName; AlwaysConnected: Boolean = False); overload;
 
-    {Уничтожает объект DefIni}
+    {РЈРЅРёС‡С‚РѕР¶Р°РµС‚ РѕР±СЉРµРєС‚ DefIni}
     procedure FreeDefIni;
 
     destructor Destroy; override;
   end;
 
-  {Абстрактный класс описания структуры таблицы}
+  {РђР±СЃС‚СЂР°РєС‚РЅС‹Р№ РєР»Р°СЃСЃ РѕРїРёСЃР°РЅРёСЏ СЃС‚СЂСѓРєС‚СѓСЂС‹ С‚Р°Р±Р»РёС†С‹}
   TfbTableDesc = class
-  private {Виртуальные функции}
+  private {Р’РёСЂС‚СѓР°Р»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё}
     procedure SetUseModifyDate(Value: TFBTriggerState); virtual; abstract;
     function GetUseModifyDate: TFBTriggerState; virtual; abstract;
-  public {Виртуальные функции}
+  public {Р’РёСЂС‚СѓР°Р»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё}
 
-    { Добавить описание поля базы данных }
+    { Р”РѕР±Р°РІРёС‚СЊ РѕРїРёСЃР°РЅРёРµ РїРѕР»СЏ Р±Р°Р·С‹ РґР°РЅРЅС‹С… }
     procedure AddField(AName, AType, ADefault: string; NotNull: TFBNotNull); virtual; abstract;
 
-    { Устанавливает первичный ключ таблицы }
+    { РЈСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ РїРµСЂРІРёС‡РЅС‹Р№ РєР»СЋС‡ С‚Р°Р±Р»РёС†С‹ }
     procedure SetPrimaryKey(AName, ConstraintFields: string); virtual; abstract;
 
-    { Добавить индекс}
+    { Р”РѕР±Р°РІРёС‚СЊ РёРЅРґРµРєСЃ}
     procedure AddIndex(AName: string; IsUnique: Boolean;
       ASorting: TFBSorting; ConstraintFields: string); virtual; abstract;
 
-    { Добавить выражение проверки для таблицы }
+    { Р”РѕР±Р°РІРёС‚СЊ РІС‹СЂР°Р¶РµРЅРёРµ РїСЂРѕРІРµСЂРєРё РґР»СЏ С‚Р°Р±Р»РёС†С‹ }
     procedure AddCheck(AName: string; ACheck: string); virtual; abstract;
 
-    { Добавить триггер. В качестве TriggerName можно задавать пустую строку. В
-      этом случае имя триггера будет сформировано автоматически. В качестве TriggerPos
-      (порядок срабатывания триггера) рекомендуется значение > 0 }
+    { Р”РѕР±Р°РІРёС‚СЊ С‚СЂРёРіРіРµСЂ. Р’ РєР°С‡РµСЃС‚РІРµ TriggerName РјРѕР¶РЅРѕ Р·Р°РґР°РІР°С‚СЊ РїСѓСЃС‚СѓСЋ СЃС‚СЂРѕРєСѓ. Р’
+      СЌС‚РѕРј СЃР»СѓС‡Р°Рµ РёРјСЏ С‚СЂРёРіРіРµСЂР° Р±СѓРґРµС‚ СЃС„РѕСЂРјРёСЂРѕРІР°РЅРѕ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё. Р’ РєР°С‡РµСЃС‚РІРµ TriggerPos
+      (РїРѕСЂСЏРґРѕРє СЃСЂР°Р±Р°С‚С‹РІР°РЅРёСЏ С‚СЂРёРіРіРµСЂР°) СЂРµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ Р·РЅР°С‡РµРЅРёРµ > 0 }
     procedure AddTrigger(TriggerEventTime: TFBTriggerEventTime; TriggerEvents: TFBTriggerEvents;
       TriggerPos: Integer; TriggerState: TFBTriggerState; TriggerName: string;
       TriggerVarDesc, TriggerBody: string); virtual; abstract;
 
-    { Добавляет триггер для автоинкремента }
+    { Р”РѕР±Р°РІР»СЏРµС‚ С‚СЂРёРіРіРµСЂ РґР»СЏ Р°РІС‚РѕРёРЅРєСЂРµРјРµРЅС‚Р° }
     procedure AddAutoIncTrigger(ATriggerName, AFieldName, AGenName: string; CreateGenerator: Boolean); virtual; abstract;
 
-    { Определяет, следует ли использовать MODIFYDATE }
+    { РћРїСЂРµРґРµР»СЏРµС‚, СЃР»РµРґСѓРµС‚ Р»Рё РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ MODIFYDATE }
     property UseModifyDateTrigger: TFBTriggerState read GetUseModifyDate write SetUseModifyDate;
   end;
 
-  {Абстрактный класс описания структуры базы данных}
+  {РђР±СЃС‚СЂР°РєС‚РЅС‹Р№ РєР»Р°СЃСЃ РѕРїРёСЃР°РЅРёСЏ СЃС‚СЂСѓРєС‚СѓСЂС‹ Р±Р°Р·С‹ РґР°РЅРЅС‹С…}
   TfbDataBaseDesc = class
-  public {Виртуальные функции}
-    { Номер версии }
+  public {Р’РёСЂС‚СѓР°Р»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё}
+    { РќРѕРјРµСЂ РІРµСЂСЃРёРё }
     function GetVersion: Integer; virtual; abstract;
 
-    { Добавляет описание домена }
+    { Р”РѕР±Р°РІР»СЏРµС‚ РѕРїРёСЃР°РЅРёРµ РґРѕРјРµРЅР° }
     procedure AddDomain(AName, AType, ADefault: string; NotNull: TFBNotNull; ACheck: string); virtual; abstract;
 
-    { Добавляет описание таблицы }
+    { Р”РѕР±Р°РІР»СЏРµС‚ РѕРїРёСЃР°РЅРёРµ С‚Р°Р±Р»РёС†С‹ }
     function AddTable(TableName: string): TfbTableDesc; virtual; abstract;
 
-    { Добавляет внешний ключ }
+    { Р”РѕР±Р°РІР»СЏРµС‚ РІРЅРµС€РЅРёР№ РєР»СЋС‡ }
     procedure AddForeignKey(AName, TableName, ConstraintFields,
       RefTableName, RefConstraintFields: string); virtual; abstract;
 
-    { Добавляет счетчик генератора }
+    { Р”РѕР±Р°РІР»СЏРµС‚ СЃС‡РµС‚С‡РёРє РіРµРЅРµСЂР°С‚РѕСЂР° }
     procedure AddGenerator(AName: string; StartValue: Int64); virtual; abstract;
 
-    { Добавляет хранимую процедуру }
+    { Р”РѕР±Р°РІР»СЏРµС‚ С…СЂР°РЅРёРјСѓСЋ РїСЂРѕС†РµРґСѓСЂСѓ }
     procedure AddProcedure(AName, InFieldsDesc, OutFieldsDesc, VarDesc, Body: string); virtual; abstract;
 
-    { Добавляет объект исключения "ERR" }
+    { Р”РѕР±Р°РІР»СЏРµС‚ РѕР±СЉРµРєС‚ РёСЃРєР»СЋС‡РµРЅРёСЏ "ERR" }
     procedure AddDefaultException; virtual; abstract;
   end;
 
@@ -470,28 +475,28 @@ type
     constructor Create;
     destructor Destroy; override;
   public
-    {Описание структуры БД по умолчанию (данная переменная нужна лишь для удобства
-     программиста: Вам не потребуется объявлять собственную переменную для тех же целей)}
+    {РћРїРёСЃР°РЅРёРµ СЃС‚СЂСѓРєС‚СѓСЂС‹ Р‘Р” РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ (РґР°РЅРЅР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ РЅСѓР¶РЅР° Р»РёС€СЊ РґР»СЏ СѓРґРѕР±СЃС‚РІР°
+     РїСЂРѕРіСЂР°РјРјРёСЃС‚Р°: Р’Р°Рј РЅРµ РїРѕС‚СЂРµР±СѓРµС‚СЃСЏ РѕР±СЉСЏРІР»СЏС‚СЊ СЃРѕР±СЃС‚РІРµРЅРЅСѓСЋ РїРµСЂРµРјРµРЅРЅСѓСЋ РґР»СЏ С‚РµС… Р¶Рµ С†РµР»РµР№)}
     property DefDBDesc: TfbDataBaseDesc read FDefDBDesc;
 
-    {Создает объект TfbDataBaseDesc (описание структуры базы данных)}
+    {РЎРѕР·РґР°РµС‚ РѕР±СЉРµРєС‚ TfbDataBaseDesc (РѕРїРёСЃР°РЅРёРµ СЃС‚СЂСѓРєС‚СѓСЂС‹ Р±Р°Р·С‹ РґР°РЅРЅС‹С…)}
     function CreateDataBaseDesc: TfbDataBaseDesc;
 
-    {Уничтожает объект TfbDataBaseDesc}
+    {РЈРЅРёС‡С‚РѕР¶Р°РµС‚ РѕР±СЉРµРєС‚ TfbDataBaseDesc}
     procedure FreeDataBaseDesc(dbDesc: TfbDataBaseDesc);
 
-    {Создает объект DefDBDesc}
+    {РЎРѕР·РґР°РµС‚ РѕР±СЉРµРєС‚ DefDBDesc}
     procedure ReCreateDefDataBaseDesc;
 
-    {Уничтожает объект DefDBDesc}
+    {РЈРЅРёС‡С‚РѕР¶Р°РµС‚ РѕР±СЉРµРєС‚ DefDBDesc}
     procedure FreeDefDataBaseDesc;
 
-    {Осуществляет проверку и необходимую коррекцию структуры базы данных}
+    {РћСЃСѓС‰РµСЃС‚РІР»СЏРµС‚ РїСЂРѕРІРµСЂРєСѓ Рё РЅРµРѕР±С…РѕРґРёРјСѓСЋ РєРѕСЂСЂРµРєС†РёСЋ СЃС‚СЂСѓРєС‚СѓСЂС‹ Р±Р°Р·С‹ РґР°РЅРЅС‹С…}
     procedure CheckDataBaseStruct(fbDataBaseDesc: TfbDataBaseDesc; AServerName: string;
       APort: Integer; ADataBase: string; AUserName: string; APassword: string;
       ACharSet: string; LogProc: TFBLogEventsProc);
 
-    {Осуществляет проверку и необходимую коррекцию структуры базы данных для DefDBDesc}
+    {РћСЃСѓС‰РµСЃС‚РІР»СЏРµС‚ РїСЂРѕРІРµСЂРєСѓ Рё РЅРµРѕР±С…РѕРґРёРјСѓСЋ РєРѕСЂСЂРµРєС†РёСЋ СЃС‚СЂСѓРєС‚СѓСЂС‹ Р±Р°Р·С‹ РґР°РЅРЅС‹С… РґР»СЏ DefDBDesc}
     procedure CheckDefDataBaseStruct(AServerName: string;
       APort: Integer; ADataBase: string; AUserName: string; APassword: string;
       ACharSet: string; LogProc: TFBLogEventsProc);
@@ -513,167 +518,186 @@ type
     procedure SetUserName(const Value: string);
     function GetPassword: string;
     procedure SetPassword(const Value: string);
+    function GetCodePage: string;
+    procedure SetCodePage(const CodePage: string);
+    procedure SetPort(APort: Integer);
+    function GetPort: Integer;
     procedure InitFBUtils;
     function SplitFieldNamesValuesArray(FieldNamesValues: array of Variant; const ErrPrefix: string): TfbFieldsNamesValuesRec;
   public
     constructor Create;
     destructor Destroy; override;
   public
-    {Пул подключений}
+    {РџСѓР» РїРѕРґРєР»СЋС‡РµРЅРёР№}
     property Pool: TfbPool read FPool;
 
-    {Резервирование / восстановление}
+    {Р РµР·РµСЂРІРёСЂРѕРІР°РЅРёРµ / РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ}
     property br: TfbBackupRestore read FBackupRestore;
 
-    {Работа с Ini-файлом}
+    {Р Р°Р±РѕС‚Р° СЃ Ini-С„Р°Р№Р»РѕРј}
     property Ini: TfbIniCreator read FIni;
 
-    {Коррекция структуры базы даных (изменение метаинформации)}
+    {РљРѕСЂСЂРµРєС†РёСЏ СЃС‚СЂСѓРєС‚СѓСЂС‹ Р±Р°Р·С‹ РґР°РЅС‹С… (РёР·РјРµРЅРµРЅРёРµ РјРµС‚Р°РёРЅС„РѕСЂРјР°С†РёРё)}
     property DBStruct: TfbDBStructCreator read FDBStruct;
 
-    {Имя пользователя для подключения к базе данных}
+    {РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РґР»СЏ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р±Р°Р·Рµ РґР°РЅРЅС‹С…}
     property UserName: string read GetUserName write SetUserName;
 
-    {Пароль пользователя для подключения к базе данных}
+    {РџР°СЂРѕР»СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РґР»СЏ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р±Р°Р·Рµ РґР°РЅРЅС‹С…}
     property Password: string read GetPassword write SetPassword;
 
-    {Создает объект подключения к базе данных.
-     Внимание! Не уничтожайте объект методом TIBDataBase.Free. Используйте fb.FreeConnection()}
+    {РљРѕРґРѕРІР°СЏ СЃС‚СЂР°РЅРёС†Р° (РѕР±С‹С‡РЅРѕ РѕРґРЅР° Рё С‚Р° Р¶Рµ РґР»СЏ РІСЃРµС… Р±Р°Р· РґР°РЅРЅС‹С…}
+    property CodePage: string read GetCodePage write SetCodePage;
+
+    {TCP-РїРѕСЂС‚ Firebird}
+    property Port: Integer read GetPort write SetPort;
+
+    {РЎРѕР·РґР°РµС‚ РѕР±СЉРµРєС‚ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р±Р°Р·Рµ РґР°РЅРЅС‹С….
+     Р’РЅРёРјР°РЅРёРµ! РќРµ СѓРЅРёС‡С‚РѕР¶Р°Р№С‚Рµ РѕР±СЉРµРєС‚ РјРµС‚РѕРґРѕРј TIBDataBase.Free. РСЃРїРѕР»СЊР·СѓР№С‚Рµ fb.FreeConnection()}
     function CreateConnection(AServerName: string; APort: Integer; ADataBase: string;
       AUserName, APassword, ACodePage: string; TranType: TTransactionType = trDef;
       DoOpen: Boolean = True; AOwner: TComponent = nil): TIBDataBase;
 
-    {Подключение к базе данных}
+    {РџРѕРґРєР»СЋС‡РµРЅРёРµ Рє Р±Р°Р·Рµ РґР°РЅРЅС‹С…}
     procedure ConnectDB(FDB: TIBDatabase);
 
-    {Отключение от базы данных}
+    {РћС‚РєР»СЋС‡РµРЅРёРµ РѕС‚ Р±Р°Р·С‹ РґР°РЅРЅС‹С…}
     procedure DisconnectDB(FDB: TIBDatabase);
 
-    {Удаление объекта подключения}
+    {РЈРґР°Р»РµРЅРёРµ РѕР±СЉРµРєС‚Р° РїРѕРґРєР»СЋС‡РµРЅРёСЏ}
     procedure FreeConnection(FDB: TIBDatabase);
 
-    {Создает тразакцию в соответствии с заданным TranType }
+    {РЎРѕР·РґР°РµС‚ С‚СЂР°Р·Р°РєС†РёСЋ РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРё СЃ Р·Р°РґР°РЅРЅС‹Рј TranType }
     function CreateTransaction(FDB: TIBDataBase; TranType: TTransactionType = trDef;
       AutoStart: Boolean = True; AOwner: TComponent = nil): TIBTransaction;
 
-    {Создает набор данных TIBDataSet}
+    {РЎРѕР·РґР°РµС‚ РЅР°Р±РѕСЂ РґР°РЅРЅС‹С… TIBDataSet}
     function CreateDataSet(FDB: TIBDatabase; FTran: TIBTransaction; TranAutoStart: Boolean = True;
       AOwner: TComponent = nil): TIBDataSet;
 
-    {Создает набор данных TIBDataSet и автоматически выполняет SELECT-запрос}
+    {РЎРѕР·РґР°РµС‚ РЅР°Р±РѕСЂ РґР°РЅРЅС‹С… TIBDataSet Рё Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РІС‹РїРѕР»РЅСЏРµС‚ SELECT-Р·Р°РїСЂРѕСЃ}
     function CreateAndOpenDataSet(FDB: TIBDatabase; FTran: TIBTransaction; SQL: string;
       ParamNames: array of string; ParamValues: array of Variant;
       AOwner: TComponent = nil): TIBDataSet;
 
-    {Возвращает набор данных TIBDataSet по SQL-запросу. Если объект TIBDataSet не был создан,
-     то создаёт его. Объекты TIBDataSet будут уничтожены автоматически при удалении транзакции, т.е.
-     удалять объект TIBDataSet не обязательно! }
+    {Р’РѕР·РІСЂР°С‰Р°РµС‚ РЅР°Р±РѕСЂ РґР°РЅРЅС‹С… TIBDataSet РїРѕ SQL-Р·Р°РїСЂРѕСЃСѓ. Р•СЃР»Рё РѕР±СЉРµРєС‚ TIBDataSet РЅРµ Р±С‹Р» СЃРѕР·РґР°РЅ,
+     С‚Рѕ СЃРѕР·РґР°С‘С‚ РµРіРѕ. РћР±СЉРµРєС‚С‹ TIBDataSet Р±СѓРґСѓС‚ СѓРЅРёС‡С‚РѕР¶РµРЅС‹ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РїСЂРё СѓРґР°Р»РµРЅРёРё С‚СЂР°РЅР·Р°РєС†РёРё, С‚.Рµ.
+     СѓРґР°Р»СЏС‚СЊ РѕР±СЉРµРєС‚ TIBDataSet РЅРµ РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ! }
     function GetDataSet(FDB: TIBDatabase; FTran: TIBTransaction; SQL: string): TIBDataSet;
 
-    {Возвращает набор данных TIBDataSet по SQL-запросу и автоматически выполняет SELECT-запрос}
+    {Р’РѕР·РІСЂР°С‰Р°РµС‚ РЅР°Р±РѕСЂ РґР°РЅРЅС‹С… TIBDataSet РїРѕ SQL-Р·Р°РїСЂРѕСЃСѓ Рё Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РІС‹РїРѕР»РЅСЏРµС‚ SELECT-Р·Р°РїСЂРѕСЃ}
     function GetAndOpenDataSet(FDB: TIBDatabase; FTran: TIBTransaction; SQL: string;
       ParamNames: array of string; ParamValues: array of Variant): TIBDataSet;
 
-    {Создает набор данных TIBDataSet и выполняет SELECT-запрос к одной таблице}
+    {РЎРѕР·РґР°РµС‚ РЅР°Р±РѕСЂ РґР°РЅРЅС‹С… TIBDataSet Рё РІС‹РїРѕР»РЅСЏРµС‚ SELECT-Р·Р°РїСЂРѕСЃ Рє РѕРґРЅРѕР№ С‚Р°Р±Р»РёС†Рµ}
     function CreateAndOpenTable(FDB: TIBDatabase; FTran: TIBTransaction;
       ATable, AFilter, AOrder: string;
       ParamNames: array of string; ParamValues: array of Variant;
       AOwner: TComponent = nil): TIBDataSet;
 
-    {Выполняет указанный SQL-запрос}
+    {Р’С‹РїРѕР»РЅСЏРµС‚ СѓРєР°Р·Р°РЅРЅС‹Р№ SQL-Р·Р°РїСЂРѕСЃ}
     procedure ExecQuery(FDB: TIBDatabase; FTran: TIBTransaction; SQL: string;
       ParamNames: array of string; ParamValues: array of Variant);
 
-    { Возвращает массив значений заданных полей указанной таблицы для первой найденной записи }
+    { Р’РѕР·РІСЂР°С‰Р°РµС‚ РјР°СЃСЃРёРІ Р·РЅР°С‡РµРЅРёР№ Р·Р°РґР°РЅРЅС‹С… РїРѕР»РµР№ СѓРєР°Р·Р°РЅРЅРѕР№ С‚Р°Р±Р»РёС†С‹ РґР»СЏ РїРµСЂРІРѕР№ РЅР°Р№РґРµРЅРЅРѕР№ Р·Р°РїРёСЃРё }
     function GetTableFieldValues(FDB: TIBDatabase; FTran: TIBTransaction; TableName: string; FieldNames: array of string;
-    KeyFields: array of string; KeyValues: array of Variant; DefValues: array of Variant): OleVariant;
+      KeyFields: array of string; KeyValues: array of Variant; DefValues: array of Variant): OleVariant;
 
-    { Возвращает значение заданного поля указанной таблицы для первой найденной записи}
+    { Р’РѕР·РІСЂР°С‰Р°РµС‚ (РІ С„РѕСЂРјР°С‚Рµ TParamsRec) РјР°СЃСЃРёРІ Р·РЅР°С‡РµРЅРёР№ Р·Р°РґР°РЅРЅС‹С… РїРѕР»РµР№ СѓРєР°Р·Р°РЅРЅРѕР№ С‚Р°Р±Р»РёС†С‹ РґР»СЏ РїРµСЂРІРѕР№ РЅР°Р№РґРµРЅРЅРѕР№ Р·Р°РїРёСЃРё.
+      Р’РќРРњРђРќРР•! РќРµ РїС‹С‚Р°Р№С‚РµСЃСЊ РїРѕР»СѓС‡РёС‚СЊ Р·РЅР°С‡РµРЅРёРµ РїРѕР»СЏ РІ РѕРґРЅРѕРј РІС‹Р·РѕРІРµ СЃ GetTableFieldNamedValues! РќРµРѕР±С…РѕРґРёРјРѕ Р·Р°РІРµСЃС‚Рё
+      РїРµСЂРµРјРµРЅРЅСѓСЋ С‚РёРїР° TParamsRec Рё РІ РЅРµС‘ РїСЂРёСЃРІРѕРёС‚СЊ СЂРµР·СѓР»СЊС‚Р°С‚ С„СѓРЅРєС†РёРё GetTableFieldNamedValues }
+    function GetTableFieldNamedValues(FDB: TIBDatabase; FTran: TIBTransaction; TableName: string; FieldNames: array of string;
+      KeyFields: array of string; KeyValues: array of Variant; DefValues: array of Variant): TParamsRec;
+
+    { Р’РѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ Р·Р°РґР°РЅРЅРѕРіРѕ РїРѕР»СЏ СѓРєР°Р·Р°РЅРЅРѕР№ С‚Р°Р±Р»РёС†С‹ РґР»СЏ РїРµСЂРІРѕР№ РЅР°Р№РґРµРЅРЅРѕР№ Р·Р°РїРёСЃРё}
     function GetTableFieldValue(FDB: TIBDatabase; FTran: TIBTransaction; TableName: string; FieldName: string;
       KeyFields: array of string; KeyValues: array of Variant; DefValue: Variant): OleVariant;
 
-    { Возвращает текущие дату / время на сервере Firebird }
+    { Р’РѕР·РІСЂР°С‰Р°РµС‚ С‚РµРєСѓС‰РёРµ РґР°С‚Сѓ / РІСЂРµРјСЏ РЅР° СЃРµСЂРІРµСЂРµ Firebird }
     function GetCurrentDateTime(FDB: TIBDataBase; FTran: TIBTransaction): TDateTime;
 
-    {Изменение записи в указанной таблице (названия полей чередуются со значениями
-     через запятую, как это сделано в библиотеке SuperObject). Сохранить название
-     процедуры UpdateRecord не удалось, из-за непонятливости компилятора}
+    {РР·РјРµРЅРµРЅРёРµ Р·Р°РїРёСЃРё РІ СѓРєР°Р·Р°РЅРЅРѕР№ С‚Р°Р±Р»РёС†Рµ (РЅР°Р·РІР°РЅРёСЏ РїРѕР»РµР№ С‡РµСЂРµРґСѓСЋС‚СЃСЏ СЃРѕ Р·РЅР°С‡РµРЅРёСЏРјРё
+     С‡РµСЂРµР· Р·Р°РїСЏС‚СѓСЋ, РєР°Рє СЌС‚Рѕ СЃРґРµР»Р°РЅРѕ РІ Р±РёР±Р»РёРѕС‚РµРєРµ SuperObject). РЎРѕС…СЂР°РЅРёС‚СЊ РЅР°Р·РІР°РЅРёРµ
+     РїСЂРѕС†РµРґСѓСЂС‹ UpdateRecord РЅРµ СѓРґР°Р»РѕСЃСЊ, РёР·-Р·Р° РЅРµРїРѕРЅСЏС‚Р»РёРІРѕСЃС‚Рё РєРѕРјРїРёР»СЏС‚РѕСЂР°}
     procedure UpdateRecordDB(FDB: TIBDataBase; FTran: TIBTransaction;
       TableName: string; KeyNamesValues: array of Variant;
       FieldNamesValues: array of Variant);
 
-    {Изменение записи в указанной таблице}
+    {РР·РјРµРЅРµРЅРёРµ Р·Р°РїРёСЃРё РІ СѓРєР°Р·Р°РЅРЅРѕР№ С‚Р°Р±Р»РёС†Рµ}
     procedure UpdateRecord(FDB: TIBDataBase; FTran: TIBTransaction;
       TableName: string; KeyFields: array of string; KeyValues: array of Variant;
       FieldNames: array of string; AFieldValues: array of Variant);
 
-    {Добавление записи в указанную таблицу}
+    {Р”РѕР±Р°РІР»РµРЅРёРµ Р·Р°РїРёСЃРё РІ СѓРєР°Р·Р°РЅРЅСѓСЋ С‚Р°Р±Р»РёС†Сѓ}
     procedure InsertRecord(FDB: TIBDataBase; FTran: TIBTransaction;
       TableName: string; FieldNames: array of string; AFieldValues: array of Variant);
 
-    {Добавление записи в указанную таблицу (более читабельная версия)}
+    {Р”РѕР±Р°РІР»РµРЅРёРµ Р·Р°РїРёСЃРё РІ СѓРєР°Р·Р°РЅРЅСѓСЋ С‚Р°Р±Р»РёС†Сѓ (Р±РѕР»РµРµ С‡РёС‚Р°Р±РµР»СЊРЅР°СЏ РІРµСЂСЃРёСЏ)}
     procedure InsertRecordDB(FDB: TIBDataBase; FTran: TIBTransaction;
       TableName: string; FieldNamesValues: array of Variant);
 
-    {Удаление записи из указанной таблицу}
+    {РЈРґР°Р»РµРЅРёРµ Р·Р°РїРёСЃРё РёР· СѓРєР°Р·Р°РЅРЅРѕР№ С‚Р°Р±Р»РёС†Сѓ}
     procedure DeleteRecord(FDB: TIBDataBase; FTran: TIBTransaction;
       TableName: string; KeyFields: array of string; KeyValues: array of Variant);
 
-    {Удаление записи из указанной таблицу (более читабельная версия)}
+    {РЈРґР°Р»РµРЅРёРµ Р·Р°РїРёСЃРё РёР· СѓРєР°Р·Р°РЅРЅРѕР№ С‚Р°Р±Р»РёС†Сѓ (Р±РѕР»РµРµ С‡РёС‚Р°Р±РµР»СЊРЅР°СЏ РІРµСЂСЃРёСЏ)}
     procedure DeleteRecordDB(FDB: TIBDataBase; FTran: TIBTransaction;
       TableName: string; KeyNamesValues: array of Variant);
 
-    {Обновляет или добавляет запись в указанную таблицу}
+    {РћР±РЅРѕРІР»СЏРµС‚ РёР»Рё РґРѕР±Р°РІР»СЏРµС‚ Р·Р°РїРёСЃСЊ РІ СѓРєР°Р·Р°РЅРЅСѓСЋ С‚Р°Р±Р»РёС†Сѓ}
     procedure UpdateOrInsertRecord(FDB: TIBDataBase; FTran: TIBTransaction;
       TableName: string; FieldNames: array of string; AFieldValues: array of Variant;
       KeyFields: array of string);
 
-    {Пересчет индексной статистики (используется EXECUTE BLOCK)}
+    {РџРµСЂРµСЃС‡РµС‚ РёРЅРґРµРєСЃРЅРѕР№ СЃС‚Р°С‚РёСЃС‚РёРєРё (РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ EXECUTE BLOCK)}
     procedure RecomputeIndexStatistics(FDB: TIBDatabase);
 
-    {Увеличивает значение генератора GeneratorName на IncValue и возвращает полученное значение.
-     Вариант без указания транзакции для записи}
+    {РЈРІРµР»РёС‡РёРІР°РµС‚ Р·РЅР°С‡РµРЅРёРµ РіРµРЅРµСЂР°С‚РѕСЂР° GeneratorName РЅР° IncValue Рё РІРѕР·РІСЂР°С‰Р°РµС‚ РїРѕР»СѓС‡РµРЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ.
+     Р’Р°СЂРёР°РЅС‚ Р±РµР· СѓРєР°Р·Р°РЅРёСЏ С‚СЂР°РЅР·Р°РєС†РёРё РґР»СЏ Р·Р°РїРёСЃРё}
     function GenID(FDB: TIBDatabase; GeneratorName: string; IncValue: Integer = 1): Int64; overload;
 
-    {Вариант с указанием транзакции для записи}
+    {Р’Р°СЂРёР°РЅС‚ СЃ СѓРєР°Р·Р°РЅРёРµРј С‚СЂР°РЅР·Р°РєС†РёРё РґР»СЏ Р·Р°РїРёСЃРё}
     function GenID(FDB: TIBDatabase; TranW: TIBTransaction; GeneratorName: string; IncValue: Integer = 1): Int64; overload;
 
-    {Выполняет команду EXECUTE BLOCK и возвращает набор данных с полями OutFieldsDesc}
+    {Р’С‹РїРѕР»РЅСЏРµС‚ РєРѕРјР°РЅРґСѓ EXECUTE BLOCK Рё РІРѕР·РІСЂР°С‰Р°РµС‚ РЅР°Р±РѕСЂ РґР°РЅРЅС‹С… СЃ РїРѕР»СЏРјРё OutFieldsDesc}
     function ExecuteBlock(FDB: TIBDataBase; FTran: TIBTransaction; OutFieldsDesc,
       VarDesc, Body: string): TIBDataSet; overload;
 
-    {Аналогично function ExecuteBlock, но не возвращает никакого результата}
+    {РђРЅР°Р»РѕРіРёС‡РЅРѕ function ExecuteBlock, РЅРѕ РЅРµ РІРѕР·РІСЂР°С‰Р°РµС‚ РЅРёРєР°РєРѕРіРѕ СЂРµР·СѓР»СЊС‚Р°С‚Р°}
     procedure ExecuteBlock(FDB: TIBDataBase; FTran: TIBTransaction;
       VarDesc, Body: string); overload;
 
-    {Производит очистку таблицы ATableName (для сборки мусора следует указать FTran=NIL)}
+    {РџСЂРѕРёР·РІРѕРґРёС‚ РѕС‡РёСЃС‚РєСѓ С‚Р°Р±Р»РёС†С‹ ATableName (РґР»СЏ СЃР±РѕСЂРєРё РјСѓСЃРѕСЂР° СЃР»РµРґСѓРµС‚ СѓРєР°Р·Р°С‚СЊ FTran=NIL)}
     procedure ClearTable(FDB: TIBDataBase; FTran: TIBTransaction; ATableName: string; AWhere: string = '';
       GarbageCollection: Boolean = True);
 
-    {Возвращает версию библиотеки. Эту информацию имеет смысл использовать только
-     если загружена библиотека FBUTILS.DLL. Для целей совместимости}
+    {Р’РѕР·РІСЂР°С‰Р°РµС‚ РІРµСЂСЃРёСЋ Р±РёР±Р»РёРѕС‚РµРєРё. Р­С‚Сѓ РёРЅС„РѕСЂРјР°С†РёСЋ РёРјРµРµС‚ СЃРјС‹СЃР» РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ
+     РµСЃР»Рё Р·Р°РіСЂСѓР¶РµРЅР° Р±РёР±Р»РёРѕС‚РµРєР° FBUTILS.DLL. Р”Р»СЏ С†РµР»РµР№ СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё}
     function GetUtilsVersion: Integer;
 
-  public {Некоторые дополнительные функции}
+    {Р’РѕР·РІСЂР°С‰Р°РµС‚ РґРµСЃРєСЂРёРїС‚РѕСЂ Р·Р°РіСЂСѓР¶РµРЅРЅРѕР№ Р±РёР±Р»РёРѕС‚РµРєРё FBUTILS.DLL. Р•СЃР»Рё РѕРЅР° РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ
+     РёР»Рё РЅРµ Р·Р°РіСЂСѓР¶РµРЅР°, С‚Рѕ РІРѕР·РІСЂР°С‰Р°РµС‚ 0 }
+    function GetLibHandle: THandle;
 
-    {Преобразует дату/время в строку в формате "yyyy-mm-dd hh:nn:ss.zzz"}
+    procedure WriteToLog(AMessage: string; MsgType: Integer = 0);
+  public {РќРµРєРѕС‚РѕСЂС‹Рµ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё}
+
+    {РџСЂРµРѕР±СЂР°Р·СѓРµС‚ РґР°С‚Сѓ/РІСЂРµРјСЏ РІ СЃС‚СЂРѕРєСѓ РІ С„РѕСЂРјР°С‚Рµ "yyyy-mm-dd hh:nn:ss.zzz"}
     function DateTimeToString(Value: TDateTime; UseMilliseconds: Boolean = True): string;
 
-    {Преобразует дату в строку в формате "yyyy-mm-dd"}
+    {РџСЂРµРѕР±СЂР°Р·СѓРµС‚ РґР°С‚Сѓ РІ СЃС‚СЂРѕРєСѓ РІ С„РѕСЂРјР°С‚Рµ "yyyy-mm-dd"}
     function DateToString(Value: TDateTime): string;
 
-    {Преобразует время в строку в формате "hh:nn:ss.zzz"}
+    {РџСЂРµРѕР±СЂР°Р·СѓРµС‚ РІСЂРµРјСЏ РІ СЃС‚СЂРѕРєСѓ РІ С„РѕСЂРјР°С‚Рµ "hh:nn:ss.zzz"}
     function TimeToString(Value: TDateTime): string;
   end;
 
 
 
 var
-  { Глобальная переменная для работы с БД Firebird. Вам не требуется объявлять
-    свои переменные, имеющие тип  TfbUtils.}
+  { Р“Р»РѕР±Р°Р»СЊРЅР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ Р‘Р” Firebird. Р’Р°Рј РЅРµ С‚СЂРµР±СѓРµС‚СЃСЏ РѕР±СЉСЏРІР»СЏС‚СЊ
+    СЃРІРѕРё РїРµСЂРµРјРµРЅРЅС‹Рµ, РёРјРµСЋС‰РёРµ С‚РёРї  TfbUtils.}
   fb: TfbUtils;
-
-
 
 implementation
 
@@ -684,17 +708,17 @@ uses fbUtilsBase, fbUtilsPool, fbUtilsBackupRestore, fbUtilsIniFiles,
 
 {$IFDEF FBUTILSDLL}
 const
-  fbUtilsDLL = 'fbUtils.dll'; // Укажите свое имя DLL (например IBXFBUtils.dll) при необходимости
+  fbUtilsDLL = 'fbUtils.dll'; // РЈРєР°Р¶РёС‚Рµ СЃРІРѕРµ РёРјСЏ DLL (РЅР°РїСЂРёРјРµСЂ IBXFBUtils.dll) РїСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё
 {$ENDIF}
 
 resourcestring
-  FBStrFBUtilsDLLNotFound = 'Модуль "%s" не загружен. ' + sLineBreak + 'В запуске приложения отказано!';
+  FBStrFBUtilsDLLNotFound = 'РњРѕРґСѓР»СЊ "%s" РЅРµ Р·Р°РіСЂСѓР¶РµРЅ. ' + sLineBreak + 'Р’ Р·Р°РїСѓСЃРєРµ РїСЂРёР»РѕР¶РµРЅРёСЏ РѕС‚РєР°Р·Р°РЅРѕ!';
 
-  FBStrFBUTILSDLLOptionNotFoundInDLL = 'Модуль "%s" загружен, однако он скомпилирован без '+
-    'директивы FBUTILSDLL. В запуске приложения отказано!';
+  FBStrFBUTILSDLLOptionNotFoundInDLL = 'РњРѕРґСѓР»СЊ "%s" Р·Р°РіСЂСѓР¶РµРЅ, РѕРґРЅР°РєРѕ РѕРЅ СЃРєРѕРјРїРёР»РёСЂРѕРІР°РЅ Р±РµР· '+
+    'РґРёСЂРµРєС‚РёРІС‹ FBUTILSDLL. Р’ Р·Р°РїСѓСЃРєРµ РїСЂРёР»РѕР¶РµРЅРёСЏ РѕС‚РєР°Р·Р°РЅРѕ!';
 
-  FBStrDifferentPackages = 'Модуль "%s", либо вызывающий модуль скомпилированы без пакета "ibxpress", '+
-    'либо используются разные версии библиотеки IBX. В запуске приложения отказано!';
+  FBStrDifferentPackages = 'РњРѕРґСѓР»СЊ "%s", Р»РёР±Рѕ РІС‹Р·С‹РІР°СЋС‰РёР№ РјРѕРґСѓР»СЊ СЃРєРѕРјРїРёР»РёСЂРѕРІР°РЅС‹ Р±РµР· РїР°РєРµС‚Р° "ibxpress", '+
+    'Р»РёР±Рѕ РёСЃРїРѕР»СЊР·СѓСЋС‚СЃСЏ СЂР°Р·РЅС‹Рµ РІРµСЂСЃРёРё Р±РёР±Р»РёРѕС‚РµРєРё IBX. Р’ Р·Р°РїСѓСЃРєРµ РїСЂРёР»РѕР¶РµРЅРёСЏ РѕС‚РєР°Р·Р°РЅРѕ!';
 var
   {$IFDEF FBUTILSDLL}
   fbUtilsHlib: THandle;
@@ -702,7 +726,7 @@ var
 
   FModuleName: string;
 
-  {Процедуры и функции, реализованные в модуле fbUtilsBase}
+  {РџСЂРѕС†РµРґСѓСЂС‹ Рё С„СѓРЅРєС†РёРё, СЂРµР°Р»РёР·РѕРІР°РЅРЅС‹Рµ РІ РјРѕРґСѓР»Рµ fbUtilsBase}
 
   FBCreateConnection: function(AServerName: string; APort: Integer; ADataBase: string;
       AUserName, APassword, ACodePage: string; TranType: TTransactionType;
@@ -762,6 +786,11 @@ var
   FBGetUserName: function: string;
   FBSetPassword: procedure(APassword: string);
   FBGetPassword: function: string;
+  FBSetCodePage: procedure(CodePage: string);
+  FBGetCodePage: function: string;
+
+  FBSetPort: procedure(APort: Integer);
+  FBGetPort: function: Integer;
 
   FBRecomputeIndexStatistics: procedure(FDB: TIBDatabase; AModuleName: string);
 
@@ -774,6 +803,8 @@ var
   FBExecuteBlockProc: procedure(FDB: TIBDataBase; FTran: TIBTransaction;
     VarDesc, Body: string; AModuleName: string);
 
+  FBWriteToLog: procedure(AMessage: string; MsgType: Integer{TLDSLogType}; AModuleName: string);
+
   FBClearTable: procedure(FDB: TIBDataBase; FTran: TIBTransaction; ATableName, AWhere: string;
     GarbageCollection: Boolean; AModuleName: string);
 
@@ -781,7 +812,7 @@ var
   FBPackagesIsCorrect: function(IBDBClass: TClass): Boolean;
   {$ENDIF}
 
-  {Процедуры и функции, реализованные в модуле fbUtilsPool}
+  {РџСЂРѕС†РµРґСѓСЂС‹ Рё С„СѓРЅРєС†РёРё, СЂРµР°Р»РёР·РѕРІР°РЅРЅС‹Рµ РІ РјРѕРґСѓР»Рµ fbUtilsPool}
 
   FBPoolAddConnectionProfile: procedure(AProfileName: string; AServerName: string; APort: Integer;
    ADataBase: string; AUserName: string; APassword: string; ACharSet: string; AModuleName: string);
@@ -803,7 +834,7 @@ var
 
   FBPoolGetSize: function: Integer;
 
-  {Процедуры и функции, реализованные в модуле fbUtilsBackupRestore}
+  {РџСЂРѕС†РµРґСѓСЂС‹ Рё С„СѓРЅРєС†РёРё, СЂРµР°Р»РёР·РѕРІР°РЅРЅС‹Рµ РІ РјРѕРґСѓР»Рµ fbUtilsBackupRestore}
 
   FBBackupDatabaseOnServer: procedure(AServerName: string; APort: Integer; ADBName, ABackupFile,
     AUser, APassw: string; ABackupOptions: TFBBackupOptions; AProgressProc: TBackupRestoreProgressProc; AModuleName: string);
@@ -820,18 +851,18 @@ var
     ABackupFileOnClient, ABackupFileOnServer: string; TryDeleteBackupFileOnClient, TryDeleteBackupFileOnServer: Boolean; AModuleName: string);
 
 
-  {Процедуры и функции, реализованные в модуле fbUtilsIniFiles}
+  {РџСЂРѕС†РµРґСѓСЂС‹ Рё С„СѓРЅРєС†РёРё, СЂРµР°Р»РёР·РѕРІР°РЅРЅС‹Рµ РІ РјРѕРґСѓР»Рµ fbUtilsIniFiles}
 
   FBCreateIniFile: function(AFileName: string; AlwaysConnected: Boolean): TFBIniFile;
 
   FBFreeIniFile: procedure(Ini: TFBIniFile);
 
-  {Процедуры и функции, реализованные в модуле fbUtilsDBStruct}
+  {РџСЂРѕС†РµРґСѓСЂС‹ Рё С„СѓРЅРєС†РёРё, СЂРµР°Р»РёР·РѕРІР°РЅРЅС‹Рµ РІ РјРѕРґСѓР»Рµ fbUtilsDBStruct}
 
   FBCreateDataBaseDesc: function: TfbDataBaseDesc;
   FBFreeDataBaseDesc: procedure(dbDesc: TfbDataBaseDesc);
 
-  {Процедуры и функции, реализованные в модуле fbUtilsCheckDBStruct}
+  {РџСЂРѕС†РµРґСѓСЂС‹ Рё С„СѓРЅРєС†РёРё, СЂРµР°Р»РёР·РѕРІР°РЅРЅС‹Рµ РІ РјРѕРґСѓР»Рµ fbUtilsCheckDBStruct}
   FBCheckDBStruct: procedure(fbDataBaseDesc: TfbDataBaseDesc; AServerName: string;
     APort: Integer; ADataBase: string; AUserName: string; APassword: string;
     ACharSet: string; LogProc: TFBLogEventsProc; AModuleName: string);
@@ -851,7 +882,7 @@ end;
 
 procedure TfbUtils.InitFBUtils;
 begin
-  { Определяем имя файла двоичного модуля }
+  { РћРїСЂРµРґРµР»СЏРµРј РёРјСЏ С„Р°Р№Р»Р° РґРІРѕРёС‡РЅРѕРіРѕ РјРѕРґСѓР»СЏ }
   FModuleName := ExtractFileName(GetModuleName(HInstance));
 
   {$IFDEF FBUTILSDLL}
@@ -859,24 +890,24 @@ begin
 
   if fbUtilsHlib = 0 then
   begin
-    // Здесь можно добавить сообщение в какой-нибудь лог
+    // Р—РґРµСЃСЊ РјРѕР¶РЅРѕ РґРѕР±Р°РІРёС‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ РІ РєР°РєРѕР№-РЅРёР±СѓРґСЊ Р»РѕРі
     MessageBox(GetActiveWindow, PChar(Format(FBStrFBUtilsDLLNotFound, [fbUtilsDLL])), 'Error!', MB_ICONERROR);
-    ExitProcess(0); // Выходим из приложения
+    ExitProcess(0); // Р’С‹С…РѕРґРёРј РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
   end else
   begin
-    {Загружаем адреса функций, экспортируемых в fbUtilsBase.pas}
+    {Р—Р°РіСЂСѓР¶Р°РµРј Р°РґСЂРµСЃР° С„СѓРЅРєС†РёР№, СЌРєСЃРїРѕСЂС‚РёСЂСѓРµРјС‹С… РІ fbUtilsBase.pas}
     @FBPackagesIsCorrect    := GetProcAddress(fbUtilsHlib, 'ibxFBPackagesIsCorrect');
 
     if not Assigned(FBPackagesIsCorrect) then
     begin
       MessageBox(GetActiveWindow, PChar(Format(FBStrFBUTILSDLLOptionNotFoundInDLL, [fbUtilsDLL])), 'Error!', MB_ICONERROR);
-      ExitProcess(0); // Выходим из приложения
+      ExitProcess(0); // Р’С‹С…РѕРґРёРј РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
     end;
 
     if not FBPackagesIsCorrect(TIBDatabase) then
     begin
       MessageBox(GetActiveWindow, PChar(Format(FBStrDifferentPackages, [fbUtilsDLL])), 'Error!', MB_ICONERROR);
-      ExitProcess(0); // Выходим из приложения
+      ExitProcess(0); // Р’С‹С…РѕРґРёРј РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ
     end;
 
     @FBCreateConnection     := GetProcAddress(fbUtilsHlib, 'ibxFBCreateConnection');
@@ -900,14 +931,19 @@ begin
     @FBGetUserName          := GetProcAddress(fbUtilsHlib, 'ibxFBGetUserName');
     @FBSetPassword          := GetProcAddress(fbUtilsHlib, 'ibxFBSetPassword');
     @FBGetPassword          := GetProcAddress(fbUtilsHlib, 'ibxFBGetPassword');
+    @FBSetCodePage          := GetProcAddress(fbUtilsHlib, 'ibxFBCodePage');
+    @FBGetCodePage          := GetProcAddress(fbUtilsHlib, 'ibxFBCodePage');
+    @FBSetPort              := GetProcAddress(fbUtilsHlib, 'ibxFBSetPort');
+    @FBGetPort              := GetProcAddress(fbUtilsHlib, 'ibxFBGetPort');
     @FBRecomputeIndexStatistics := GetProcAddress(fbUtilsHlib, 'ibxFBRecomputeIndexStatistics');
     @FBGenID                := GetProcAddress(fbUtilsHlib, 'ibxFBGenID');
     @FBGenIDEx              := GetProcAddress(fbUtilsHlib, 'ibxFBGenIDEx');
     @FBExecuteBlockFunc     := GetProcAddress(fbUtilsHlib, 'ibxFBExecuteBlockFunc');
     @FBExecuteBlockProc     := GetProcAddress(fbUtilsHlib, 'ibxFBExecuteBlockProc');
+    @FBWriteToLog           := GetProcAddress(fbUtilsHlib, 'ibxFBWriteToLog');
     @FBClearTable           := GetProcAddress(fbUtilsHlib, 'ibxFBClearTable');
 
-    {Загружаем адреса функций, экспортируемых в fbUtilsPool.pas}
+    {Р—Р°РіСЂСѓР¶Р°РµРј Р°РґСЂРµСЃР° С„СѓРЅРєС†РёР№, СЌРєСЃРїРѕСЂС‚РёСЂСѓРµРјС‹С… РІ fbUtilsPool.pas}
     @FBPoolAddConnectionProfile         := GetProcAddress(fbUtilsHlib, 'ibxFBPoolAddConnectionProfile');
     @FBPoolAddDefaultConnectionProfile  := GetProcAddress(fbUtilsHlib, 'ibxFBPoolAddDefaultConnectionProfile');
     @FBPoolGetConnectionByProfile       := GetProcAddress(fbUtilsHlib, 'ibxFBPoolGetConnectionByProfile');
@@ -916,26 +952,26 @@ begin
     @FBPoolReturnConnection             := GetProcAddress(fbUtilsHlib, 'ibxFBPoolReturnConnection');
     @FBPoolGetSize                      := GetProcAddress(fbUtilsHlib, 'ibxFBPoolGetSize');
 
-    {Загружаем адреса функций, экспортируемых в fbUtilsBackupRestore.pas}
+    {Р—Р°РіСЂСѓР¶Р°РµРј Р°РґСЂРµСЃР° С„СѓРЅРєС†РёР№, СЌРєСЃРїРѕСЂС‚РёСЂСѓРµРјС‹С… РІ fbUtilsBackupRestore.pas}
     @FBBackupDatabaseOnServer                := GetProcAddress(fbUtilsHlib, 'ibxFBBackupDatabaseOnServer');
     @FBBackupDatabaseAndCopyFromServer       := GetProcAddress(fbUtilsHlib, 'ibxFBBackupDatabaseAndCopyFromServer');
     @FBRestoreDatabaseOnServer               := GetProcAddress(fbUtilsHlib, 'ibxFBRestoreDatabaseOnServer');
     @FBCopyBackupToServerAndRestoreDatabase  := GetProcAddress(fbUtilsHlib, 'ibxFBCopyBackupToServerAndRestoreDatabase');
 
-    {Загружаем адреса функций, экспортируемых в fbUtilsIniFiles.pas}
+    {Р—Р°РіСЂСѓР¶Р°РµРј Р°РґСЂРµСЃР° С„СѓРЅРєС†РёР№, СЌРєСЃРїРѕСЂС‚РёСЂСѓРµРјС‹С… РІ fbUtilsIniFiles.pas}
     @FBCreateIniFile  := GetProcAddress(fbUtilsHlib, 'ibxFBCreateIniFile');
     @FBFreeIniFile    := GetProcAddress(fbUtilsHlib, 'ibxFBFreeIniFile');
 
-    {Загружаем адреса функций, экспортируемых в fbUtilsDBStruct.pas}
+    {Р—Р°РіСЂСѓР¶Р°РµРј Р°РґСЂРµСЃР° С„СѓРЅРєС†РёР№, СЌРєСЃРїРѕСЂС‚РёСЂСѓРµРјС‹С… РІ fbUtilsDBStruct.pas}
     @FBCreateDataBaseDesc := GetProcAddress(fbUtilsHlib, 'ibxFBCreateDataBaseDesc');
     @FBFreeDataBaseDesc   := GetProcAddress(fbUtilsHlib, 'ibxFBFreeDataBaseDesc');
 
-    {Загружаем адреса функций, экспортируемых в fbUtilsCheckDBStruct.pas}
+    {Р—Р°РіСЂСѓР¶Р°РµРј Р°РґСЂРµСЃР° С„СѓРЅРєС†РёР№, СЌРєСЃРїРѕСЂС‚РёСЂСѓРµРјС‹С… РІ fbUtilsCheckDBStruct.pas}
     @FBCheckDBStruct := GetProcAddress(fbUtilsHlib, 'ibxFBCheckDBStruct');
   end;
 
   {$ELSE}
-    {Загружаем адреса функций, реализованных в fbUtilsBase.pas}
+    {Р—Р°РіСЂСѓР¶Р°РµРј Р°РґСЂРµСЃР° С„СѓРЅРєС†РёР№, СЂРµР°Р»РёР·РѕРІР°РЅРЅС‹С… РІ fbUtilsBase.pas}
     @FBCreateConnection     := @fbUtilsBase.FBCreateConnection;
     @FBConnectDB            := @fbUtilsBase.FBConnectDB;
     @FBDisconnectDB         := @fbUtilsBase.FBDisconnectDB;
@@ -957,14 +993,19 @@ begin
     @FBGetUserName          := @fbUtilsBase.FBGetUserName;
     @FBSetPassword          := @fbUtilsBase.FBSetPassword;
     @FBGetPassword          := @fbUtilsBase.FBGetPassword;
+    @FBSetCodePage          := @fbUtilsBase.FBSetCodePage;
+    @FBGetCodePage          := @fbUtilsBase.FBGetCodePage;
+    @FBSetPort              := @fbUtilsBase.FBSetPort;
+    @FBGetPort              := @fbUtilsBase.FBGetPort;
     @FBRecomputeIndexStatistics := @fbUtilsBase.FBRecomputeIndexStatistics;
     @FBGenID                := @fbUtilsBase.FBGenID;
     @FBGenIDEx              := @fbUtilsBase.FBGenIDEx;
     @FBExecuteBlockFunc     := @fbUtilsBase.FBExecuteBlockFunc;
     @FBExecuteBlockProc     := @fbUtilsBase.FBExecuteBlockProc;
+    @FBWriteToLog           := @fbUtilsBase.FBWriteToLog;
     @FBClearTable           := @fbUtilsBase.FBClearTable;
 
-    {Загружаем адреса функций, реализованных в fbUtilsPool.pas}
+    {Р—Р°РіСЂСѓР¶Р°РµРј Р°РґСЂРµСЃР° С„СѓРЅРєС†РёР№, СЂРµР°Р»РёР·РѕРІР°РЅРЅС‹С… РІ fbUtilsPool.pas}
     @FBPoolAddConnectionProfile         := @fbUtilsPool.FBPoolAddConnectionProfile;
     @FBPoolAddDefaultConnectionProfile  := @fbUtilsPool.FBPoolAddDefaultConnectionProfile;
     @FBPoolGetConnectionByProfile       := @fbUtilsPool.FBPoolGetConnectionByProfile;
@@ -973,21 +1014,21 @@ begin
     @FBPoolReturnConnection             := @fbUtilsPool.FBPoolReturnConnection;
     @FBPoolGetSize                      := @fbUtilsPool.FBPoolGetSize;
 
-    {Загружаем адреса функций, реализованных в fbUtilsBackupRestore.pas}
+    {Р—Р°РіСЂСѓР¶Р°РµРј Р°РґСЂРµСЃР° С„СѓРЅРєС†РёР№, СЂРµР°Р»РёР·РѕРІР°РЅРЅС‹С… РІ fbUtilsBackupRestore.pas}
     @FBBackupDatabaseOnServer                := @fbUtilsBackupRestore.FBBackupDatabaseOnServer;
     @FBBackupDatabaseAndCopyFromServer       := @fbUtilsBackupRestore.FBBackupDatabaseAndCopyFromServer;
     @FBRestoreDatabaseOnServer               := @fbUtilsBackupRestore.FBRestoreDatabaseOnServer;
     @FBCopyBackupToServerAndRestoreDatabase  := @fbUtilsBackupRestore.FBCopyBackupToServerAndRestoreDatabase;
 
-    {Загружаем адреса функций, реализованных в fbUtilsIniFiles.pas}
+    {Р—Р°РіСЂСѓР¶Р°РµРј Р°РґСЂРµСЃР° С„СѓРЅРєС†РёР№, СЂРµР°Р»РёР·РѕРІР°РЅРЅС‹С… РІ fbUtilsIniFiles.pas}
     @FBCreateIniFile  := @fbUtilsIniFiles.FBCreateIniFile;
     @FBFreeIniFile    := @fbUtilsIniFiles.FBFreeIniFile;
 
-    {Загружаем адреса функций, реализованных в fbUtilsDBStruct.pas}
+    {Р—Р°РіСЂСѓР¶Р°РµРј Р°РґСЂРµСЃР° С„СѓРЅРєС†РёР№, СЂРµР°Р»РёР·РѕРІР°РЅРЅС‹С… РІ fbUtilsDBStruct.pas}
     @FBCreateDataBaseDesc := @fbUtilsDBStruct.FBCreateDataBaseDesc;
     @FBFreeDataBaseDesc   := @fbUtilsDBStruct.FBFreeDataBaseDesc;
 
-    {Загружаем адреса функций, реализованных в fbUtilsCheckDBStruct.pas}
+    {Р—Р°РіСЂСѓР¶Р°РµРј Р°РґСЂРµСЃР° С„СѓРЅРєС†РёР№, СЂРµР°Р»РёР·РѕРІР°РЅРЅС‹С… РІ fbUtilsCheckDBStruct.pas}
     @FBCheckDBStruct := @fbUtilsCheckDBStruct.FBCheckDBStruct;
   {$ENDIF}
 end;
@@ -995,7 +1036,7 @@ end;
 
 constructor TfbUtils.Create;
 begin
-  inherited; {на всякий случай}
+  inherited; {РЅР° РІСЃСЏРєРёР№ СЃР»СѓС‡Р°Р№}
   InitFBUtils;
   FPool := TfbPool.Create;
   FIni := TfbIniCreator.Create;
@@ -1136,6 +1177,14 @@ begin
     raise Exception.Create('TfbUtils: FBGetAndOpenDataSet = nil');
 end;
 
+function TfbUtils.GetCodePage: string;
+begin
+  if Assigned(FBGetCodePage) then
+    Result := FBGetCodePage
+  else
+    Result := FBRusCharSet;
+end;
+
 function TfbUtils.GetCurrentDateTime(FDB: TIBDataBase; FTran: TIBTransaction): TDateTime;
 var
   ds: TIBDataSet;
@@ -1153,9 +1202,42 @@ begin
     raise Exception.Create('TfbUtils: FBGetDataSet = nil');
 end;
 
+function TfbUtils.GetLibHandle: THandle;
+begin
+{$IFDEF FBUTILSDLL}
+  Result := fbUtilsHlib;
+{$ELSE}
+  Result := 0;
+{$ENDIF}
+end;
+
 function TfbUtils.GetPassword: string;
 begin
   Result := FBGetPassword;
+end;
+
+function TfbUtils.GetPort: Integer;
+begin
+  if Assigned(FBGetPort) then
+    Result := FBGetPort()
+  else
+    Result := 30050; // Р”Р»СЏ СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё СЃ РџРўРљ РђР—РЎ 12
+end;
+
+function TfbUtils.GetTableFieldNamedValues(FDB: TIBDatabase;
+  FTran: TIBTransaction; TableName: string; FieldNames,
+  KeyFields: array of string; KeyValues,
+  DefValues: array of Variant): TParamsRec;
+var
+  ResValues: Variant;
+  I: Integer;
+begin
+  ResValues := GetTableFieldValues(FDB, FTran, TableName, FieldNames, KeyFields, KeyValues, DefValues);
+  Result.Clear;
+  if High(FieldNames) <> VarArrayHighBound(ResValues, 1) then
+    raise Exception.Create('TfbUtils: GetTableFieldNamedValues: High(FieldNames) <> VarArrayHighBound(ResValues)');
+  for I := 0 to High(FieldNames) do
+    Result.SetParam(FieldNames[I], ResValues[I]);
 end;
 
 function TfbUtils.GetTableFieldValue(FDB: TIBDatabase; FTran: TIBTransaction; TableName,
@@ -1215,9 +1297,21 @@ begin
   FBRecomputeIndexStatistics(FDB, FModuleName);
 end;
 
+procedure TfbUtils.SetCodePage(const CodePage: string);
+begin
+  if Assigned(FBSetCodePage) then
+    FBSetCodePage(CodePage);
+end;
+
 procedure TfbUtils.SetPassword(const Value: string);
 begin
   FBSetPassword(Value);
+end;
+
+procedure TfbUtils.SetPort(APort: Integer);
+begin
+  if Assigned(FBSetPort) then
+    FBSetPort(APort);
 end;
 
 procedure TfbUtils.SetUserName(const Value: string);
@@ -1269,6 +1363,12 @@ begin
   FieldsRec := SplitFieldNamesValuesArray(FieldNamesValues, ErrPrefix);
 
   UpdateRecord(FDB, FTran, TableName, KeysRec.Names, KeysRec.Values, FieldsRec.Names, FieldsRec.Values);
+end;
+
+procedure TfbUtils.WriteToLog(AMessage: string; MsgType: Integer);
+begin
+  if Assigned(FBWriteToLog) then
+    FBWriteToLog(AMessage, MsgType, FModuleName);
 end;
 
 procedure TfbUtils.UpdateRecord(FDB: TIBDataBase; FTran: TIBTransaction;
@@ -1898,7 +1998,7 @@ end;
 
 procedure TfbDBStructCreator.ReCreateDefDataBaseDesc;
 begin
-  FreeDefDataBaseDesc; // На всякий случай
+  FreeDefDataBaseDesc; // РќР° РІСЃСЏРєРёР№ СЃР»СѓС‡Р°Р№
   FDefDBDesc := CreateDataBaseDesc();
 end;
 

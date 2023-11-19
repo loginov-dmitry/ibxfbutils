@@ -25,6 +25,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 library fbUtils;
 
+{$IFDEF FPC}
+  {$MODE Delphi}
+{$ENDIF}
+
 uses
   SysUtils,
   Classes,
@@ -39,6 +43,6 @@ uses
 
 begin
   {$IFNDEF FBUTILSDLL}
-  менаундхлн б ножхъу опнейрю ондйкчвхрэ дхпейрхбс FBUTILSDLL
+  //п²п∙п·п▒п╔п·п■п≤п°п· п▓ п·п÷п╕п≤п╞п╔ п÷п═п·п∙п п╒п░ п÷п·п■п п⌡п╝п╖п≤п╒п╛ п■п≤п═п∙п п╒п≤п▓пё FBUTILSDLL
   {$ENDIF}
 end.

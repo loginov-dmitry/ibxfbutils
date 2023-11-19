@@ -25,14 +25,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 program fbUtilsTest;
 
+{$IFDEF FPC}
+{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
+{$ENDIF}
+
 uses
+{$IFDEF FPC}
+  Interfaces,
+{$ENDIF}
   Forms,
   TestForm in 'TestForm.pas' {Form1},
   fbUtilsBase in 'fbUtilsBase.pas',
   fbTypes in 'fbTypes.pas',
   fbSomeFuncs in 'fbSomeFuncs.pas',
   fbUtilsPool in 'fbUtilsPool.pas',
-  fbUtilsLoading in 'fbUtilsLoading.pas',
+  {$IFnDEF FPC}fbUtilsLoading in 'fbUtilsLoading.pas',{$ENDIF}
   fbUtilsBackupRestore in 'fbUtilsBackupRestore.pas',
   fbUtilsIniFiles in 'fbUtilsIniFiles.pas',
   fbUtilsDBStruct in 'fbUtilsDBStruct.pas',
@@ -41,9 +48,11 @@ uses
 
 {$R *.res}
 
+{$IFnDEF FPC}
 {$IF RTLVersion >= 18.00}
    {$DEFINE D2007PLUS}
 {$IFEND}
+{$ENDIF}
 
 begin
   Application.Initialize;

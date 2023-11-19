@@ -1,4 +1,4 @@
-{
+п»ї{
 Copyright (c) 2012-2013, Loginov Dmitry Sergeevich
 All rights reserved.
 
@@ -27,79 +27,88 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 {                                                                             }
 {                                                                             }
 {                                                                             }
-{ Модуль fbUtilsIniFiles - содержит функции, позволяющие работать с базой     }
-{ данных так же, как и с INI-файлом                                           }
-{ (c) 2012 Логинов Дмитрий Сергеевич                                          }
-{ Последнее обновление: 30.04.2012                                            }
-{ Протестировано на D7, D2007, D2010, D-XE2                                   }
-{ Адрес сайта: http://loginovprojects.ru/                                     }
+{ РњРѕРґСѓР»СЊ fbUtilsIniFiles - СЃРѕРґРµСЂР¶РёС‚ С„СѓРЅРєС†РёРё, РїРѕР·РІРѕР»СЏСЋС‰РёРµ СЂР°Р±РѕС‚Р°С‚СЊ СЃ Р±Р°Р·РѕР№     }
+{ РґР°РЅРЅС‹С… С‚Р°Рє Р¶Рµ, РєР°Рє Рё СЃ INI-С„Р°Р№Р»РѕРј                                           }
+{ (c) 2012 Р›РѕРіРёРЅРѕРІ Р”РјРёС‚СЂРёР№ РЎРµСЂРіРµРµРІРёС‡                                          }
+{ РџРѕСЃР»РµРґРЅРµРµ РѕР±РЅРѕРІР»РµРЅРёРµ: 30.04.2012                                            }
+{ РџСЂРѕС‚РµСЃС‚РёСЂРѕРІР°РЅРѕ РЅР° D7, D2007, D2010, D-XE2                                   }
+{ РђРґСЂРµСЃ СЃР°Р№С‚Р°: http://loginovprojects.ru/                                     }
 { e-mail: loginov_d@inbox.ru                                                  }
 {                                                                             }
 { *************************************************************************** }
 
 {
-Данный модуль является достаточно автономным, однако рекомендуется с ним работать
-через интерфейсы, реализованные в модуле fbUtils.pas
+Р”Р°РЅРЅС‹Р№ РјРѕРґСѓР»СЊ СЏРІР»СЏРµС‚СЃСЏ РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ Р°РІС‚РѕРЅРѕРјРЅС‹Рј, РѕРґРЅР°РєРѕ СЂРµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ СЃ РЅРёРј СЂР°Р±РѕС‚Р°С‚СЊ
+С‡РµСЂРµР· РёРЅС‚РµСЂС„РµР№СЃС‹, СЂРµР°Р»РёР·РѕРІР°РЅРЅС‹Рµ РІ РјРѕРґСѓР»Рµ fbUtils.pas
 
-Перед использованием объекта TFBIniFile Вам необходимо создать в базе данных
-следующую таблицу:
+РџРµСЂРµРґ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµРј РѕР±СЉРµРєС‚Р° TFBIniFile Р’Р°Рј РЅРµРѕР±С…РѕРґРёРјРѕ СЃРѕР·РґР°С‚СЊ РІ Р±Р°Р·Рµ РґР°РЅРЅС‹С…
+СЃР»РµРґСѓСЋС‰СѓСЋ С‚Р°Р±Р»РёС†Сѓ:
 
       CREATE TABLE CONFIGPARAMS(
-        FILENAME     VARCHAR(100) NOT NULL, -- Наименование INI-файла (по умолчанию: CONF)
-        COMPUTERNAME VARCHAR(100) NOT NULL, -- Наименование компьютера. * - любой компьютер
-        USERNAME     VARCHAR(100) NOT NULL, -- Имя пользователя. * - ВСЕ пользователи.
-        SECTIONNAME  VARCHAR(100) NOT NULL, -- Наименование секции
-        PARAMNAME    VARCHAR(100) NOT NULL, -- Имя параметра
-        PARAMVALUE   VARCHAR(10000),        -- Строковое значение параметра
-        PARAMBLOB    BLOB,                  -- Для хранения больших двоичных объектов (в том числе текстовых документов)
-        PARAMBLOBHASH VARCHAR(50),          -- Для хранения хэша двоичного объекта
-        MODIFYDATE   TIMESTAMP,             -- Дата и время изменения записи
-        MODIFYUSER   VARCHAR(100),          -- Имя пользователя, который внес изменения
-        PRIMARY KEY (FILENAME, COMPUTERNAME, USERNAME, SECTIONNAME, PARAMNAME)) -- Первичный ключ (5 полей)
+        FILENAME     VARCHAR(70) NOT NULL, -- РќР°РёРјРµРЅРѕРІР°РЅРёРµ INI-С„Р°Р№Р»Р° (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ: CONF)
+        COMPUTERNAME VARCHAR(70) NOT NULL, -- РќР°РёРјРµРЅРѕРІР°РЅРёРµ РєРѕРјРїСЊСЋС‚РµСЂР°. * - Р»СЋР±РѕР№ РєРѕРјРїСЊСЋС‚РµСЂ
+        USERNAME     VARCHAR(70) NOT NULL, -- РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ. * - Р’РЎР• РїРѕР»СЊР·РѕРІР°С‚РµР»Рё.
+        SECTIONNAME  VARCHAR(70) NOT NULL, -- РќР°РёРјРµРЅРѕРІР°РЅРёРµ СЃРµРєС†РёРё
+        PARAMNAME    VARCHAR(70) NOT NULL, -- РРјСЏ РїР°СЂР°РјРµС‚СЂР°
+        PARAMVALUE   VARCHAR(5000),        -- РЎС‚СЂРѕРєРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ РїР°СЂР°РјРµС‚СЂР°
+        PARAMBLOB    BLOB,                  -- Р”Р»СЏ С…СЂР°РЅРµРЅРёСЏ Р±РѕР»СЊС€РёС… РґРІРѕРёС‡РЅС‹С… РѕР±СЉРµРєС‚РѕРІ (РІ С‚РѕРј С‡РёСЃР»Рµ С‚РµРєСЃС‚РѕРІС‹С… РґРѕРєСѓРјРµРЅС‚РѕРІ)
+        PARAMBLOBHASH VARCHAR(50),          -- Р”Р»СЏ С…СЂР°РЅРµРЅРёСЏ С…СЌС€Р° РґРІРѕРёС‡РЅРѕРіРѕ РѕР±СЉРµРєС‚Р°
+        MODIFYDATE   TIMESTAMP,             -- Р”Р°С‚Р° Рё РІСЂРµРјСЏ РёР·РјРµРЅРµРЅРёСЏ Р·Р°РїРёСЃРё
+        MODIFYUSER   VARCHAR(100),          -- РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ, РєРѕС‚РѕСЂС‹Р№ РІРЅРµСЃ РёР·РјРµРЅРµРЅРёСЏ
+        PRIMARY KEY CONFIGPARAMS_PK (FILENAME, COMPUTERNAME, USERNAME, SECTIONNAME, PARAMNAME)) -- РџРµСЂРІРёС‡РЅС‹Р№ РєР»СЋС‡ (5 РїРѕР»РµР№)
 
-Имена полей могут быть другими, но при этом Вам придется исправлять модуль fbTypes.
-Длину полей Вы можете взять на свое усмотрение. Здесь даны рекомендуемые значения.
-Поле PARAMBLOB должно иметь  SUB_TYPE 0 (Binary) (иначе, если там Text, то функции
-чтения работают неправильно, добавляют лишние байты).
-При желании Вы можете сделать целочисленный автоинкрементный первичный ключ, а указанные
-здесь (в PRIMARY KEY) поля оформить в виде уникального индекса
+РРјРµРЅР° РїРѕР»РµР№ РјРѕРіСѓС‚ Р±С‹С‚СЊ РґСЂСѓРіРёРјРё, РЅРѕ РїСЂРё СЌС‚РѕРј Р’Р°Рј РїСЂРёРґРµС‚СЃСЏ РёСЃРїСЂР°РІР»СЏС‚СЊ РјРѕРґСѓР»СЊ fbTypes.
+Р”Р»РёРЅСѓ РїРѕР»РµР№ Р’С‹ РјРѕР¶РµС‚Рµ РІР·СЏС‚СЊ РЅР° СЃРІРѕРµ СѓСЃРјРѕС‚СЂРµРЅРёРµ. Р—РґРµСЃСЊ РґР°РЅС‹ СЂРµРєРѕРјРµРЅРґСѓРµРјС‹Рµ Р·РЅР°С‡РµРЅРёСЏ.
+РџРѕР»Рµ PARAMBLOB РґРѕР»Р¶РЅРѕ РёРјРµС‚СЊ  SUB_TYPE 0 (Binary) (РёРЅР°С‡Рµ, РµСЃР»Рё С‚Р°Рј Text, С‚Рѕ С„СѓРЅРєС†РёРё
+С‡С‚РµРЅРёСЏ СЂР°Р±РѕС‚Р°СЋС‚ РЅРµРїСЂР°РІРёР»СЊРЅРѕ, РґРѕР±Р°РІР»СЏСЋС‚ Р»РёС€РЅРёРµ Р±Р°Р№С‚С‹).
+РџСЂРё Р¶РµР»Р°РЅРёРё Р’С‹ РјРѕР¶РµС‚Рµ СЃРґРµР»Р°С‚СЊ С†РµР»РѕС‡РёСЃР»РµРЅРЅС‹Р№ Р°РІС‚РѕРёРЅРєСЂРµРјРµРЅС‚РЅС‹Р№ РїРµСЂРІРёС‡РЅС‹Р№ РєР»СЋС‡, Р° СѓРєР°Р·Р°РЅРЅС‹Рµ
+Р·РґРµСЃСЊ (РІ PRIMARY KEY) РїРѕР»СЏ РѕС„РѕСЂРјРёС‚СЊ РІ РІРёРґРµ СѓРЅРёРєР°Р»СЊРЅРѕРіРѕ РёРЅРґРµРєСЃР°
 }
 
-unit fbUtilsIniFiles;
+{$IFDEF FPC}
+{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
+{$ENDIF}
 
+unit fbUtilsIniFiles;
+   
 interface
 
 uses
-  Windows, SysUtils, Classes, IBDatabase, IBCustomDataSet, SyncObjs, DB, Math,
+{$IFnDEF FPC}
+  Windows,
+{$ELSE}
+  LCLIntf, LCLType, LMessages,
+{$ENDIF}
+  SysUtils, Classes, IBDatabase, IBCustomDataSet, IB, SyncObjs, DB, Math,
   fbUtilsBase, fbUtilsPool, fbSomeFuncs, fbTypes;
 
 type
-  {ВНИМАНИЕ! Не меняйте виртуальные функции местами! Они должы располагаться в
-   той же последовательности, как и в fbUtils.pas}
+  {Р’РќРРњРђРќРР•! РќРµ РјРµРЅСЏР№С‚Рµ РІРёСЂС‚СѓР°Р»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё РјРµСЃС‚Р°РјРё! РћРЅРё РґРѕР»Р¶С‹ СЂР°СЃРїРѕР»Р°РіР°С‚СЊСЃСЏ РІ
+   С‚РѕР№ Р¶Рµ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё, РєР°Рє Рё РІ fbUtils.pas}
   TFBIniFile = class(TObject)
   private
-    FAlwaysConnected: Boolean;// Определяет, должно ли подключение быть установленно на протяжении всей работы программы
-    FPoolProfileName: string; // Имя профиля из пула подключений
-    FConnParams: TFBConnectionParams; // Параметры подключения к Firebird
-    FComputerName: string;    // Имя компьютера (по умолчанию - текущий)
-    FUserName: string;        // Имя пользователя (по умолчанию - текущий пользователь Windows)
-    FFileName: string;        // Имя файла (по аналогии с INI-файлами)
+    FAlwaysConnected: Boolean;// РћРїСЂРµРґРµР»СЏРµС‚, РґРѕР»Р¶РЅРѕ Р»Рё РїРѕРґРєР»СЋС‡РµРЅРёРµ Р±С‹С‚СЊ СѓСЃС‚Р°РЅРѕРІР»РµРЅРЅРѕ РЅР° РїСЂРѕС‚СЏР¶РµРЅРёРё РІСЃРµР№ СЂР°Р±РѕС‚С‹ РїСЂРѕРіСЂР°РјРјС‹
+    FPoolProfileName: string; // РРјСЏ РїСЂРѕС„РёР»СЏ РёР· РїСѓР»Р° РїРѕРґРєР»СЋС‡РµРЅРёР№
+    FConnParams: TFBConnectionParams; // РџР°СЂР°РјРµС‚СЂС‹ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Firebird
+    FComputerName: string;    // РРјСЏ РєРѕРјРїСЊСЋС‚РµСЂР° (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ - С‚РµРєСѓС‰РёР№)
+    FUserName: string;        // РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ - С‚РµРєСѓС‰РёР№ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ Windows)
+    FFileName: string;        // РРјСЏ С„Р°Р№Р»Р° (РїРѕ Р°РЅР°Р»РѕРіРёРё СЃ INI-С„Р°Р№Р»Р°РјРё)
 
-    FDB: TIBDatabase;         // Подключение к БД (из пула)
-    FTranW: TIBTransaction;   // Транзакция на запись
-    FTranR: TIBTransaction;   // Транзакция на чтение
+    FDB: TIBDatabase;         // РџРѕРґРєР»СЋС‡РµРЅРёРµ Рє Р‘Р” (РёР· РїСѓР»Р°)
+    FTranW: TIBTransaction;   // РўСЂР°РЅР·Р°РєС†РёСЏ РЅР° Р·Р°РїРёСЃСЊ
+    FTranR: TIBTransaction;   // РўСЂР°РЅР·Р°РєС†РёСЏ РЅР° С‡С‚РµРЅРёРµ
 
-    dsRead: TIBDataSet;       // Набор данных на чтение заданного параметна
-    dsIns: TIBDataSet;        // Набор данных на вставку нового параметра
-    dsUpd: TIBDataSet;        // Набор данных на изменение существующего параметра
-    dsCustom: TIBDataSet;     // Набор данных для выполнения прочих операций
-    //dsInsOrUpd: TIBDataSet; - не реализована, т.к. данной возможности не было в старых версиях Firebird
+    dsRead: TIBDataSet;       // РќР°Р±РѕСЂ РґР°РЅРЅС‹С… РЅР° С‡С‚РµРЅРёРµ Р·Р°РґР°РЅРЅРѕРіРѕ РїР°СЂР°РјРµС‚РЅР°
+    dsIns: TIBDataSet;        // РќР°Р±РѕСЂ РґР°РЅРЅС‹С… РЅР° РІСЃС‚Р°РІРєСѓ РЅРѕРІРѕРіРѕ РїР°СЂР°РјРµС‚СЂР°
+    dsUpd: TIBDataSet;        // РќР°Р±РѕСЂ РґР°РЅРЅС‹С… РЅР° РёР·РјРµРЅРµРЅРёРµ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ РїР°СЂР°РјРµС‚СЂР°
+    dsCustom: TIBDataSet;     // РќР°Р±РѕСЂ РґР°РЅРЅС‹С… РґР»СЏ РІС‹РїРѕР»РЅРµРЅРёСЏ РїСЂРѕС‡РёС… РѕРїРµСЂР°С†РёР№
+    //dsInsOrUpd: TIBDataSet; - РЅРµ СЂРµР°Р»РёР·РѕРІР°РЅР°, С‚.Рє. РґР°РЅРЅРѕР№ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РЅРµ Р±С‹Р»Рѕ РІ СЃС‚Р°СЂС‹С… РІРµСЂСЃРёСЏС… Firebird
 
     FObjs: TObjHolder;
 
-    FCritSect: TCriticalSection; // Критическая секция для предотвращения одновременного доступа к объекту из разных потоков
+    FCritSect: TCriticalSection; // РљСЂРёС‚РёС‡РµСЃРєР°СЏ СЃРµРєС†РёСЏ РґР»СЏ РїСЂРµРґРѕС‚РІСЂР°С‰РµРЅРёСЏ РѕРґРЅРѕРІСЂРµРјРµРЅРЅРѕРіРѕ РґРѕСЃС‚СѓРїР° Рє РѕР±СЉРµРєС‚Сѓ РёР· СЂР°Р·РЅС‹С… РїРѕС‚РѕРєРѕРІ
 
-    FWasBeginWorkCall: Boolean; // TRUE, если была вызвана функция BeginWork
+    FWasBeginWorkCall: Boolean; // TRUE, РµСЃР»Рё Р±С‹Р»Р° РІС‹Р·РІР°РЅР° С„СѓРЅРєС†РёСЏ BeginWork
 
     procedure CheckParams(const Section, Key: string; CheckKey: Boolean = True);
     function InternalValueExists(AnyComp, AnyUser: Boolean; const Section, Key: string; var Value: string; ReadHash: Boolean): Boolean;
@@ -116,7 +125,7 @@ type
     function GetPoolProfileName: string; virtual;
     procedure SetPoolProfileName(const Value: string); virtual;
 
-    {Основные функции ReadXXX и WriteXXX, работающие с текстовым полем в базе данных}
+    {РћСЃРЅРѕРІРЅС‹Рµ С„СѓРЅРєС†РёРё ReadXXX Рё WriteXXX, СЂР°Р±РѕС‚Р°СЋС‰РёРµ СЃ С‚РµРєСЃС‚РѕРІС‹Рј РїРѕР»РµРј РІ Р±Р°Р·Рµ РґР°РЅРЅС‹С…}
     procedure DoWriteString(AnyComp, AnyUser: Boolean; const Section, Key, Value: String); virtual;
     procedure DoWriteInteger(AnyComp, AnyUser: Boolean; const Section, Key: string; Value: Integer); virtual;
     procedure DoWriteBool(AnyComp, AnyUser: Boolean; const Section, Key: string; Value: Boolean); virtual;
@@ -133,249 +142,249 @@ type
     function DoReadDate(AnyComp, AnyUser: Boolean; const Section, Key: string; Default: TDateTime): TDateTime; virtual;
     function DoReadTime(AnyComp, AnyUser: Boolean; const Section, Key: string; Default: TDateTime): TDateTime; virtual;
 
-    {Функции ReadXXX и WriteXXX, работающие с BLOB-полем в базе данных}
+    {Р¤СѓРЅРєС†РёРё ReadXXX Рё WriteXXX, СЂР°Р±РѕС‚Р°СЋС‰РёРµ СЃ BLOB-РїРѕР»РµРј РІ Р±Р°Р·Рµ РґР°РЅРЅС‹С…}
     procedure DoWriteStream(AnyComp, AnyUser: Boolean; const Section, Key: String; AStream: TStream); virtual;
     function DoReadStream(AnyComp, AnyUser: Boolean; const Section, Key: String; AStream: TStream): Boolean; virtual;
 
-    {Записывает заданный текст в BLOB-поле. Текст в BLOB-поле хранится в кодировке UNICODE}
+    {Р—Р°РїРёСЃС‹РІР°РµС‚ Р·Р°РґР°РЅРЅС‹Р№ С‚РµРєСЃС‚ РІ BLOB-РїРѕР»Рµ. РўРµРєСЃС‚ РІ BLOB-РїРѕР»Рµ С…СЂР°РЅРёС‚СЃСЏ РІ РєРѕРґРёСЂРѕРІРєРµ UNICODE}
     procedure DoWriteText(AnyComp, AnyUser: Boolean; const Section, Key: String; Value: string); virtual;
 
-    {Считывает текст из BLOB-поля}
+    {РЎС‡РёС‚С‹РІР°РµС‚ С‚РµРєСЃС‚ РёР· BLOB-РїРѕР»СЏ}
     function DoReadText(AnyComp, AnyUser: Boolean; const Section, Key: String; Default: String): string; virtual;
 
-    {Записывает произвольные двоичные данные в BLOB-поле}
+    {Р—Р°РїРёСЃС‹РІР°РµС‚ РїСЂРѕРёР·РІРѕР»СЊРЅС‹Рµ РґРІРѕРёС‡РЅС‹Рµ РґР°РЅРЅС‹Рµ РІ BLOB-РїРѕР»Рµ}
     procedure DoWriteBinaryData(AnyComp, AnyUser: Boolean; const Section, Key: string; const Buffer; BufSize: Integer); virtual;
 
-    {Считывает двоичные данные из BLOB-поля}
+    {РЎС‡РёС‚С‹РІР°РµС‚ РґРІРѕРёС‡РЅС‹Рµ РґР°РЅРЅС‹Рµ РёР· BLOB-РїРѕР»СЏ}
     function DoReadBinaryData(AnyComp, AnyUser: Boolean; const Section, Key: string; var Buffer; BufSize: Integer): Integer; virtual;
 
-    {Основные функции для работы с секциями}
+    {РћСЃРЅРѕРІРЅС‹Рµ С„СѓРЅРєС†РёРё РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ СЃРµРєС†РёСЏРјРё}
 
-    {Считывает список наименований параметров}
+    {РЎС‡РёС‚С‹РІР°РµС‚ СЃРїРёСЃРѕРє РЅР°РёРјРµРЅРѕРІР°РЅРёР№ РїР°СЂР°РјРµС‚СЂРѕРІ}
     procedure DoReadSection(AnyComp, AnyUser: Boolean; const Section: string; Strings: TStrings); virtual;
 
-    {Считывает имена секций}
+    {РЎС‡РёС‚С‹РІР°РµС‚ РёРјРµРЅР° СЃРµРєС†РёР№}
     procedure DoReadSections(AnyComp, AnyUser: Boolean; Strings: TStrings); virtual;
 
-    {Для указанной секции считывает наименования параметров и их значения}
+    {Р”Р»СЏ СѓРєР°Р·Р°РЅРЅРѕР№ СЃРµРєС†РёРё СЃС‡РёС‚С‹РІР°РµС‚ РЅР°РёРјРµРЅРѕРІР°РЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ Рё РёС… Р·РЅР°С‡РµРЅРёСЏ}
     procedure DoReadSectionValues(AnyComp, AnyUser: Boolean; const Section: string; Strings: TStrings); virtual;
 
-    {Проверяет, существует ли заданная секция}
+    {РџСЂРѕРІРµСЂСЏРµС‚, СЃСѓС‰РµСЃС‚РІСѓРµС‚ Р»Рё Р·Р°РґР°РЅРЅР°СЏ СЃРµРєС†РёСЏ}
     function DoSectionExists(AnyComp, AnyUser: Boolean; const Section: string): Boolean; virtual;
 
-    {Проверяет, существует ли заданный параметр}
+    {РџСЂРѕРІРµСЂСЏРµС‚, СЃСѓС‰РµСЃС‚РІСѓРµС‚ Р»Рё Р·Р°РґР°РЅРЅС‹Р№ РїР°СЂР°РјРµС‚СЂ}
     function DoValueExists(AnyComp, AnyUser: Boolean; const Section, Key: string): Boolean; virtual;
 
-    {Удаляет указанную секцию}
+    {РЈРґР°Р»СЏРµС‚ СѓРєР°Р·Р°РЅРЅСѓСЋ СЃРµРєС†РёСЋ}
     procedure DoEraseSection(AnyComp, AnyUser: Boolean; const Section: string); virtual;
 
-    {Удаляет заданный параметр и его значение}
+    {РЈРґР°Р»СЏРµС‚ Р·Р°РґР°РЅРЅС‹Р№ РїР°СЂР°РјРµС‚СЂ Рё РµРіРѕ Р·РЅР°С‡РµРЅРёРµ}
     procedure DoDeleteKey(AnyComp, AnyUser: Boolean; const Section, Key: String); virtual;
   public
 
-    {Внимание! Для каждой функции предлагается 3 варианта вызова:
-     1 - "привычный": указывается имя секции и имя параметра, как и при работе с TIniFile.
-         Параметр, записанный таким способом, будет доступен с любого компьютера и
-         для любого пользователя. Предназначен для глобальных, общедоступных параметров
-     2 - "подробный": позволяет задать дополнительно 2 параметра: AnyComp и AnyUser.
-         Если AnyComp (пер. "любой компьютер") равен False, то параметр будет доступен
-         ТОЛЬКО с этого же компьютера. Если AnyUser (пер. "любой пользователь") равен False,
-         то параметр будет доступен ТОЛЬКО для данного пользователя. При необходимости
-         параметры AnyComp и AnyUser можно кобминировать. Например, если AnyComp=True и AnyUser=False,
-         то параметр будет доступен для данного пользователя, независимо от того,
-         за каким компьютером он работает.
-     3 - "упрощенный": аналогичный первому варианту, однако имя секции указывать не
-         требуется (используется секция FBIniDefSection (PARAMS))}
+    {Р’РЅРёРјР°РЅРёРµ! Р”Р»СЏ РєР°Р¶РґРѕР№ С„СѓРЅРєС†РёРё РїСЂРµРґР»Р°РіР°РµС‚СЃСЏ 3 РІР°СЂРёР°РЅС‚Р° РІС‹Р·РѕРІР°:
+     1 - "РїСЂРёРІС‹С‡РЅС‹Р№": СѓРєР°Р·С‹РІР°РµС‚СЃСЏ РёРјСЏ СЃРµРєС†РёРё Рё РёРјСЏ РїР°СЂР°РјРµС‚СЂР°, РєР°Рє Рё РїСЂРё СЂР°Р±РѕС‚Рµ СЃ TIniFile.
+         РџР°СЂР°РјРµС‚СЂ, Р·Р°РїРёСЃР°РЅРЅС‹Р№ С‚Р°РєРёРј СЃРїРѕСЃРѕР±РѕРј, Р±СѓРґРµС‚ РґРѕСЃС‚СѓРїРµРЅ СЃ Р»СЋР±РѕРіРѕ РєРѕРјРїСЊСЋС‚РµСЂР° Рё
+         РґР»СЏ Р»СЋР±РѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ. РџСЂРµРґРЅР°Р·РЅР°С‡РµРЅ РґР»СЏ РіР»РѕР±Р°Р»СЊРЅС‹С…, РѕР±С‰РµРґРѕСЃС‚СѓРїРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
+     2 - "РїРѕРґСЂРѕР±РЅС‹Р№": РїРѕР·РІРѕР»СЏРµС‚ Р·Р°РґР°С‚СЊ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕ 2 РїР°СЂР°РјРµС‚СЂР°: AnyComp Рё AnyUser.
+         Р•СЃР»Рё AnyComp (РїРµСЂ. "Р»СЋР±РѕР№ РєРѕРјРїСЊСЋС‚РµСЂ") СЂР°РІРµРЅ False, С‚Рѕ РїР°СЂР°РјРµС‚СЂ Р±СѓРґРµС‚ РґРѕСЃС‚СѓРїРµРЅ
+         РўРћР›Р¬РљРћ СЃ СЌС‚РѕРіРѕ Р¶Рµ РєРѕРјРїСЊСЋС‚РµСЂР°. Р•СЃР»Рё AnyUser (РїРµСЂ. "Р»СЋР±РѕР№ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ") СЂР°РІРµРЅ False,
+         С‚Рѕ РїР°СЂР°РјРµС‚СЂ Р±СѓРґРµС‚ РґРѕСЃС‚СѓРїРµРЅ РўРћР›Р¬РљРћ РґР»СЏ РґР°РЅРЅРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ. РџСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё
+         РїР°СЂР°РјРµС‚СЂС‹ AnyComp Рё AnyUser РјРѕР¶РЅРѕ РєРѕР±РјРёРЅРёСЂРѕРІР°С‚СЊ. РќР°РїСЂРёРјРµСЂ, РµСЃР»Рё AnyComp=True Рё AnyUser=False,
+         С‚Рѕ РїР°СЂР°РјРµС‚СЂ Р±СѓРґРµС‚ РґРѕСЃС‚СѓРїРµРЅ РґР»СЏ РґР°РЅРЅРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ, РЅРµР·Р°РІРёСЃРёРјРѕ РѕС‚ С‚РѕРіРѕ,
+         Р·Р° РєР°РєРёРј РєРѕРјРїСЊСЋС‚РµСЂРѕРј РѕРЅ СЂР°Р±РѕС‚Р°РµС‚.
+     3 - "СѓРїСЂРѕС‰РµРЅРЅС‹Р№": Р°РЅР°Р»РѕРіРёС‡РЅС‹Р№ РїРµСЂРІРѕРјСѓ РІР°СЂРёР°РЅС‚Сѓ, РѕРґРЅР°РєРѕ РёРјСЏ СЃРµРєС†РёРё СѓРєР°Р·С‹РІР°С‚СЊ РЅРµ
+         С‚СЂРµР±СѓРµС‚СЃСЏ (РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ СЃРµРєС†РёСЏ FBIniDefSection (PARAMS))}
 
-    {== ФУНКЦИИ ДЛЯ ЗАПИСИ В INI ==}
+    {== Р¤РЈРќРљР¦РР Р”Р›РЇ Р—РђРџРРЎР Р’ INI ==}
 
-    {Запись строки}
+    {Р—Р°РїРёСЃСЊ СЃС‚СЂРѕРєРё}
     procedure WriteString(const Section, Key, Value: String); overload;
     procedure WriteString(AnyComp, AnyUser: Boolean; const Section, Key, Value: String); overload;
     procedure WriteString(const Key, Value: String); overload;
 
-    {Запись логического значения}
+    {Р—Р°РїРёСЃСЊ Р»РѕРіРёС‡РµСЃРєРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ}
     procedure WriteBool(const Section, Key: string; Value: Boolean); overload;
     procedure WriteBool(AnyComp, AnyUser: Boolean; const Section, Key: string; Value: Boolean); overload;
     procedure WriteBool(const Key: string; Value: Boolean); overload;
 
-    {Запись вещественного числа Double}
+    {Р—Р°РїРёСЃСЊ РІРµС‰РµСЃС‚РІРµРЅРЅРѕРіРѕ С‡РёСЃР»Р° Double}
     procedure WriteFloat(const Section, Key: string; Value: Double); overload;
     procedure WriteFloat(AnyComp, AnyUser: Boolean; const Section, Key: string; Value: Double); overload;
     procedure WriteFloat(const Key: string; Value: Double); overload;
 
-    {Запись даты и времени}
+    {Р—Р°РїРёСЃСЊ РґР°С‚С‹ Рё РІСЂРµРјРµРЅРё}
     procedure WriteDateTime(const Section, Key: string; Value: TDateTime); overload;
     procedure WriteDateTime(AnyComp, AnyUser: Boolean; const Section, Key: string; Value: TDateTime); overload;
     procedure WriteDateTime(const Key: string; Value: TDateTime); overload;
 
-    {Запись целочисленного значения}
+    {Р—Р°РїРёСЃСЊ С†РµР»РѕС‡РёСЃР»РµРЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ}
     procedure WriteInteger(const Section, Key: string; Value: Integer); overload;
     procedure WriteInteger(AnyComp, AnyUser: Boolean; const Section, Key: string; Value: Integer); overload;
     procedure WriteInteger(const Key: string; Value: Integer); overload;
 
-    {Запись даты}
+    {Р—Р°РїРёСЃСЊ РґР°С‚С‹}
     procedure WriteDate(const Section, Key: string; Value: TDateTime); overload;
     procedure WriteDate(AnyComp, AnyUser: Boolean; const Section, Key: string; Value: TDateTime); overload;
     procedure WriteDate(Key: string; Value: TDateTime); overload;
 
-    {Запись времени}
+    {Р—Р°РїРёСЃСЊ РІСЂРµРјРµРЅРё}
     procedure WriteTime(const Section, Key: string; Value: TDateTime); overload;
     procedure WriteTime(AnyComp, AnyUser: Boolean; const Section, Key: string; Value: TDateTime); overload;
     procedure WriteTime(Key: string; Value: TDateTime); overload;
 
-    {== Функции для записи в INI двоичных объектов (в поле BLOB) ==}
+    {== Р¤СѓРЅРєС†РёРё РґР»СЏ Р·Р°РїРёСЃРё РІ INI РґРІРѕРёС‡РЅС‹С… РѕР±СЉРµРєС‚РѕРІ (РІ РїРѕР»Рµ BLOB) ==}
 
-    {Запись потока TStream}
+    {Р—Р°РїРёСЃСЊ РїРѕС‚РѕРєР° TStream}
     procedure WriteStream(const Section, Key: String; AStream: TStream); overload;
     procedure WriteStream(AnyComp, AnyUser: Boolean; const Section, Key: String; AStream: TStream); overload;
     procedure WriteStream(Key: String; AStream: TStream); overload;
 
-    {Запись текста (любого объема; хранится в формате Unicode)}
+    {Р—Р°РїРёСЃСЊ С‚РµРєСЃС‚Р° (Р»СЋР±РѕРіРѕ РѕР±СЉРµРјР°; С…СЂР°РЅРёС‚СЃСЏ РІ С„РѕСЂРјР°С‚Рµ Unicode)}
     procedure WriteText(const Section, Key: String; Value: string); overload;
     procedure WriteText(AnyComp, AnyUser: Boolean; const Section, Key: String; Value: string); overload;
     procedure WriteText(Key: String; Value: string); overload;
 
-    {Запись произвольного двоичного буфера (например, массива)}
+    {Р—Р°РїРёСЃСЊ РїСЂРѕРёР·РІРѕР»СЊРЅРѕРіРѕ РґРІРѕРёС‡РЅРѕРіРѕ Р±СѓС„РµСЂР° (РЅР°РїСЂРёРјРµСЂ, РјР°СЃСЃРёРІР°)}
     procedure WriteBinaryData(const Section, Key: string; const Buffer; BufSize: Integer); overload;
     procedure WriteBinaryData(AnyComp, AnyUser: Boolean; const Section, Key: string; const Buffer; BufSize: Integer); overload;
     procedure WriteBinaryData(Key: string; const Buffer; BufSize: Integer); overload;
 
-    {== ФУНКЦИИ ДЛЯ ЗАПИСИ В INI ==}
+    {== Р¤РЈРќРљР¦РР Р”Р›РЇ Р—РђРџРРЎР Р’ INI ==}
 
-    {Чтение строки}
+    {Р§С‚РµРЅРёРµ СЃС‚СЂРѕРєРё}
     function ReadString(const Section, Key, Default: String): string; overload;
     function ReadString(AnyComp, AnyUser: Boolean; const Section, Key, Default: String): string; overload;
     function ReadString(const Key, Default: String): string; overload;
 
-    {Чтение целочисленного значения}
+    {Р§С‚РµРЅРёРµ С†РµР»РѕС‡РёСЃР»РµРЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ}
     function ReadInteger(const Section, Key: string; Default: Integer): Integer; overload;
     function ReadInteger(AnyComp, AnyUser: Boolean; const Section, Key: string; Default: Integer): Integer; overload;
     function ReadInteger(const Key: string; Default: Integer): Integer; overload;
 
-    {Чтение логического значения}
+    {Р§С‚РµРЅРёРµ Р»РѕРіРёС‡РµСЃРєРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ}
     function ReadBool(const Section, Key: string; Default: Boolean): Boolean; overload;
     function ReadBool(AnyComp, AnyUser: Boolean; const Section, Key: string; Default: Boolean): Boolean; overload;
     function ReadBool(const Key: string; Default: Boolean): Boolean; overload;
 
-    {Чтение вещественного значения (Double)}
+    {Р§С‚РµРЅРёРµ РІРµС‰РµСЃС‚РІРµРЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ (Double)}
     function ReadFloat(const Section, Key: string; Default: Double): Double; overload;
     function ReadFloat(AnyComp, AnyUser: Boolean; const Section, Key: string; Default: Double): Double; overload;
     function ReadFloat(const Key: string; Default: Double): Double; overload;
 
-    {Чтение даты и времени}
+    {Р§С‚РµРЅРёРµ РґР°С‚С‹ Рё РІСЂРµРјРµРЅРё}
     function ReadDateTime(const Section, Key: string; Default: TDateTime): TDateTime; overload;
     function ReadDateTime(AnyComp, AnyUser: Boolean; const Section, Key: string; Default: TDateTime): TDateTime; overload;
     function ReadDateTime(const Key: string; Default: TDateTime): TDateTime; overload;
 
-    {Чтение даты}
+    {Р§С‚РµРЅРёРµ РґР°С‚С‹}
     function ReadDate(const Section, Key: string; Default: TDateTime): TDateTime; overload;
     function ReadDate(AnyComp, AnyUser: Boolean; const Section, Key: string; Default: TDateTime): TDateTime; overload;
     function ReadDate(Key: string; Default: TDateTime): TDateTime; overload;
 
-    {Чтение времени}
+    {Р§С‚РµРЅРёРµ РІСЂРµРјРµРЅРё}
     function ReadTime(const Section, Key: string; Default: TDateTime): TDateTime; overload;
     function ReadTime(AnyComp, AnyUser: Boolean; const Section, Key: string; Default: TDateTime): TDateTime; overload;
     function ReadTime(Key: string; Default: TDateTime): TDateTime; overload;
 
-    {== Функции для чтения из INI двоичных объектов (из поля BLOB) ==}
+    {== Р¤СѓРЅРєС†РёРё РґР»СЏ С‡С‚РµРЅРёСЏ РёР· INI РґРІРѕРёС‡РЅС‹С… РѕР±СЉРµРєС‚РѕРІ (РёР· РїРѕР»СЏ BLOB) ==}
 
-    {Чтение в поток TStream}
+    {Р§С‚РµРЅРёРµ РІ РїРѕС‚РѕРє TStream}
     function ReadStream(AnyComp, AnyUser: Boolean; const Section, Key: String; AStream: TStream): Boolean; overload;
     function ReadStream(const Section, Key: String; AStream: TStream): Boolean; overload;
     function ReadStream(Key: String; AStream: TStream): Boolean; overload;
 
-    {Чтение текста}
+    {Р§С‚РµРЅРёРµ С‚РµРєСЃС‚Р°}
     function ReadText(AnyComp, AnyUser: Boolean; const Section, Key: String; Default: String): string; overload;
     function ReadText(const Section, Key: String; Default: String): string; overload;
     function ReadText(Key: String; Default: String): string; overload;
 
-    {Чтение в двоичный буфер}
+    {Р§С‚РµРЅРёРµ РІ РґРІРѕРёС‡РЅС‹Р№ Р±СѓС„РµСЂ}
     function ReadBinaryData(AnyComp, AnyUser: Boolean; const Section, Key: string; var Buffer; BufSize: Integer): Integer; overload;
     function ReadBinaryData(const Section, Key: string; var Buffer; BufSize: Integer): Integer; overload;
     function ReadBinaryData(Key: string; var Buffer; BufSize: Integer): Integer; overload;
 
 
-    {== ФУНКЦИИ ДЛЯ РАБОТЫ С СЕКЦИЯМИ ==}
+    {== Р¤РЈРќРљР¦РР Р”Р›РЇ Р РђР‘РћРўР« РЎ РЎР•РљР¦РРЇРњР ==}
 
-    {==ReadSection - считывает список наименований параметров для заданной секции}
+    {==ReadSection - СЃС‡РёС‚С‹РІР°РµС‚ СЃРїРёСЃРѕРє РЅР°РёРјРµРЅРѕРІР°РЅРёР№ РїР°СЂР°РјРµС‚СЂРѕРІ РґР»СЏ Р·Р°РґР°РЅРЅРѕР№ СЃРµРєС†РёРё}
     procedure ReadSection(const Section: string; Strings: TStrings); overload;
     procedure ReadSection(AnyComp, AnyUser: Boolean; const Section: string; Strings: TStrings); overload;
     procedure ReadSection(Strings: TStrings); overload;
 
-    {==ReadSections - считывает наименования секций}
+    {==ReadSections - СЃС‡РёС‚С‹РІР°РµС‚ РЅР°РёРјРµРЅРѕРІР°РЅРёСЏ СЃРµРєС†РёР№}
     procedure ReadSections(Strings: TStrings); overload;
     procedure ReadSections(AnyComp, AnyUser: Boolean; Strings: TStrings); overload;
 
-    {==ReadSectionValues - для указанной секции считывает наименования параметров и их значения}
+    {==ReadSectionValues - РґР»СЏ СѓРєР°Р·Р°РЅРЅРѕР№ СЃРµРєС†РёРё СЃС‡РёС‚С‹РІР°РµС‚ РЅР°РёРјРµРЅРѕРІР°РЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ Рё РёС… Р·РЅР°С‡РµРЅРёСЏ}
     procedure ReadSectionValues(const Section: string; Strings: TStrings); overload;
     procedure ReadSectionValues(AnyComp, AnyUser: Boolean; const Section: string; Strings: TStrings); overload;
     procedure ReadSectionValues(Strings: TStrings); overload;
 
-    {== SectionExists - Проверяет, существует ли заданная секция}
+    {== SectionExists - РџСЂРѕРІРµСЂСЏРµС‚, СЃСѓС‰РµСЃС‚РІСѓРµС‚ Р»Рё Р·Р°РґР°РЅРЅР°СЏ СЃРµРєС†РёСЏ}
     function SectionExists(const Section: string): Boolean; overload;
     function SectionExists(AnyComp, AnyUser: Boolean; const Section: string): Boolean; overload;
     function SectionExists: Boolean; overload;
 
-    {== ValueExists - Проверяет, существует ли заданный параметр}
+    {== ValueExists - РџСЂРѕРІРµСЂСЏРµС‚, СЃСѓС‰РµСЃС‚РІСѓРµС‚ Р»Рё Р·Р°РґР°РЅРЅС‹Р№ РїР°СЂР°РјРµС‚СЂ}
     function ValueExists(const Section, Key: string): Boolean; overload;
     function ValueExists(AnyComp, AnyUser: Boolean; const Section, Key: string): Boolean; overload;
     function ValueExists(Key: string): Boolean; overload;
 
-    {== EraseSection - Удаляет указанную секцию}
+    {== EraseSection - РЈРґР°Р»СЏРµС‚ СѓРєР°Р·Р°РЅРЅСѓСЋ СЃРµРєС†РёСЋ}
     procedure EraseSection(const Section: string); overload;
     procedure EraseSection(AnyComp, AnyUser: Boolean; const Section: string); overload;
     procedure EraseSection; overload;
 
-    {== DeleteKey - Удаляет заданный параметр и его значение}
+    {== DeleteKey - РЈРґР°Р»СЏРµС‚ Р·Р°РґР°РЅРЅС‹Р№ РїР°СЂР°РјРµС‚СЂ Рё РµРіРѕ Р·РЅР°С‡РµРЅРёРµ}
     procedure DeleteKey(const Section, Key: String); overload;
     procedure DeleteKey(AnyComp, AnyUser: Boolean; const Section, Key: String); overload;
     procedure DeleteKey(const Key: String); overload;
   public
-    { Устанавливает параметры подключения к базе данных. Если указано имя профиля,
-      то использовать параметры не обязательно! Параметры следует указывать до начала
-      работы с функциями ReadXXX или WriteXXX }
+    { РЈСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ РїР°СЂР°РјРµС‚СЂС‹ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р±Р°Р·Рµ РґР°РЅРЅС‹С…. Р•СЃР»Рё СѓРєР°Р·Р°РЅРѕ РёРјСЏ РїСЂРѕС„РёР»СЏ,
+      С‚Рѕ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РїР°СЂР°РјРµС‚СЂС‹ РЅРµ РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ! РџР°СЂР°РјРµС‚СЂС‹ СЃР»РµРґСѓРµС‚ СѓРєР°Р·С‹РІР°С‚СЊ РґРѕ РЅР°С‡Р°Р»Р°
+      СЂР°Р±РѕС‚С‹ СЃ С„СѓРЅРєС†РёСЏРјРё ReadXXX РёР»Рё WriteXXX }
     procedure SetConnectionParams(AServerName: string; APort: Integer; ADataBase: string;
       AUserName: string; APassword: string; ACharSet: string); virtual;
 
-    { Начало работы с объектом. Рекомендуется вызывать при чтении/записи большого
-      количества параметров. Это ускоряет работу, если используется активная
-      работа с пулом подключений }
+    { РќР°С‡Р°Р»Рѕ СЂР°Р±РѕС‚С‹ СЃ РѕР±СЉРµРєС‚РѕРј. Р РµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ РІС‹Р·С‹РІР°С‚СЊ РїСЂРё С‡С‚РµРЅРёРё/Р·Р°РїРёСЃРё Р±РѕР»СЊС€РѕРіРѕ
+      РєРѕР»РёС‡РµСЃС‚РІР° РїР°СЂР°РјРµС‚СЂРѕРІ. Р­С‚Рѕ СѓСЃРєРѕСЂСЏРµС‚ СЂР°Р±РѕС‚Сѓ, РµСЃР»Рё РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ Р°РєС‚РёРІРЅР°СЏ
+      СЂР°Р±РѕС‚Р° СЃ РїСѓР»РѕРј РїРѕРґРєР»СЋС‡РµРЅРёР№ }
     procedure BeginWork; virtual;
 
-    { Окончание работы с объектом. Предварительно должен быть вызван метод BeginWork }
+    { РћРєРѕРЅС‡Р°РЅРёРµ СЂР°Р±РѕС‚С‹ СЃ РѕР±СЉРµРєС‚РѕРј. РџСЂРµРґРІР°СЂРёС‚РµР»СЊРЅРѕ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РІС‹Р·РІР°РЅ РјРµС‚РѕРґ BeginWork }
     procedure EndWork; virtual;
 
-    { Позволяет указать имя пользователя (по умолчанию берется имя текущего пользователя Windows) }
+    { РџРѕР·РІРѕР»СЏРµС‚ СѓРєР°Р·Р°С‚СЊ РёРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ Р±РµСЂРµС‚СЃСЏ РёРјСЏ С‚РµРєСѓС‰РµРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ Windows) }
     property UserName: string read GetUserName write SetUserName;
 
-    { Позволяет указать имя компьютера (по умолчанию берется имя текущего компьютера) }
+    { РџРѕР·РІРѕР»СЏРµС‚ СѓРєР°Р·Р°С‚СЊ РёРјСЏ РєРѕРјРїСЊСЋС‚РµСЂР° (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ Р±РµСЂРµС‚СЃСЏ РёРјСЏ С‚РµРєСѓС‰РµРіРѕ РєРѕРјРїСЊСЋС‚РµСЂР°) }
     property ComputerName: string read GetComputerName write SetComputerName;
 
-    { Позволяет указать имя профиля из пула подключений (по умолчанию берется FBDefDB) }
+    { РџРѕР·РІРѕР»СЏРµС‚ СѓРєР°Р·Р°С‚СЊ РёРјСЏ РїСЂРѕС„РёР»СЏ РёР· РїСѓР»Р° РїРѕРґРєР»СЋС‡РµРЅРёР№ (РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ Р±РµСЂРµС‚СЃСЏ FBDefDB) }
     property PoolProfileName: string read GetPoolProfileName write SetPoolProfileName;
 
   public
-    {Конструктор. Параметр только один: AlwaysConnected. Если он = TRUE, то подключение
-     к базе данных устанавливается один раз (берется из пула) и держится на всем
-     протяжении работы программы. Если он = FALSE, то подключение берется из пула
-     только на момент выполнения операций ReadXXX и WriteXXX)}
-    { Позволяет указать имя файла (имитация нескольких INI-файлов). По умолчанию: CONF
-      Если раньше Ваше приложение работало с множеством INI-файлов, то Вы можете
-      при создании объекта указать имя INI-файла. Приложение претерпит минимум изменений. }
+    {РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ. РџР°СЂР°РјРµС‚СЂ С‚РѕР»СЊРєРѕ РѕРґРёРЅ: AlwaysConnected. Р•СЃР»Рё РѕРЅ = TRUE, С‚Рѕ РїРѕРґРєР»СЋС‡РµРЅРёРµ
+     Рє Р±Р°Р·Рµ РґР°РЅРЅС‹С… СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚СЃСЏ РѕРґРёРЅ СЂР°Р· (Р±РµСЂРµС‚СЃСЏ РёР· РїСѓР»Р°) Рё РґРµСЂР¶РёС‚СЃСЏ РЅР° РІСЃРµРј
+     РїСЂРѕС‚СЏР¶РµРЅРёРё СЂР°Р±РѕС‚С‹ РїСЂРѕРіСЂР°РјРјС‹. Р•СЃР»Рё РѕРЅ = FALSE, С‚Рѕ РїРѕРґРєР»СЋС‡РµРЅРёРµ Р±РµСЂРµС‚СЃСЏ РёР· РїСѓР»Р°
+     С‚РѕР»СЊРєРѕ РЅР° РјРѕРјРµРЅС‚ РІС‹РїРѕР»РЅРµРЅРёСЏ РѕРїРµСЂР°С†РёР№ ReadXXX Рё WriteXXX)}
+    { РџРѕР·РІРѕР»СЏРµС‚ СѓРєР°Р·Р°С‚СЊ РёРјСЏ С„Р°Р№Р»Р° (РёРјРёС‚Р°С†РёСЏ РЅРµСЃРєРѕР»СЊРєРёС… INI-С„Р°Р№Р»РѕРІ). РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ: CONF
+      Р•СЃР»Рё СЂР°РЅСЊС€Рµ Р’Р°С€Рµ РїСЂРёР»РѕР¶РµРЅРёРµ СЂР°Р±РѕС‚Р°Р»Рѕ СЃ РјРЅРѕР¶РµСЃС‚РІРѕРј INI-С„Р°Р№Р»РѕРІ, С‚Рѕ Р’С‹ РјРѕР¶РµС‚Рµ
+      РїСЂРё СЃРѕР·РґР°РЅРёРё РѕР±СЉРµРєС‚Р° СѓРєР°Р·Р°С‚СЊ РёРјСЏ INI-С„Р°Р№Р»Р°. РџСЂРёР»РѕР¶РµРЅРёРµ РїСЂРµС‚РµСЂРїРёС‚ РјРёРЅРёРјСѓРј РёР·РјРµРЅРµРЅРёР№. }
     constructor Create(AFileName: string; AlwaysConnected: Boolean);
 
-    {Деструктор}
+    {Р”РµСЃС‚СЂСѓРєС‚РѕСЂ}
     destructor Destroy; override;
   end;
 
-{Создает объект TFBIniFile}
+{РЎРѕР·РґР°РµС‚ РѕР±СЉРµРєС‚ TFBIniFile}
 function FBCreateIniFile(AFileName: string; AlwaysConnected: Boolean): TFBIniFile;
 
-{Уничтожает заданный объект TFBIniFile}
+{РЈРЅРёС‡С‚РѕР¶Р°РµС‚ Р·Р°РґР°РЅРЅС‹Р№ РѕР±СЉРµРєС‚ TFBIniFile}
 procedure FBFreeIniFile(Ini: TFBIniFile);
 
-{$IFDEF FBUTILSDLL} // Замечания по директиве смотрите в модуле fbUtilsBase.pas
+{$IFDEF FBUTILSDLL} // Р—Р°РјРµС‡Р°РЅРёСЏ РїРѕ РґРёСЂРµРєС‚РёРІРµ СЃРјРѕС‚СЂРёС‚Рµ РІ РјРѕРґСѓР»Рµ fbUtilsBase.pas
 exports
   FBCreateIniFile name 'ibxFBCreateIniFile',
   FBFreeIniFile name 'ibxFBFreeIniFile';
@@ -384,8 +393,8 @@ exports
 implementation
 
 const
-  SAnyComp = '*'; // Любой компьютер
-  SAnyUser = '*'; // ВСЕ пользователи
+  SAnyComp = '*'; // Р›СЋР±РѕР№ РєРѕРјРїСЊСЋС‚РµСЂ
+  SAnyUser = '*'; // Р’РЎР• РїРѕР»СЊР·РѕРІР°С‚РµР»Рё
 
 function FBCreateIniFile(AFileName: string; AlwaysConnected: Boolean): TFBIniFile;
 begin
@@ -404,7 +413,7 @@ begin
   FCritSect.Enter;
   try
     if FWasBeginWorkCall then
-      raise Exception.Create('Call of TFBIniFile.EndWork was skipped!'); // Где-то не был вызван метод TFBIniFile.EndWork
+      raise Exception.Create('Call of TFBIniFile.EndWork was skipped!'); // Р“РґРµ-С‚Рѕ РЅРµ Р±С‹Р» РІС‹Р·РІР°РЅ РјРµС‚РѕРґ TFBIniFile.EndWork
     FWasBeginWorkCall := True;
     ConnectDB(False);
   except
@@ -420,16 +429,16 @@ end;
 procedure TFBIniFile.CheckParams(const Section, Key: string; CheckKey: Boolean = True);
 begin
   if Section = '' then
-    raise Exception.Create('Section name is empty!'); //Имя секции не указано
+    raise Exception.Create('Section name is empty!'); //РРјСЏ СЃРµРєС†РёРё РЅРµ СѓРєР°Р·Р°РЅРѕ
 
   if CheckKey then
     if Key = '' then
-      raise Exception.Create('Parameter name is empty!'); // Имя параметра не указано
+      raise Exception.Create('Parameter name is empty!'); // РРјСЏ РїР°СЂР°РјРµС‚СЂР° РЅРµ СѓРєР°Р·Р°РЅРѕ
 end;
 
 procedure TFBIniFile.ConnectDB(Internal: Boolean);
 begin
-  if FDB = nil then // Если объект подключения к БД еще не создан...
+  if FDB = nil then // Р•СЃР»Рё РѕР±СЉРµРєС‚ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Р‘Р” РµС‰Рµ РЅРµ СЃРѕР·РґР°РЅ...
   begin
     if FConnParams.cpDataBase <> '' then
       FDB := FBPoolGetConnectionByParams(FConnParams.cpServerName, FConnParams.cpPort,
@@ -459,7 +468,7 @@ begin
   FComputerName := GetCurrentComputerName;
   FUserName := GetCurrentUserName;
   FFileName := AFileName;
-  FPoolProfileName := FBDefDB; // Имя профиля параметров подключений в пуле по умолчанию
+  FPoolProfileName := FBDefDB; // РРјСЏ РїСЂРѕС„РёР»СЏ РїР°СЂР°РјРµС‚СЂРѕРІ РїРѕРґРєР»СЋС‡РµРЅРёР№ РІ РїСѓР»Рµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
   FObjs := TObjHolder.Create;
 
   FObjs.RegObj(FCritSect, TCriticalSection.Create);
@@ -494,8 +503,8 @@ end;
 
 destructor TFBIniFile.Destroy;
 begin
-  FAlwaysConnected := False; // Отключаем режим "постоянное подключение"
-  DisconnectDB(True);        // Отключаемся от базы данных
+  FAlwaysConnected := False; // РћС‚РєР»СЋС‡Р°РµРј СЂРµР¶РёРј "РїРѕСЃС‚РѕСЏРЅРЅРѕРµ РїРѕРґРєР»СЋС‡РµРЅРёРµ"
+  DisconnectDB(True);        // РћС‚РєР»СЋС‡Р°РµРјСЃСЏ РѕС‚ Р±Р°Р·С‹ РґР°РЅРЅС‹С…
   FObjs.Free;
   inherited;
 end;
@@ -504,9 +513,9 @@ procedure TFBIniFile.DisconnectDB(Internal: Boolean);
 begin
   if not FAlwaysConnected then
   begin
-    if FWasBeginWorkCall then // Если вызван метод BeginWork
-      if Internal then        // и если это внутренний вызов
-        Exit;                 // то подключение не прерываем
+    if FWasBeginWorkCall then // Р•СЃР»Рё РІС‹Р·РІР°РЅ РјРµС‚РѕРґ BeginWork
+      if Internal then        // Рё РµСЃР»Рё СЌС‚Рѕ РІРЅСѓС‚СЂРµРЅРЅРёР№ РІС‹Р·РѕРІ
+        Exit;                 // С‚Рѕ РїРѕРґРєР»СЋС‡РµРЅРёРµ РЅРµ РїСЂРµСЂС‹РІР°РµРј
 
     if Assigned(FDB) then
     begin
@@ -525,7 +534,7 @@ procedure TFBIniFile.EndWork;
 begin
   try
     if not FWasBeginWorkCall then
-      raise Exception.Create('Call of TFBIniFile.BeginWork was skipped'); // Был пропущен вызов TFBIniFile.BeginWork
+      raise Exception.Create('Call of TFBIniFile.BeginWork was skipped'); // Р‘С‹Р» РїСЂРѕРїСѓС‰РµРЅ РІС‹Р·РѕРІ TFBIniFile.BeginWork
 
     try
       DisconnectDB(False);
@@ -646,7 +655,7 @@ begin
           ms.Position := 0;
           ms.Read(Buffer, Result);
           if Result < BufSize then
-          begin // Обнуляем оставшуюся часть буфера
+          begin // РћР±РЅСѓР»СЏРµРј РѕСЃС‚Р°РІС€СѓСЋСЃСЏ С‡Р°СЃС‚СЊ Р±СѓС„РµСЂР°
             Ar := @Buffer;
             for I := Result to BufSize - 1 do
               Ar[I] := 0;
@@ -1022,8 +1031,8 @@ var
 begin
   AList := TStringList.Create;
   try
-    DoReadSections(AnyComp, AnyUser, AList); // Считываем имена всех секций
-    Result := AList.IndexOf(Section) >= 0;   // Проверяем, есть ли среди них искомая секция
+    DoReadSections(AnyComp, AnyUser, AList); // РЎС‡РёС‚С‹РІР°РµРј РёРјРµРЅР° РІСЃРµС… СЃРµРєС†РёР№
+    Result := AList.IndexOf(Section) >= 0;   // РџСЂРѕРІРµСЂСЏРµРј, РµСЃС‚СЊ Р»Рё СЃСЂРµРґРё РЅРёС… РёСЃРєРѕРјР°СЏ СЃРµРєС†РёСЏ
   finally
     AList.Free;
   end;
@@ -1044,7 +1053,7 @@ procedure TFBIniFile.SetComputerName(const Value: string);
 begin
   if Trim(Value) = '' then
     raise Exception.Create('Computer name is empty');
-  FCritSect.Enter; // На всякий случай защищаем переменную с помощью крит. секции
+  FCritSect.Enter; // РќР° РІСЃСЏРєРёР№ СЃР»СѓС‡Р°Р№ Р·Р°С‰РёС‰Р°РµРј РїРµСЂРµРјРµРЅРЅСѓСЋ СЃ РїРѕРјРѕС‰СЊСЋ РєСЂРёС‚. СЃРµРєС†РёРё
   FComputerName := Value;
   FCritSect.Leave;
 end;
@@ -1056,7 +1065,7 @@ begin
   begin
     cpServerName := AServerName;
     cpPort := APort;
-    cpDataBase := ADataBase; // Имя базы данных как раз определяет, нужно ли использовать FConnParams
+    cpDataBase := ADataBase; // РРјСЏ Р±Р°Р·С‹ РґР°РЅРЅС‹С… РєР°Рє СЂР°Р· РѕРїСЂРµРґРµР»СЏРµС‚, РЅСѓР¶РЅРѕ Р»Рё РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ FConnParams
     cpUserName := AUserName;
     cpPassword := APassword;
     cpCharSet := ACharSet;
@@ -1091,7 +1100,7 @@ end;
 
 procedure TFBIniFile.SetPoolProfileName(const Value: string);
 begin
-  FCritSect.Enter; // На всякий случай защищаем переменную с помощью крит. секции
+  FCritSect.Enter; // РќР° РІСЃСЏРєРёР№ СЃР»СѓС‡Р°Р№ Р·Р°С‰РёС‰Р°РµРј РїРµСЂРµРјРµРЅРЅСѓСЋ СЃ РїРѕРјРѕС‰СЊСЋ РєСЂРёС‚. СЃРµРєС†РёРё
   FPoolProfileName := Value;
   FCritSect.Leave;
 end;
@@ -1226,6 +1235,11 @@ procedure TFBIniFile.DoWriteStream(AnyComp, AnyUser: Boolean; const Section,
 var
   ds: TIBDataSet;
   OldHash, NewHash: string;
+  {$IFDEF FPC}
+  ibxParam: ISQLParam;
+  ibxBlob: IBlob;
+  sTmp: string;
+  {$ENDIF}
 begin
   try
     FCritSect.Enter;
@@ -1233,13 +1247,13 @@ begin
       ConnectDB(True);
       try
         AStream.Position := 0;
-        // Вычисляем хэш
+        // Р’С‹С‡РёСЃР»СЏРµРј С…СЌС€
         NewHash := CalcStreamHash(AStream);
 
         if InternalValueExists(AnyComp, AnyUser, Section, Key, OldHash, True) then
         begin
           if FBIniCheckBlobHash then
-            if NewHash = OldHash then Exit; // Если то же самое значение, то выходим
+            if NewHash = OldHash then Exit; // Р•СЃР»Рё С‚Рѕ Р¶Рµ СЃР°РјРѕРµ Р·РЅР°С‡РµРЅРёРµ, С‚Рѕ РІС‹С…РѕРґРёРј
           ds := dsUpd;
         end
         else
@@ -1249,9 +1263,16 @@ begin
         try
           SetParams(ds, AnyComp, AnyUser, Section, Key);
           ds.ParamByName('PARAMVALUE').Clear;
+
+          {$IFDEF FPC}
+          ibxBlob := FDB.Attachment.CreateBlob(FTranW.TransactionIntf, FBIniTableConfigParams, FBIniFieldParamBlob);
+          ibxBlob.LoadFromStream(AStream);
+          ds.ParamByName('PARAMBLOB').AsBlob := ibxBlob;
+          {$ELSE}
           ds.ParamByName('PARAMBLOB').LoadFromStream(AStream);
+          {$ENDIF}
           ds.ParamByName('PARAMBLOBHASH').AsString := NewHash;
-          ds.ParamByName('MODIFYUSER').AsString := FUserName; // Без AnsiUpperCase
+          ds.ParamByName('MODIFYUSER').AsString := FUserName; // Р‘РµР· AnsiUpperCase
           ds.ExecSQL;
 
           FTranW.Commit;
@@ -1283,7 +1304,7 @@ begin
       try
         if InternalValueExists(AnyComp, AnyUser, Section, Key, OldValue, False) then
         begin
-          if OldValue = Value then Exit; // Если то же самое значение, то выходим
+          if OldValue = Value then Exit; // Р•СЃР»Рё С‚Рѕ Р¶Рµ СЃР°РјРѕРµ Р·РЅР°С‡РµРЅРёРµ, С‚Рѕ РІС‹С…РѕРґРёРј
           ds := dsUpd;
         end
         else
@@ -1295,7 +1316,7 @@ begin
           ds.ParamByName('PARAMVALUE').AsString := Value;
           ds.ParamByName('PARAMBLOB').Clear;
           ds.ParamByName('PARAMBLOBHASH').Clear;
-          ds.ParamByName('MODIFYUSER').AsString := FUserName; // Без AnsiUpperCase
+          ds.ParamByName('MODIFYUSER').AsString := FUserName; // Р‘РµР· AnsiUpperCase
           ds.ExecSQL;
 
           FTranW.Commit;
@@ -1321,7 +1342,7 @@ var
   ws: WideString;
   ms: TMemoryStream;
 begin
-  ws := Value; {для НЕ-юникодных Дельфи произойдет автоматическая перекодировка}
+  ws := Value; {РґР»СЏ РќР•-СЋРЅРёРєРѕРґРЅС‹С… Р”РµР»СЊС„Рё РїСЂРѕРёР·РѕР№РґРµС‚ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєР°СЏ РїРµСЂРµРєРѕРґРёСЂРѕРІРєР°}
   ms := TMemoryStream.Create;
   try
     if ws <> '' then
