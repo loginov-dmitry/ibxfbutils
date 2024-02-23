@@ -358,6 +358,15 @@ object Form1: TForm1
       Caption = #1044#1086#1073'. '#1079#1072#1087#1080#1089#1077#1081':'
     end
   end
+  object Button1: TButton
+    Left = 568
+    Top = 200
+    Width = 75
+    Height = 25
+    Caption = 'Button1'
+    TabOrder = 6
+    OnClick = Button1Click
+  end
   object IBTransaction1: TIBTransaction
     Left = 480
     Top = 72

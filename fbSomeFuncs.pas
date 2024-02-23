@@ -1,4 +1,8 @@
-﻿{
+﻿{$IFDEF FPC}
+{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
+{$ENDIF}
+
+{
 Copyright (c) 2012-2013, Loginov Dmitry Sergeevich
 All rights reserved.
 
@@ -42,10 +46,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Все они протестированы годами.
 Здесь находятся только те функции, которые используются в fbUtils
 }
-
-{$IFDEF FPC}
-{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
-{$ENDIF}
 
 unit fbSomeFuncs;
 
@@ -449,14 +449,20 @@ begin
 end;
 
 function GetCurrentUserName: string;
+{$IfDef MSWINDOWS}
 var
   AUserName: string;
   ASize: Cardinal;
+{$EndIf}
 begin
+  {$IfDef MSWINDOWS}
   SetLength(AUserName, 100);
   ASize := 100;
   GetUserName(PChar(AUserName), ASize);
   Result := PChar(AUserName);
+  {$Else}
+  Result := GetEnvironmentVariable('USER');
+  {$EndIf}
 end;
 
 

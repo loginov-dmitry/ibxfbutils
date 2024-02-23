@@ -1,3 +1,7 @@
+﻿{$IFDEF FPC}
+{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
+{$ENDIF}
+
 {
 Copyright (c) 2012-2013, Loginov Dmitry Sergeevich
 All rights reserved.
@@ -60,19 +64,15 @@ Firebird. А если ранее на компьютере был установ
 
 unit fbUtilsLoading;
 
-{$IFDEF FPC}
-  {$MODE Delphi}
-{$ENDIF}
-
 interface
 
 uses
 {$IFnDEF FPC}
-  Windows,
+  Windows, IBIntf,
 {$ELSE}
   {$IFDEF MSWINDOWS}Windows, {$ENDIF}LCLIntf, LCLType, LMessages,
 {$ENDIF}
-  SysUtils{, IBIntf};
+  SysUtils;
 
 {$IFnDEF FPC}
 {$IF RTLVersion >= 23.00}

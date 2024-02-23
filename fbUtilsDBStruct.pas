@@ -1,4 +1,8 @@
-﻿{
+﻿{$IFDEF FPC}
+{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
+{$ENDIF}
+
+{
 Copyright (c) 2012-2013, Loginov Dmitry Sergeevich
 All rights reserved.
 
@@ -41,10 +45,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 использовать при разработке коробочных приложений, где структура базы данных
 зачастую относительно простая.
 }
-
-{$IFDEF FPC}
-{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
-{$ENDIF}
 
 unit fbUtilsDBStruct;
     

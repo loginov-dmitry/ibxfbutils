@@ -1,4 +1,8 @@
-﻿{
+﻿{$IFDEF FPC}
+{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
+{$ENDIF}
+
+{
 Copyright (c) 2012-2013, Loginov Dmitry Sergeevich
 All rights reserved.
 
@@ -64,10 +68,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 При желании Вы можете сделать целочисленный автоинкрементный первичный ключ, а указанные
 здесь (в PRIMARY KEY) поля оформить в виде уникального индекса
 }
-
-{$IFDEF FPC}
-{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
-{$ENDIF}
 
 unit fbUtilsIniFiles;
    

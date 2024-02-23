@@ -1,3 +1,7 @@
+{$IFDEF FPC}
+{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
+{$ENDIF}
+
 {
 Copyright (c) 2012-2013, Loginov Dmitry Sergeevich
 All rights reserved.
@@ -76,10 +80,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Перед началом работы рекомендуется ознакомиться с файлом ibxfbutils.html
 }
 
-{$IFDEF FPC}
-{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
-{$ENDIF}
-
 unit ibxFBUtils;
 
 interface
@@ -87,7 +87,7 @@ uses
 {$IFnDEF FPC}
   Windows,
 {$ELSE}
-  LCLIntf, LCLType, LazUTF8,
+  LCLIntf, LCLType, //LMessages, LazUTF8,
 {$ENDIF}
   SysUtils, Classes, IBDatabase, IBCustomDataSet, fbTypes, ParamsUtils, Variants;
 
@@ -680,6 +680,8 @@ type
     function GetLibHandle: THandle;
 
     procedure WriteToLog(AMessage: string; MsgType: Integer = 0);
+
+    function FieldExists(FDB: TIBDatabase; FTran: TIBTransaction; const TableName: string; const FieldName: string): Boolean;
   public {Некоторые дополнительные функции}
 
     {Преобразует дату/время в строку в формате "yyyy-mm-dd hh:nn:ss.zzz"}
@@ -1146,6 +1148,19 @@ procedure TfbUtils.ExecuteBlock(FDB: TIBDataBase; FTran: TIBTransaction;
   VarDesc, Body: string);
 begin
   FBExecuteBlockProc(FDB, FTran, VarDesc, Body, FModuleName);
+end;
+
+function TfbUtils.FieldExists(FDB: TIBDatabase; FTran: TIBTransaction;
+  const TableName, FieldName: string): Boolean;
+var
+  ds: TIBDataSet;
+begin
+  ds := CreateAndOpenDataSet(FDB, FTran, Format('SELECT FIRST 0 * FROM "%s"', [TableName]), [], []);
+  try
+    Result := Assigned(ds.FindField(FieldName));
+  finally
+    ds.Free;
+  end;
 end;
 
 procedure TfbUtils.FreeConnection(FDB: TIBDatabase);

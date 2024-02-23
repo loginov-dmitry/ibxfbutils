@@ -1,4 +1,8 @@
-﻿{
+﻿{$IFDEF FPC}
+{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
+{$ENDIF}
+
+{
 Copyright (c) 2012-2013, Loginov Dmitry Sergeevich
 All rights reserved.
 
@@ -37,10 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 {                                                                             }
 { *************************************************************************** }
 
-{$IFDEF FPC}
-{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
-{$ENDIF}
-
 unit fbUtilsBackupRestore;
 
 interface
@@ -48,7 +48,7 @@ uses
 {$IFnDEF FPC}
   Windows,
 {$ELSE}
-  {$IFDEF MSWINDOWS}Windows, {$ENDIF}LCLIntf, LCLType, LMessages, LazUTF8,
+  {$IFDEF MSWINDOWS}Windows,{$ELSE}FileUtil, {$ENDIF}LCLIntf, LCLType, LMessages, LazUTF8,
 {$ENDIF}
   SysUtils, Classes, IBDatabase, IBServices, IB, fbSomeFuncs, fbUtilsBase, fbTypes;
 
@@ -195,11 +195,13 @@ begin
 
     if FileExists(ADestBackupFileOnClient) then
       if not DeleteFile(ADestBackupFileOnClient) then
-        raise Exception.CreateFmt(FBStrCanNotDeleteFile, [ADestBackupFileOnClient, SysErrorMessage(GetLastError)]);
+        raise Exception.CreateFmt(FBStrCanNotDeleteFile, [ADestBackupFileOnClient,
+          SysErrorMessage({$IfNDef FPC}GetLastError{$Else}GetLastOSError{$EndIf})]);
 
     if not CopyFile(PChar(ASourBackupFileOnServer), PChar(ADestBackupFileOnClient), True) then
       raise Exception.CreateFmt(FBStrCanNotCopyFile,
-        [ASourBackupFileOnServer, ADestBackupFileOnClient, SysErrorMessage(GetLastError)]);
+        [ASourBackupFileOnServer, ADestBackupFileOnClient,
+          SysErrorMessage({$IfNDef FPC}GetLastError{$Else}GetLastOSError{$EndIf})]);
 
     if TryDeleteSourBackupFile then
       DeleteFile(ASourBackupFileOnServer); // В случае неудачи ошибка не выдается!
@@ -293,12 +295,14 @@ begin
 
     if FileExists(ABackupFileOnServer) then
       if not DeleteFile(ABackupFileOnServer) then
-        raise Exception.CreateFmt(FBStrCanNotDeleteFile, [ABackupFileOnServer, SysErrorMessage(GetLastError)]);
+        raise Exception.CreateFmt(FBStrCanNotDeleteFile, [ABackupFileOnServer,
+          SysErrorMessage({$IfNDef FPC}GetLastError{$Else}GetLastOSError{$EndIf})]);
 
     // Копируем файл бэкапа на сервер
     if not CopyFile(PChar(ABackupFileOnClient), PChar(ABackupFileOnServer), True) then
       raise Exception.CreateFmt(FBStrCanNotCopyFile,
-        [ABackupFileOnClient, ABackupFileOnServer, SysErrorMessage(GetLastError)]);
+        [ABackupFileOnClient, ABackupFileOnServer,
+          SysErrorMessage({$IfNDef FPC}GetLastError{$Else}GetLastOSError{$EndIf})]);
 
     // Осуществляет восстановление БД из резервной копии
     FBRestoreDatabaseOnServer(AServerName, APort, ADBName, ABackupFile,

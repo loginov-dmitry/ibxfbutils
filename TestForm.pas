@@ -1,3 +1,8 @@
+﻿{$IFDEF FPC}
+{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
+{$WARN 6058 off : Call to subroutine "$1" marked as inline is not inlined}
+{$ENDIF}
+
 {
 Copyright (c) 2012-2013, Loginov Dmitry Sergeevich
 All rights reserved.
@@ -23,13 +28,8 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 }
 
-{$IFDEF FPC}
-{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
-{$ENDIF}
-
 unit TestForm;
 
-{$WARN 6058 off : Call to subroutine "$1" marked as inline is not inlined}
 interface
 
 uses
@@ -47,7 +47,7 @@ type
   { TForm1 }
 
   TForm1 = class(TForm)
-    Button1: TButton;
+
     IBTransaction1: TIBTransaction;
     Memo1: TMemo;
     Memo2: TMemo;
@@ -88,6 +88,7 @@ type
     labInsCount: TLabel;
     Label15: TLabel;
     Label14: TLabel;
+    Button1: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure btnChooseDBClick(Sender: TObject);

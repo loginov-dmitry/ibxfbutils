@@ -1,3 +1,7 @@
+{$IFDEF FPC}
+{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
+{$ENDIF}
+
 {
 Copyright (c) 2012-2013, Loginov Dmitry Sergeevich
 All rights reserved.
@@ -35,10 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 { e-mail: loginov_d@inbox.ru                                                  }
 {                                                                             }
 { *************************************************************************** }
-
-{$IFDEF FPC}
-{$MODE DELPHI}{$H+}{$CODEPAGE UTF8}
-{$ENDIF}
 
 unit fbTypes;
 
@@ -164,7 +164,12 @@ implementation
 
 procedure FBUpdateFormatSettings;
 begin
+  {$IfDef MSWINDOWS}
   GetLocaleFormatSettings(0, FBFormatSettings);
+  {$Else}
+  FBFormatSettings := DefaultFormatSettings;
+  {$EndIf}
+
   FBFormatSettings.LongDateFormat := 'yyyy/mm/dd';
   FBFormatSettings.ShortDateFormat := 'yyyy/mm/dd';
   FBFormatSettings.LongTimeFormat := 'hh:nn:ss.zzz';
