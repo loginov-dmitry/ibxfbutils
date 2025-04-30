@@ -53,13 +53,14 @@ begin
   // Подключаемся к базе данных + создаем транзакцию RCRW
   fdb := fb.CreateConnection('localhost', FBDefPort, 'C:\TEMP\TEST.FDB',
     FBDefUser, FBDefPassword, FBRusCharSet, trRCRW);
-  // Добавляем новую запись в таблицу
-  fb.InsertRecord(fdb, nil, 'TESTTABLE', ['ID', 'NAME', 'SUMMA'],
-    [1, 'FIREBIRD - FOREVER', 100500]);
-  // Подтверждение транзакции
-  fdb.DefaultTransaction.Commit;
-  // Удаление подключения к БД
-  fb.FreeConnection(fdb);
+  try
+    // Добавляем новую запись в таблицу
+    fb.InsertRecordDB(fdb, nil, 'TESTTABLE', ['ID', 1, 'NAME', 'FIREBIRD - FOREVER', 'SUMMA', 100500]);
+  
+    fdb.DefaultTransaction.Commit; // Подтверждение транзакции
+  finally    
+    fb.FreeConnection(fdb); // Удаление подключения к БД
+  end;
 end;
 ```
 
